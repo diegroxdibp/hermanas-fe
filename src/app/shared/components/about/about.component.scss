@@ -1,0 +1,6 @@
+@use "../../../../assets/styles/palette.scss" as palette;
+
+.persons {
+  display: flex;
+  flex-direction: column;
+}

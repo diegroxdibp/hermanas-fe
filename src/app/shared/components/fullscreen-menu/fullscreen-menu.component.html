@@ -1,0 +1,71 @@
+<button class="menu-button" (click)="toggleMenu()">
+  <!-- <span [class.open]="isMenuOpen">☰</span> -->
+  <svg
+    [class.open]="isMenuOpen"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    width="40px"
+    height="40px"
+    viewBox="0 0 32 32"
+    enable-background="new 0 0 32 32"
+    id="Editable-line"
+    version="1.1"
+    xml:space="preserve"
+  >
+    <line
+      fill="none"
+      id="XMLID_103_"
+      stroke="#0a4c6e"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-miterlimit="10"
+      stroke-width="2"
+      x1="7"
+      x2="25"
+      y1="16"
+      y2="16"
+    />
+    <line
+      fill="none"
+      id="XMLID_102_"
+      stroke="#0a4c6e"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-miterlimit="10"
+      stroke-width="2"
+      x1="7"
+      x2="25"
+      y1="25"
+      y2="25"
+    />
+    <line
+      fill="none"
+      id="XMLID_101_"
+      stroke="#0a4c6e"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-miterlimit="10"
+      stroke-width="2"
+      x1="7"
+      x2="25"
+      y1="7"
+      y2="7"
+    />
+  </svg>
+</button>
+
+<div
+  class="fullscreen-menu"
+  [@menuAnimation]="isMenuOpen ? 'open' : 'closed'"
+  *ngIf="isMenuOpen"
+>
+  <nav>
+    <ul>
+      <li *ngFor="let navigationItem of navigationService.navigationItems">
+        <a (click)="navigateTo(navigationItem.destination)" class="menu-item">{{
+          navigationItem.name
+        }}</a>
+      </li>
+    </ul>
+  </nav>
+</div>

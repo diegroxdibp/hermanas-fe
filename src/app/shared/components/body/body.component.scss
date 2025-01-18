@@ -1,0 +1,101 @@
+@use "../../../../assets/styles/breakpoints.scss" as breakpoint;
+@use "../../../../assets/styles/palette.scss" as palette;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: palette.$supportingColor2;
+
+  content {
+    display: flex;
+    flex-direction: column;
+    background-color: palette.$supportingColor2;
+    width: 100%;
+    margin: 1em 0;
+    align-items: center;
+
+    .introduction,
+    .services-description {
+      padding: 0 1.5em;
+      margin: 2em 0;
+    }
+
+    section {
+      img {
+        margin: 1em 0;
+      }
+
+      .services {
+        display: flex;
+        flex-direction: column;
+        gap: 2em;
+        margin: 2em 0;
+      }
+
+      .services-description {
+        margin: 0 !important;
+      }
+    }
+  }
+
+  @media (min-width: breakpoint.$breakpoint-lg) {
+    app-hero {
+      margin-bottom: 4em;
+    }
+
+    section {
+      padding: 0;
+      margin-bottom: 6em;
+      width: 100%;
+      // max-width: 800px;
+      max-width: 1140px;
+
+      img {
+        margin: 4em 0;
+      }
+    }
+  }
+}
+
+.service {
+  padding: 2em;
+  .service-type {
+    display: flex;
+    justify-content: space-between;
+  }
+}
+
+.service:nth-of-type(odd) {
+  background-color: palette.$supportingColor1;
+}
+
+.service:nth-of-type(even) {
+  background-color: palette.$supportingColor2;
+}
+
+.service-type {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 8px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+  padding: 12px;
+  cursor: pointer;
+}
+
+.content {
+  padding: 12px;
+}
+
+
+
+svg {
+  height: 40px;
+  color: palette.$primaryColor;
+}

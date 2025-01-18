@@ -1,0 +1,22 @@
+<!-- Left Image -->
+<picture class="card-image">
+  <img [src]="imgUrl()" alt="Therapy" />
+</picture>
+
+<!-- Content -->
+<div class="card-content">
+  <div class="card-header">
+    <h2>{{ title() }}</h2>
+    @if(subTitle()){
+    <p>{{ subTitle()}}</p>
+    }
+  </div>
+  <div class="card-text">
+    {{ description() }}
+  </div>
+</div>
+
+<!-- Learn More Button -->
+<div class="card-action">
+  <button class="know-more-btn">Saiba mais</button>
+</div>

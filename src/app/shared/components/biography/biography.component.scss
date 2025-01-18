@@ -1,0 +1,52 @@
+@use "../../../../assets/styles/palette.scss" as palette;
+
+:host {
+  //   padding-top: 80px;
+
+  display: flex;
+  flex-direction: column;
+  background-color: palette.$supportingColor2;
+  width: 100%;
+  max-width: 800px;
+  align-items: center;
+
+  padding: 0 1.5em;
+  // margin: 2em 0;
+
+  .description {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    margin: 1em 0;
+  }
+
+  h2 {
+    font-family: Inter;
+    font-weight: 200;
+    font-size: 16px;
+    letter-spacing: 1.1px;
+    font-style: italic;
+  }
+}
+
+picture {
+  width: 100%; /* Set the desired container width */
+  height: 300px;
+  overflow: hidden; /* Ensures content doesn't overflow */
+  position: relative;
+  mask-repeat: no-repeat;
+  margin: 1.5em 0;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 30%;
+    // Add some extra height to allow for parallax movement
+    min-height: 120%; // Adjust this value based on how much parallax you want
+    will-change: transform; // Performance optimization
+  }
+}
+
+.separator {
+  margin: 0.5em 0;
+}
