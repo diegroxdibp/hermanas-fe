@@ -1,6 +1,6 @@
 <nav class="" id="navbar">
   <!-- <img (click)="navigationService.navigateTo('')" src="/assets/images/logo.png" alt="logo" /> -->
-  @if(!screenSizeService.isMobile()){
+  @if(screenSizeService.isDesktop()){
   <ul>
     <li *ngFor="let navigationItem of navigationService.navigationItems">
       <a (click)="navigateTo(navigationItem.destination)" class="menu-item">{{
@@ -14,7 +14,7 @@
     <li><a href="">Log in</a></li>
     <li><a href="">Sign up</a></li>
   </ul>
-  } } @if(screenSizeService.isMobile()){
+  } } @if(!screenSizeService.isDesktop()){
   <app-fullscreen-menu></app-fullscreen-menu>
   }
 </nav>

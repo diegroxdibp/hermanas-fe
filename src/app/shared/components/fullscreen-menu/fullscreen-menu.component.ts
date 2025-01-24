@@ -1,4 +1,4 @@
-import { CommonModule, NgIf } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { NavigationService } from '../../services/navigation.service';

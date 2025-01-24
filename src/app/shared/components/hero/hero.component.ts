@@ -1,20 +1,30 @@
-import { Component, HostBinding, HostListener } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  HostBinding,
+  HostListener,
+  ViewChild,
+} from '@angular/core';
 import { NavigationBarService } from '../../services/navigation-bar.service';
 import { AppConstants } from '../../../app-constants';
 import { NavbarBackground } from '../../enums/navbar-background.enum';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-hero',
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './hero.component.html',
   styleUrl: './hero.component.scss',
   standalone: true,
 })
 export class HeroComponent {
   @HostBinding('style.height') heroHeight = this.getHeroHeight();
+  @ViewChild('heroImage') heroImage: ElementRef | undefined;
   // Keep track of scroll position
   scrollPosition = 0;
+  private lastScrollPosition = 0;
   private animationFrame: number | null = null;
+  heroImageLoaded: boolean = false;
   @HostListener('window:scroll')
   onWindowScroll() {
     if (!this.animationFrame) {
@@ -26,18 +36,14 @@ export class HeroComponent {
   }
 
   constructor() {}
-  private lastScrollPosition = 0;
 
   ngOnInit() {
     this.updateParallax();
   }
 
-  ngOnDestroy() {
-    if (this.animationFrame) {
-      cancelAnimationFrame(this.animationFrame);
-    }
+  imageLoaded(){
+    console.log('Loaded!')
   }
-
 
   getHeroHeight(): string {
     if (AppConstants.navigation.background === NavbarBackground.Transparent)
@@ -53,5 +59,11 @@ export class HeroComponent {
       image.style.transform = `translate3d(0, ${offset}px, 0)`;
     }
     this.lastScrollPosition = scrollPosition;
+  }
+
+  ngOnDestroy() {
+    if (this.animationFrame) {
+      cancelAnimationFrame(this.animationFrame);
+    }
   }
 }
