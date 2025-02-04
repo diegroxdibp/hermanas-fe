@@ -1,3 +1,4 @@
+import { ScreenSizeService } from './../../services/screen-size.service';
 import { Component, computed, OnInit, signal, Signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Bio } from '../../models/bio.model';
@@ -28,7 +29,10 @@ export class BiographyComponent implements OnInit {
     return this.targetNames.includes(paramValue || '') ? paramValue : null;
   });
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(
+    private route: ActivatedRoute,
+    public screenSize: ScreenSizeService
+  ) {}
 
   ngOnInit(): void {
     this.route.params.subscribe((params) => {

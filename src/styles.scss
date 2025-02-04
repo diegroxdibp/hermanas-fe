@@ -45,6 +45,10 @@ h1 {
   font-weight: 700;
   line-height: 1.2;
   margin: 20px 0 0.2em 0;
+  @media (min-width: breakpoint.$breakpoint-lg) {
+    // font-size: 42px;
+    font-size: 60px;
+  }
 }
 
 h2 {
@@ -64,8 +68,16 @@ p {
   text-align: justify;
   margin: 0 0 0.5em 0;
 
-  @media (min-width: breakpoint.$breakpoint-lg) {
-    font-size: 16px;
+  @media (min-width: breakpoint.$breakpoint-sm) {
+    font-size: 18px;
+    letter-spacing: 1.1px;
+  }
+  
+  @media (min-width: breakpoint.$breakpoint-md) {
+    // font-size: 18px;
+    font-size: 22px;
+    line-height: 32px;
+    letter-spacing: 1.2px;
   }
 }
 

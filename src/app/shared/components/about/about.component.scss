@@ -1,6 +1,14 @@
 @use "../../../../assets/styles/palette.scss" as palette;
+:host {
+  padding: 7em;
+}
 
 .persons {
   display: flex;
   flex-direction: column;
+  gap: 1em;
+
+  a {
+    font-size: 24px;
+  }
 }
