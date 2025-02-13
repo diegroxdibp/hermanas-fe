@@ -1,11 +1,12 @@
 import { AppConstants } from './../../../app-constants';
 import { Component } from '@angular/core';
 import { HeroComponent } from '../hero/hero.component';
-import { ServiceComponent } from '../service/service.component';
 import { CommonModule } from '@angular/common';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatButtonModule } from '@angular/material/button';
 @Component({
   selector: 'app-body',
-  imports: [HeroComponent, ServiceComponent, CommonModule],
+  imports: [HeroComponent, CommonModule, MatButtonModule, MatExpansionModule],
   templateUrl: './body.component.html',
   styleUrl: './body.component.scss',
   standalone: true,

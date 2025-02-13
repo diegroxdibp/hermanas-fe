@@ -1,1 +1,52 @@
-<p>scheduling works!</p>
+<!-- <div class="set-availability">
+    <input type="text">
+</div> -->
+
+
+<mat-form-field class="example-full-width">
+  <mat-label>Choose a date</mat-label>
+  <input matInput [matDatepicker]="picker" [min]="AppConstants.scheduling.minDate" [max]="AppConstants.scheduling.maxDate" placeholder="DD/MM/YYYY" [maskito]="options">
+  <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+  <mat-datepicker touchUi #picker></mat-datepicker>
+</mat-form-field>
+
+
+<!-- <div class="time-slots">
+  <ng-container *ngFor="let slot of timeSlots">
+    <span class="time-slot" [class]="{'unavailable': !availableTimeSlots.includes(slot)}">{{ slot }}</span>
+  </ng-container>
+</div>
+
+
+<form [formGroup]="timeForm" (ngSubmit)="addTimeRange()">
+  <label for="startTime">Start Time:</label>
+  <input
+    id="startTime"
+    formControlName="startTime"
+    maxlength="5"
+    (input)="restrictInput($event)"
+    placeholder="HH:mm"
+  />
+
+  <span>to</span>
+
+  <label for="endTime">End Time:</label>
+  <input
+    id="endTime"
+    formControlName="endTime"
+    maxlength="5"
+    (input)="restrictInput($event)"
+    placeholder="HH:mm"
+  />
+
+  <button type="submit">Add</button>
+</form>
+
+<p *ngIf="errorMessage" style="color: red;">{{ errorMessage }}</p>
+
+<h3>Stored Ranges</h3>
+<ul>
+  <li *ngFor="let range of storedRanges">
+    {{ range.start }} to {{ range.end }}
+  </li>
+</ul> -->

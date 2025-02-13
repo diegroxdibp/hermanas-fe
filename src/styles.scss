@@ -13,12 +13,9 @@ main {
   display: flex;
   flex-direction: column;
   // align-items: center;
-  background-color: palette.$supportingColor2;
+  // background-color: palette.$supportingColor2;
+  background-color: #f0f0f0;
   margin: 0;
-}
-
-main {
-  height: 100%;
 }
 
 ul,
@@ -44,7 +41,8 @@ h1 {
   letter-spacing: 1px;
   font-weight: 700;
   line-height: 1.2;
-  margin: 20px 0 0.2em 0;
+  // margin: 20px 0 0.2em 0;
+  margin: 0;
   @media (min-width: breakpoint.$breakpoint-lg) {
     // font-size: 42px;
     font-size: 60px;
@@ -55,7 +53,7 @@ h2 {
   font-family: Acumin;
   color: palette.$primaryColor;
   font-weight: 700;
-  font-size: 20px;
+  font-size: 24px;
   margin: 0;
 }
 
@@ -63,21 +61,21 @@ p {
   color: palette.$primaryColor;
   font-family: Inter;
   font-size: 14px;
-  font-weight: 400;
+  font-weight: 300;
   line-height: 1.2;
   text-align: justify;
-  margin: 0 0 0.5em 0;
+  margin: 0;
 
   @media (min-width: breakpoint.$breakpoint-sm) {
     font-size: 18px;
     letter-spacing: 1.1px;
   }
-  
+
   @media (min-width: breakpoint.$breakpoint-md) {
     // font-size: 18px;
-    font-size: 22px;
-    line-height: 32px;
-    letter-spacing: 1.2px;
+    font-size: 28px;
+    line-height: 36px;
+    letter-spacing: 1.3px;
   }
 }
 
@@ -290,3 +288,6 @@ a:link {
   font-weight: 700;
   font-style: italic;
 }
+
+// html, body { height: 100%; }
+// body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
