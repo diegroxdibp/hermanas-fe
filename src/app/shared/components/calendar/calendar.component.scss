@@ -1,0 +1,21 @@
+.calendar {
+  display: flex;
+  width: 100%;
+  gap: 12px;
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  .modality {
+    display: flex;
+    height: fit-content;
+  }
+}
+
+
+.unavailable {
+  font-size: 24px;
+  color: gray;
+  cursor: none;
+}

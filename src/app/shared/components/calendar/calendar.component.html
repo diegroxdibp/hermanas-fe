@@ -1,0 +1,23 @@
+<div class="calendar">
+  <mat-form-field class="example-full-width">
+    <mat-label>Choose a date</mat-label>
+    <input
+      matInput
+      [matDatepicker]="picker"
+      [min]="AppConstants.scheduling.minDate"
+      [max]="AppConstants.scheduling.maxDate"
+      [matDatepickerFilter]="isDateAllowed"
+      (dateInput)="onDateInput($event)"
+      placeholder="DD/MM/YYYY"
+      [maskito]="options"
+    />
+    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker [touchUi]="true"></mat-datepicker>
+  </mat-form-field>
+</div>
+
+<!-- <mat-chip-listbox class="mat-mdc-chip-set-stacked" aria-label="Time slots">
+  @for (timeSlot of timeSlots; track $index) {
+  <mat-chip-option selected>{{ timeSlot }}</mat-chip-option>
+  }
+</mat-chip-listbox> -->
