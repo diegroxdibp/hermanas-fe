@@ -1,3 +1,4 @@
+import { ApiService } from './../../../core/services/api.service';
 import { AppConstants } from './../../../app-constants';
 import { Component } from '@angular/core';
 import { HeroComponent } from '../hero/hero.component';
@@ -15,6 +16,8 @@ export class BodyComponent {
   AppConstants = AppConstants;
   // Using an object instead of an array to track expanded state
   expandedItems: { [key: string]: boolean } = {};
+
+  constructor(private ApiService: ApiService) {}
 
   toggleItem(itemId: string) {
     // Toggle only the specific item

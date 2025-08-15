@@ -10,10 +10,25 @@ export class NavigationBarService {
   navbarHeight = signal<number>(NavigationBarService.getNavbarHeight());
   navbarBackground = AppConstants.navigation.background;
   authentication = AppConstants.authentication.exists;
+  background = signal<NavbarBackground>(NavbarBackground.White);
+  position = signal<'auto' | 'fixed'>('auto');
   constructor() {}
 
   static getNavbarHeight(): number {
-    if(AppConstants.navigation.background === NavbarBackground.Transparent) return 0
+    if (AppConstants.navigation.background === NavbarBackground.Transparent)
+      return 0;
     else return AppConstants.navigation.height;
+  }
+
+  setTransparentFixed() {
+    this.background.set(NavbarBackground.Transparent);
+    this.position.set('fixed');
+    console.log('Bg',this.background(),'Pos', this.position())
+  }
+
+  resetDefault() {
+    this.background.set(NavbarBackground.White);
+    this.position.set('auto');
+        console.log('Bg',this.background(),'Pos', this.position())
   }
 }

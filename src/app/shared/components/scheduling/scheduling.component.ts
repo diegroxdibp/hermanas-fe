@@ -1,111 +1,207 @@
-import { AppConstants } from './../../../app-constants';
+import { TherapistModel } from './../../models/therapist.model';
+import { SchedulingService } from './../../services/scheduling.service';
+import { ApiService } from './../../../core/services/api.service';
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
-  FormBuilder,
-  FormGroup,
+  FormControl,
+  FormsModule,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { provideNativeDateAdapter } from '@angular/material/core';
-import { MaskitoDirective } from '@maskito/angular';
-import { MaskitoOptions } from '@maskito/core';
+import { provideNativeDateAdapter, MatOption } from '@angular/material/core';
 import mask from '../../masks/date.mask';
+import { AvailabilityModel } from '../../models/availability.model';
+import { CalendarComponent } from '../calendar/calendar.component';
+import {
+  emptyRadioInputConfiguration,
+  RadioInputConfigurationObject,
+} from '../../models/input-configuration-objects/radio-input-configuration-object';
+import { MatSelectModule } from '@angular/material/select';
+import { MatInputModule } from '@angular/material/input';
+import { MatCardModule } from '@angular/material/card';
+import { AppointmentType } from '../../enums/appointment-type.enum';
+import {
+  CalendarConfigurationObject,
+  emptyCalendarConfiguration,
+} from '../../models/input-configuration-objects/calendar-configuration-object';
+import { RadioInputComponent } from '../radio-input/radio-input.component';
+import { AvailabilitiesComponent } from '../availabilities/availabilities.component';
+import {
+  AvailabilityConfigurationObject,
+  emptyAvailabilityConfiguration,
+} from '../../models/input-configuration-objects/availability-configuration-object';
+import { dayNumberToEnum } from '../../utils/day-to-number-enum.util';
+import { SchedulingFormControlNames } from '../../enums/scheduling-form-control-names.enum';
 @Component({
   selector: 'app-scheduling',
   imports: [
     CommonModule,
     ReactiveFormsModule,
     MatFormFieldModule,
+    CalendarComponent,
+    RadioInputComponent,
+    MatOption,
+    ReactiveFormsModule,
+    MatSelectModule,
+    FormsModule,
     MatInputModule,
-    MatDatepickerModule,
-    MaskitoDirective,
+    MatCardModule,
+    RadioInputComponent,
+    AvailabilitiesComponent,
   ],
   templateUrl: './scheduling.component.html',
   providers: [provideNativeDateAdapter()],
   styleUrl: './scheduling.component.scss',
 })
-export class SchedulingComponent {
-  readonly AppConstants = AppConstants;
-  readonly options: MaskitoOptions = mask;
-  timeSlots: string[] = [
-    '18:30 - 19:30',
-    '19:30 - 20:30',
-    '18:30 - 19:30',
-    '19:30 - 20:30',
-    '20:30 - 21:30',
-    '21:30 - 22:30',
-  ];
-  availableTimeSlots: string[] = [
-    '19:30 - 20:30',
-    '19:30 - 20:30',
-    '20:30 - 21:30',
-  ];
-  timeForm: FormGroup;
-  storedRanges: { start: string; end: string }[] = [];
-  errorMessage: string = '';
+export class SchedulingComponent implements OnInit {
+  calendarConfigurationObject: CalendarConfigurationObject =
+    emptyCalendarConfiguration;
+  availabilityConfigurationObject: AvailabilityConfigurationObject =
+    emptyAvailabilityConfiguration;
+  appointmentTypeConfiguration: RadioInputConfigurationObject =
+    emptyRadioInputConfiguration;
+  allowedRecurringDays: Set<number> = new Set(); // e.g., 1 for Monday
+  allowedSpecificDates: Date[] = [];
+  therapists: TherapistModel[] = [];
+  therapistControl = new FormControl('', Validators.required);
+  availability: AvailabilityModel[] = [];
+  constructor(
+    private apiService: ApiService,
+    public schedulingService: SchedulingService
+  ) {
+    this.apiService
+      .getTherapists()
+      .subscribe((therapists: TherapistModel[]) => {
+        console.log(therapists);
+        this.therapists = therapists;
+      });
+    this.apiService
+      .getAvailabilitites()
+      .subscribe((availabilities: AvailabilityModel[]) => {
+        this.schedulingService.availability = availabilities;
+        this.availability = availabilities;
+        const now = new Date();
+        const endRange = new Date();
 
-  constructor(private fb: FormBuilder) {
-    this.timeForm = this.fb.group({
-      startTime: ['', [Validators.required, this.timeValidator.bind(this)]],
-      endTime: ['', [Validators.required, this.timeValidator.bind(this)]],
-    });
+        for (const availability of availabilities) {
+          const timeSlot = `${availability.startTime} - ${availability.endTime}`;
+
+          if (availability.isRecurring) {
+            let current = new Date(now);
+
+            // Optionally, make recurring respect endDate if present
+            const recurringEnd = new Date(availability.endDate);
+
+            while (current <= recurringEnd && current <= endRange) {
+              if (
+                dayNumberToEnum[current.getDay()] === availability.recurringDay
+              ) {
+                const key = this.formatDateKey(current);
+                this.schedulingService.timeSlots.set(key, timeSlot);
+              }
+              current.setDate(current.getDate() + 1);
+            }
+          } else {
+            // One-time availability
+            const start = new Date(availability.startDate);
+            const key = this.formatDateKey(start);
+            this.schedulingService.timeSlots.set(key, timeSlot);
+          }
+        }
+        console.log('TIMESLOTS -> ', this.schedulingService.timeSlots);
+      });
+  }
+  private formatDateKey(date: Date): string {
+    return date.toISOString().split('T')[0]; // yyyy-mm-dd
+  }
+  ngOnInit() {
+    this.setCalendarConfiguration();
+    this.setAppointmentTypeConfiguration();
+    // this.therapistForm = this.schedulingService.schedulingForm.get(
+    //   'selectedTherapist'
+    // ) as FormControl;
+    // console.log(this.therapistForm);
   }
 
-  timeValidator(control: any) {
-    const value = control.value;
-    const regex = /^([01]\d|2[0-3]):([0-5]\d)$/; // Matches HH:mm format
-
-    if (!regex.test(value)) {
-      return { invalidFormat: true };
-    }
-
-    return null;
+  setCalendarConfiguration() {
+    this.calendarConfigurationObject = {
+      title: 'Escolha uma data:',
+      dayControl: this.schedulingService.schedulingForm.get(
+        'selectedDay'
+      ) as FormControl,
+      timeSlotControl: this.schedulingService.schedulingForm.get(
+        'selectedTimeSlot'
+      ) as FormControl,
+      availability: this.availability,
+    };
   }
 
-  addTimeRange() {
-    const { startTime, endTime } = this.timeForm.value;
-    if (this.timeForm.valid && this.validateRange(startTime, endTime)) {
-      this.storedRanges.push({ start: startTime, end: endTime });
-      this.timeForm.reset();
-      this.errorMessage = '';
+  setAvailabilityConfiguration() {
+    this.calendarConfigurationObject = {
+      title: 'Escolha uma data:',
+      dayControl: this.schedulingService.schedulingForm.get(
+        'selectedDay'
+      ) as FormControl,
+      timeSlotControl: this.schedulingService.schedulingForm.get(
+        'selectedTimeSlot'
+      ) as FormControl,
+      availability: this.availability,
+    };
+  }
+
+  setAppointmentTypeConfiguration() {
+    this.appointmentTypeConfiguration = {
+      title: 'Escolha uma tipe de atendimento:',
+      control: this.schedulingService.schedulingForm.get(
+        'selectedType'
+      ) as FormControl,
+      listOfOptions: Object.values(AppointmentType),
+    };
+  }
+
+  selectTherapist(therapist: TherapistModel | null): void {
+    if (therapist) {
+      this.schedulingService.schedulingForm
+        .get(SchedulingFormControlNames.selectedTherapist)
+        ?.setValue(therapist);
+    } else {
+      this.schedulingService.schedulingForm
+        .get(SchedulingFormControlNames.selectedTherapist)
+        ?.setValue(null);
     }
   }
 
-  validateRange(startTime: string, endTime: string): boolean {
-    const [startHour, startMin] = startTime.split(':').map(Number);
-    const [endHour, endMin] = endTime.split(':').map(Number);
-    const start = startHour * 60 + startMin;
-    const end = endHour * 60 + endMin;
-
-    if (end <= start) {
-      this.errorMessage = 'The end time must be later than the start time.';
-      return false;
-    }
-
-    for (const range of this.storedRanges) {
-      const [storedStartHour, storedStartMin] = range.start
-        .split(':')
-        .map(Number);
-      const [storedEndHour, storedEndMin] = range.end.split(':').map(Number);
-      const storedStart = storedStartHour * 60 + storedStartMin;
-      const storedEnd = storedEndHour * 60 + storedEndMin;
-
-      if (
-        (start >= storedStart && start < storedEnd) ||
-        (end > storedStart && end <= storedEnd) ||
-        (start <= storedStart && end >= storedEnd)
-      ) {
-        this.errorMessage = 'Time range overlaps with an existing range.';
-        return false;
-      }
-    }
-
-    return true;
+  getDayNumber(dayName: string): number {
+    const days = [
+      'SUNDAY',
+      'MONDAY',
+      'TUESDAY',
+      'WEDNESDAY',
+      'THURSDAY',
+      'FRIDAY',
+      'SATURDAY',
+    ];
+    return days.indexOf(dayName.toUpperCase());
   }
+
+  isDateAllowed = (date: Date | null): boolean => {
+    if (!date) return false;
+
+    // Check recurring days
+    if (this.allowedRecurringDays.has(date.getDay())) return true;
+
+    // Check exact matches for specific one-time availabilities
+    return this.allowedSpecificDates.some(
+      (allowed) =>
+        allowed.getFullYear() === date.getFullYear() &&
+        allowed.getMonth() === date.getMonth() &&
+        allowed.getDate() === date.getDate()
+    );
+  };
+
+  trackById = (index: number, item: TherapistModel) => item.id;
 
   restrictInput(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -122,5 +218,11 @@ export class SchedulingComponent {
     }
 
     input.value = value; // Update the input value in real-time
+  }
+
+  submit(isSubmitted: boolean) {
+    if(isSubmitted){
+      this.apiService.setAppointment(this.schedulingService.getAppointmentPayload());
+    }
   }
 }

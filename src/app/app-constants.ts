@@ -7,7 +7,7 @@ export const AppConstants = {
   },
 
   navigation: {
-    background: NavbarBackground.Transparent,
+    background: NavbarBackground.White,
     height: 80,
   },
 
@@ -18,45 +18,43 @@ export const AppConstants = {
 
   services: [
     {
-      name: 'Psicoterapia individual',
+      name: 'Atendimento individual',
       cardImage: 'assets/images/atendimentoindividual.jpeg',
       cardDescription:
         'Atendimentos individuais com psicóloga, visando o autoconhecimento e o restabelecimento da saúde mental.',
       serviceType: [
         {
-          name: 'curta duração',
-          description:
-            'De 10 a 12 sessões, modalidade indicada para pessoas com questões relacionadas ao autoconhecimento e com sofrimento psíquico leve.',
-        },
-        {
-          name: 'longa duração',
-          description:
-            'No mínimo 12 sessões com avaliação periódica, modalidade indicada para pessoas com sofrimento psíquico moderado e grave.',
-        },
-        {
-          name: 'abordagem corporal Reichiana',
+          name: 'Análise Corporal Reichiana',
           description:
             'A abordagem reichiana pode ser realizada em curta ou longa duração.',
         },
+
         {
-          name: 'abordagem Junguiana',
+          name: 'Mindfulness',
           description:
-            'A abordagem junguiana pode ser realizada em curta ou longa duração.',
+            'Supera amiga, ja deu segue em frente ele nao te quer mais.',
+        },
+      ],
+    } as Service,
+
+    {
+      name: 'Atendimento em grupo',
+      cardImage: 'assets/images/atendimentoindividual.jpeg',
+      cardDescription:
+        'Atendimentos em grupo com psicóloga, visando o autoconhecimento e o restabelecimento da saúde mental.',
+      serviceType: [
+        {
+          name: 'Supervisão',
+          description:
+            'Supervisão supervisiona da Luane pra você ficar 100% na terapeutica #CONFIA.',
         },
         {
-          name: 'abordagem fenomenológica',
-          description:
-            'A abordagem fenomenológica pode ser realizada em curta ou longa duração.',
+          name: 'Grupo de Mulheres',
+          description: 'Mulher, só que em grupo.',
         },
         {
-          name: 'abordagem fenomenológica',
-          description:
-            'A abordagem fenomenológica pode ser realizada em curta ou longa duração.',
-        },
-        {
-          name: 'abordagem fenomenológica',
-          description:
-            'A abordagem fenomenológica pode ser realizada em curta ou longa duração.',
+          name: 'Grupo de Leitura',
+          description: 'Leitura, só que em grupo.',
         },
       ],
     } as Service,

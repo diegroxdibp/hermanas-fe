@@ -1,40 +1,56 @@
-:host{
-  margin-top:6em;
+:host {
+  padding: 24px;
+  height: 100%;
 }
 
-input {
-  width: 60px;
-  text-align: center;
-}
-
-form {
+.therapist-section {
   display: flex;
-  align-items: center;
-  gap: 10px;
-}
+  flex-direction: column;
 
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-
-
-//
-.time-slot {
-  font-size: 24px;
-  cursor: pointer;
-}
-
-.unavailable {
-  font-size: 24px;
-  color: gray;
-  cursor: none;
-}
-
-mat-form-field{
-  input {
+  .therapist-selection {
     width: 100%;
-    text-align: left;
+  }
+
+  .therapist-card {
+    display: flex;
+    flex-direction: column;
+
+    .therapist-card--header {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      .title-group {
+        margin-bottom: 16px;
+        .title {
+          color: #005a89;
+        }
+        .subtitle {
+          font-weight: 300;
+          color: #005a89;
+        }
+      }
+    }
+
+    .therapist-card--picture {
+      width: 120px; /* or any size you want */
+      height: 120px;
+      border-radius: 50%; /* makes it perfectly round */
+      border: 2px solid #ddd; /* light gray border */
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* subtle shadow */
+      object-fit: cover; /* ensures the image fills the circle */
+      margin: 8px 0;
+    }
+
+    .therapist-card--content-area {
+      .text {
+        p {
+          font-size: 16px;
+          margin: 16px 0;
+          word-spacing: 5px;
+        }
+      }
+    }
   }
 }

@@ -1,4 +1,4 @@
-export const enum NavbarBackground  {
+export enum NavbarBackground  {
     Transparent = 'transparent',
     White = 'white',
     Black = 'black',

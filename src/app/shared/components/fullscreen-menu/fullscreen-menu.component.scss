@@ -1,10 +1,18 @@
 @use "../../../../assets/styles/palette.scss" as palette;
 
+:host {
+  display: flex;
+  margin-left: auto;
+}
+
 .menu-button {
-  position: fixed;
-  top: 0;
-  right: 0;
-  height: 80px;
+  // position: fixed;
+  // top: 0;
+  // right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: fit-content;
   width: 80px;
   padding: 0;
   z-index: 1001;

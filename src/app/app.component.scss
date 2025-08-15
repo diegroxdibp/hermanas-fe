@@ -4,7 +4,69 @@
   min-height: 100vh;
   width: 100%;
 
+  header {
+    display: flex;
+    height: 80px;
+    width: 100%;
+    z-index: 100;
+    border-bottom-color: rgb(87, 86, 91);
+    background-color: white;
+    color: blue;
+
+    nav {
+      display: flex;
+      width: 100%;
+      padding: 0 1em;
+      line-height: 1;
+      align-items: center;
+      z-index: 15;
+
+      img {
+        height: 80px;
+        cursor: pointer;
+      }
+
+      svg {
+        margin-left: auto;
+        cursor: pointer;
+      }
+
+      ul {
+        display: flex;
+        gap: 1em;
+        height: fit-content;
+        display: flex;
+        align-items: center;
+        margin-left: auto;
+        padding: 0 1em;
+
+        li {
+          height: fit-content;
+          cursor: pointer;
+
+          a {
+            // color: white;
+            font-family: Inter;
+            font-size: 18px;
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+
+  main {
+    height: 100%;
+  }
+
   app-footer {
     margin-top: auto;
   }
+}
+
+.fixed {
+  position: fixed;
+  background-color: transparent;
+  top: 0;
+  transition: background-color 0.3s ease;
 }

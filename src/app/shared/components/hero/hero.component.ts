@@ -9,6 +9,7 @@ import { NavigationBarService } from '../../services/navigation-bar.service';
 import { AppConstants } from '../../../app-constants';
 import { NavbarBackground } from '../../enums/navbar-background.enum';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-hero',
@@ -18,7 +19,9 @@ import { CommonModule } from '@angular/common';
   standalone: true,
 })
 export class HeroComponent {
-  @HostBinding('style.height') heroHeight = this.getHeroHeight();
+  @HostBinding('style.height') get background(): string {
+    return this.getHeroHeight();
+  }
   @ViewChild('heroImage') heroImage: ElementRef | undefined;
   // Keep track of scroll position
   scrollPosition = 0;
@@ -35,18 +38,22 @@ export class HeroComponent {
     }
   }
 
-  constructor() {}
+  constructor(private router: Router) {}
 
   ngOnInit() {
     this.updateParallax();
   }
 
-  imageLoaded(){
-    console.log('Loaded!')
+  imageLoaded() {
+    console.log('Loaded!');
+    this.heroImageLoaded = true;
   }
 
   getHeroHeight(): string {
-    if (AppConstants.navigation.background === NavbarBackground.Transparent)
+    if (
+      AppConstants.navigation.background === NavbarBackground.Transparent ||
+      this.router.url === '/'
+    )
       return '100vh';
     else return `calc(100vh - ${NavigationBarService.getNavbarHeight()}px)`;
   }
