@@ -1,4 +1,5 @@
 import { NavbarBackground } from './shared/enums/navbar-background.enum';
+import { Pages } from './shared/enums/pages.enum';
 import { Service } from './shared/models/service.model';
 
 export const AppConstants = {
@@ -19,27 +20,27 @@ export const AppConstants = {
   services: [
     {
       name: 'Atendimento individual',
-      cardImage: 'assets/images/atendimentoindividual.jpeg',
       cardDescription:
         'Atendimentos individuais com psicóloga, visando o autoconhecimento e o restabelecimento da saúde mental.',
       serviceType: [
         {
           name: 'Análise Corporal Reichiana',
           description:
-            'A abordagem reichiana pode ser realizada em curta ou longa duração.',
+            'A análise corporal reichiana reintegra a terapia verbal à análise do corpo e tem como objetivo flexibilizar os bloqueios somáticos, considerando o ser humano como uma unidade psicossomática, na qual corpo e mente formam um sistema indissociável.',
+          knowMorePage: Pages.ANALISE_REICHANA,
         },
 
         {
           name: 'Mindfulness',
           description:
             'Supera amiga, ja deu segue em frente ele nao te quer mais.',
+          knowMorePage: Pages.MINDFULLNESS,
         },
       ],
     } as Service,
 
     {
       name: 'Atendimento em grupo',
-      cardImage: 'assets/images/atendimentoindividual.jpeg',
       cardDescription:
         'Atendimentos em grupo com psicóloga, visando o autoconhecimento e o restabelecimento da saúde mental.',
       serviceType: [

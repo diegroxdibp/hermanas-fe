@@ -10,6 +10,7 @@ import { AppConstants } from '../../../app-constants';
 import { NavbarBackground } from '../../enums/navbar-background.enum';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'app-hero',
@@ -38,7 +39,7 @@ export class HeroComponent {
     }
   }
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private navService: NavigationService) {}
 
   ngOnInit() {
     this.updateParallax();

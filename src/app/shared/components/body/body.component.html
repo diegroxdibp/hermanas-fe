@@ -2,19 +2,15 @@
 <section class="introduction">
   <content>
     <p>
-      “Acurar” é o verbo que define a visão sobre nossa atuação como psicólogas,
-      acurar significa cuidar ou tratar de (alguém ou algo) com dedicação,
-      atenção e interesse, é a ação de cuidar que gera o aperfeiçoamento. Nesse
-      momento após mais de 13 anos de carreira, sentimo-nos também acuradas
-      profissionalmente por nossas experiências profissionais diversas, sendo
-      portanto um excelente momento para ampliar nossos trabalhos de maneira
-      coletiva e integrativa.
+      Clínica Ampliada - RessignificAÇÕES (CARE) é uma formulação conceitual
+      bastante específica oriunda da saúde pública do Brasil, assim como, da
+      Política Nacional de Humanização, e fomentada por correntes internacionais
+      como a saúde pública do Reino Unido, Canadá e Itália.
     </p>
     <p>
-      Acurar é o elo entre as competências técnicas e pessoais de três
-      psicólogas que almejam facilitar o acesso aos cuidados em saúde mental no
-      cotidiano, mantendo sobretudo, um posicionamento ético e responsivo com a
-      saúde integral.
+      O conceito baseia-se em alguns pilares: *abordagem holística *cuidado
+      centrado na pessoa *modelo biopsicossocial *trabalho transdisciplinar A
+      CARE tem como alicerce os pilares supracitados e fomentar o acesso aos cu
     </p>
     <p class="quotation">
       “A saúde é um estado de completo bem-estar físico, mental e social e não
@@ -26,25 +22,12 @@
 </section>
 
 <section class="services">
-  <content class="services-description">
-    <p>
-      Desenvolvemos diversas propostas de atendimentos psicoterapêuticos e
-      terapêuticos visando a prevenção, manutenção e promoção da saúde mental.
-      Nossa intenção é acolher clientes que buscam autoconhecimento ou cuidados
-      devido algum sofrimento psíquico.
-    </p>
-    <p>
-      Aos psicoterapeutas e profissionais que estejam em suas jornadas de auto
-      aprimoramento, oferecemos espaços de suporte.
-      <a href=""><span>SAIBA MAIS</span></a>
-    </p>
-  </content>
-
   <content
     class="service"
+    id="atendimento"
     *ngFor="let service of AppConstants.services; let serviceIndex = index"
   >
-    <h1>{{ service.name }}</h1>
+    <h2>{{ service.name }}</h2>
     <ul>
       <li
         *ngFor="let serviceType of service.serviceType; let typeIndex = index"
@@ -54,53 +37,44 @@
           class="service-name"
           (click)="toggleItem(serviceIndex + '-' + typeIndex)"
         >
-          <h2>{{ serviceType.name }}</h2>
-        </div>
-        <svg
-          (click)="toggleItem(serviceIndex + '-' + typeIndex)"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 100 125"
-          fill="#005a89"
-          [class.expanded]="expandedItems[serviceIndex + '-' + typeIndex]"
-          class="expand-icon"
-        >
-          <path
-            d="M50,61.8472a2.9963,2.9963,0,0,1-1.8481-.6367L25.5264,43.5161A3,3,0,0,1,29.2227,38.79L50,55.0386,70.7773,38.79a3,3,0,1,1,3.6963,4.7266L51.8481,61.21A2.9963,2.9963,0,0,1,50,61.8472Z"
-          />
-        </svg>
-        <p
-          *ngIf="expandedItems[serviceIndex + '-' + typeIndex]"
-          class="service-description"
-        >
-          {{ serviceType.description }}
-          <!-- <a mat-button href="https://www.google.com/" target="_blank">SAIBA MAIS</a> --><a
-            href=""
-            ><span>SAIBA MAIS</span></a
+          <h3>{{ serviceType.name }}</h3>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 100 125"
+            fill="#005a89"
+            [class.invert]="expandedItems[serviceIndex + '-' + typeIndex]"
+            class="expand-icon"
           >
-        </p>
+            <path
+              d="M50,61.8472a2.9963,2.9963,0,0,1-1.8481-.6367L25.5264,43.5161A3,3,0,0,1,29.2227,38.79L50,55.0386,70.7773,38.79a3,3,0,1,1,3.6963,4.7266L51.8481,61.21A2.9963,2.9963,0,0,1,50,61.8472Z"
+            />
+          </svg>
+        </div>
+
+        <div
+          class="service-box"
+          [@expandCollapse]="
+            expandedItems[serviceIndex + '-' + typeIndex]
+              ? 'expanded'
+              : 'collapsed'
+          "
+        >
+          <p class="service-description">
+            {{ serviceType.description }}
+          </p>
+          <div class="service-actions">
+            <button mat-raised-button (click)="navigateTo(Pages.SCHEDULING)">
+              <a>AGENDAR</a>
+            </button>
+            <button
+              mat-raised-button
+              (click)="navigateTo(serviceType.knowMorePage)"
+            >
+              <a>SAIBA MAIS</a>
+            </button>
+          </div>
+        </div>
       </li>
     </ul>
   </content>
-
-  <!-- <mat-accordion>
-    <mat-expansion-panel hideToggle>
-      <mat-expansion-panel-header>
-        <mat-panel-title> This is the expansion title </mat-panel-title>
-        <mat-panel-description>
-          This is a summary of the content
-        </mat-panel-description>
-      </mat-expansion-panel-header>
-      <p>This is the primary content of the panel.</p>
-    </mat-expansion-panel>
-
-    <mat-expansion-panel hideToggle>
-      <mat-expansion-panel-header>
-        <mat-panel-title> This is the expansion title </mat-panel-title>
-        <mat-panel-description>
-          This is a summary of the content
-        </mat-panel-description>
-      </mat-expansion-panel-header>
-      <p>This is the primary content of the panel.</p>
-    </mat-expansion-panel>
-  </mat-accordion> -->
 </section>

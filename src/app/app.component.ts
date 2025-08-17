@@ -26,7 +26,6 @@ import { filter, Subject, takeUntil } from 'rxjs';
     RouterOutlet,
     HeaderComponent,
     FooterComponent,
-    HeaderScrollDirective,
     FullscreenMenuComponent,
   ],
   templateUrl: './app.component.html',
@@ -53,15 +52,10 @@ export class AppComponent {
     private renderer: Renderer2
   ) {
     this.navigationService.currentUrl.subscribe((url: string) => {
-      console.log(url);
       if (url === '/') {
-        console.log('entrou true');
-
         this.fixedHeader = true;
         this.backgroundColor = 'transparent';
       } else {
-        console.log('entrou false');
-
         this.fixedHeader = false;
         this.backgroundColor = 'white';
       }

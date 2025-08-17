@@ -3,10 +3,14 @@ export enum Pages  {
     ABOUT = 'about',
     BIO = 'bio',
     SERVICES = 'services',
+    ATENDIMENTO = 'atendimento',
+    ATENDIMENTO_INDIVIDUAL = `${Pages.ATENDIMENTO}/individual`,
+    ATENDIMENTO_GRUPO = `${Pages.ATENDIMENTO}/grupo`,
+    ANALISE_REICHANA = `${Pages.ATENDIMENTO_INDIVIDUAL}/analise-reichana`,
+    MINDFULLNESS = `${Pages.ATENDIMENTO_INDIVIDUAL}/mindfulness`,
     CONTACT = 'contact',
     SCHEDULING = 'scheduling',
     LUANE = `${Pages.BIO}/luane`,
     RAYSSA = `${Pages.BIO}/rayssa`,
     YARA = `${Pages.BIO}/yara`,
-    Purple = 'purple' 
 }

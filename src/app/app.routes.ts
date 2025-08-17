@@ -6,20 +6,33 @@ import { AboutComponent } from './shared/components/about/about.component';
 import { Pages } from './shared/enums/pages.enum';
 import { ContactComponent } from './shared/components/contact/contact.component';
 import { SchedulingComponent } from './shared/components/scheduling/scheduling.component';
+import { ServiceComponent } from './shared/components/service/service.component';
+import { MindfulnessComponent } from './shared/components/mindfulness/mindfulness.component';
+import { AnaliseCorporalReichanaComponent } from './shared/components/analise-corporal-reichana/analise-corporal-reichana.component';
 
 export const routes: Routes = [
   { path: Pages.HOME, component: BodyComponent },
+  { path: Pages.ATENDIMENTO, component: BodyComponent },
+  { path: Pages.ATENDIMENTO_INDIVIDUAL, component: BodyComponent },
+  { path: Pages.ATENDIMENTO_GRUPO, component: BodyComponent },
+  { path: Pages.ANALISE_REICHANA, component: AnaliseCorporalReichanaComponent },
+  { path: Pages.MINDFULLNESS, component: MindfulnessComponent },
   { path: Pages.ABOUT, component: AboutComponent },
   { path: Pages.CONTACT, component: ContactComponent },
   { path: Pages.SCHEDULING, component: SchedulingComponent },
   { path: Pages.BIO, component: BiographyComponent },
+  { path: Pages.BIO, component: BiographyComponent },
   { path: `${Pages.BIO}/:name`, component: BiographyComponent },
   { path: '**', redirectTo: '' },
-
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)], // Configure the routes
+  imports: [
+    RouterModule.forRoot(routes, {
+      anchorScrolling: 'enabled', // Enables anchor scroll
+      scrollOffset: [0, 80], // Optional: offset for fixed header
+    }),
+  ], // Configure the routes
   exports: [RouterModule], // Export RouterModule so it can be used in AppModule
 })
 export class AppRoutingModule {}

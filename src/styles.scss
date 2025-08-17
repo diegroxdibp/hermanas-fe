@@ -1,5 +1,6 @@
 @use "../src/assets/styles/breakpoints.scss" as breakpoint;
 @use "../src/assets/styles/palette.scss" as palette;
+@use "../src/assets/styles/variables.scss" as variables;
 
 * {
   box-sizing: border-box;
@@ -35,32 +36,47 @@ svg {
 }
 
 h1 {
-  color: palette.$primaryColor;
   font-family: Inter;
+  color: palette.$primaryColor;
   font-size: 36px;
   letter-spacing: 1px;
   font-weight: 700;
   line-height: 1.2;
   // margin: 20px 0 0.2em 0;
   margin: 0;
-  @media (min-width: breakpoint.$breakpoint-lg) {
+  @media (min-width: breakpoint.$breakpoint-md) {
     // font-size: 42px;
     font-size: 60px;
   }
 }
 
 h2 {
-  font-family: Acumin;
+  font-family: Inter;
   color: palette.$primaryColor;
   font-weight: 700;
   font-size: 24px;
   margin: 0;
+
+  @media (min-width: breakpoint.$breakpoint-md) {
+    font-size: 32px;
+  }
+}
+
+h3 {
+  font-family: Inter;
+  color: palette.$primaryColor;
+  font-weight: 700;
+  font-size: 18px;
+  margin: 0;
+  @media (min-width: breakpoint.$breakpoint-md) {
+    font-size: 24px;
+  }
 }
 
 p {
-  color: palette.$primaryColor;
   font-family: Inter;
-  font-size: 14px;
+  color: palette.$primaryColor;
+  font-size: 16px;
   font-weight: 300;
   line-height: 1.2;
   text-align: justify;
@@ -86,11 +102,107 @@ a:visited,
 a:link {
   color: palette.$primaryColor;
   font-family: Inter;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
   line-height: 1.2;
   cursor: pointer;
   text-decoration: none;
+}
+
+section {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: variables.$main-column-max-width;
+  align-items: center;
+  padding: 0 variables.$mobile-lateral-padding;
+
+  content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 1.5em;
+
+    .quotation {
+      text-align: center;
+      font-weight: 500;
+      font-style: italic;
+      margin: 1.5em;
+    }
+  }
+}
+
+.services {
+  display: flex;
+  flex-direction: column;
+  padding: 4em 0;
+  max-width: 100%;
+  gap: 3em;
+
+  .service {
+    display: flex;
+    flex-direction: column;
+    max-width: variables.$main-column-max-width;
+    padding: 0 variables.$mobile-lateral-padding;
+    gap: 1em;
+
+    .service-type {
+      // display: grid;
+      // grid-template-columns: 1fr auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 8px;
+
+      .service-name {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        align-items: center;
+        cursor: pointer;
+      }
+
+      .service-box {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+
+        .service-description {
+          font-size: 16px;
+          line-height: 30px;
+          letter-spacing: normal;
+        }
+
+        .service-actions {
+          display: flex;
+          width: 100%;
+          justify-content: right;
+          padding: 20px;
+          gap: 16px;
+        }
+      }
+    }
+  }
+
+  @media (min-width: breakpoint.$breakpoint-md) {
+    width: 100%;
+    padding: 0;
+    // max-width: 800px;
+    .services {
+      gap: 3em;
+      padding: 6em 2em;
+
+      .service {
+        p {
+          font-size: 18px;
+        }
+      }
+    }
+  }
+}
+
+.invert {
+  transform: rotate(180deg);
 }
 
 @font-face {

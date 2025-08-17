@@ -1,16 +1,10 @@
 import {
   Component,
-  computed,
-  effect,
   ElementRef,
-  HostBinding,
   HostListener,
-  OnInit,
   Renderer2,
 } from '@angular/core';
 import { NavigationBarService } from '../../services/navigation-bar.service';
-import { AppConstants } from '../../../app-constants';
-import { NavbarBackground } from '../../enums/navbar-background.enum';
 import { ScreenSizeService } from '../../services/screen-size.service';
 import { FullscreenMenuComponent } from '../fullscreen-menu/fullscreen-menu.component';
 import { NavigationService } from '../../services/navigation.service';
@@ -24,15 +18,7 @@ import { CommonModule } from '@angular/common';
   styleUrl: './header.component.scss',
   standalone: true,
 })
-export class HeaderComponent implements OnInit {
-  // @HostBinding('style.position') position(): string {
-  //   return this.navigationService.currentUrl() === '/' ? 'fixed' : 'auto';
-  // }
-  // @HostBinding('style.background') background(): string {
-  //   return this.navigationService.currentUrl() === '/'
-  //     ? 'transparent'
-  //     : 'white';
-  // }
+export class HeaderComponent {
   @HostListener('window:scroll', [])
   onWindowScroll() {
     this.checkScroll();
@@ -47,16 +33,6 @@ export class HeaderComponent implements OnInit {
     private el: ElementRef,
     private renderer: Renderer2
   ) {}
-
-  ngOnInit(): void {
-    // this.setInitialPosition();
-  }
-
-  // private setInitialPosition() {
-  //   const position =
-  //     // this.navigationService.currentUrl() === '/' ? 'fixed' : 'auto';
-  //   // this.renderer.setStyle(this.el.nativeElement, 'position', position);
-  // }
 
   navigateTo(page: Pages) {
     this.navigationService.navigateTo(page);

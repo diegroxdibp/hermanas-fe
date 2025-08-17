@@ -1,15 +1,14 @@
-import { Component, input, Input } from '@angular/core';
+import { Component } from '@angular/core';
+import { AnaliseCorporalReichanaComponent } from "../analise-corporal-reichana/analise-corporal-reichana.component";
+import { MindfulnessComponent } from "../mindfulness/mindfulness.component";
 
 @Component({
   selector: 'app-service',
-  imports: [],
+  imports: [AnaliseCorporalReichanaComponent, MindfulnessComponent],
   templateUrl: './service.component.html',
   styleUrl: './service.component.scss',
   standalone: true
 })
 export class ServiceComponent {
-  title = input<string>("Title");
-  subTitle = input<string>("");
-  description = input<string>("");
-  imgUrl = input<string>("");
+
 }
