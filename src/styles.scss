@@ -21,9 +21,19 @@ main {
 
 ul,
 li {
+  list-style: none;
+  font-family: Inter;
+  color: palette.$primaryColor;
+  font-size: 17px;
+  font-weight: 300;
+  line-height: 28px;
+  text-align: justify;
   margin: 0;
   padding: 0;
-  list-style: none;
+}
+
+ul {
+  margin: 1.5em 0;
 }
 
 img,
@@ -33,6 +43,12 @@ canvas,
 svg {
   display: block;
   max-width: 100%;
+}
+
+picture {
+  img {
+    margin: auto;
+  }
 }
 
 h1 {
@@ -46,7 +62,7 @@ h1 {
   margin: 0;
   @media (min-width: breakpoint.$breakpoint-md) {
     // font-size: 42px;
-    font-size: 60px;
+    font-size: 48px;
   }
 }
 
@@ -76,22 +92,21 @@ h3 {
 p {
   font-family: Inter;
   color: palette.$primaryColor;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 300;
-  line-height: 1.2;
+  line-height: 28px;
   text-align: justify;
   margin: 0;
 
   @media (min-width: breakpoint.$breakpoint-sm) {
-    font-size: 18px;
     letter-spacing: 1.1px;
   }
 
   @media (min-width: breakpoint.$breakpoint-md) {
     // font-size: 18px;
-    font-size: 20px;
-    line-height: 36px;
-    letter-spacing: 1.3px;
+    // font-size: 20px;
+    // line-height: 36px;
+    // letter-spacing: 1.3px;
   }
 }
 
@@ -186,7 +201,7 @@ section {
 
   @media (min-width: breakpoint.$breakpoint-md) {
     width: 100%;
-    padding: 0;
+    padding: 6em 0;
     // max-width: 800px;
     .services {
       gap: 3em;
@@ -201,9 +216,60 @@ section {
   }
 }
 
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5em;
+}
+
+.centered-list-item {
+  display: block;
+  width: 100%;
+  text-align: center;
+  line-height: normal;
+}
+
 .invert {
   transform: rotate(180deg);
 }
+
+// For scroll animate
+.before-show {
+  opacity: 0;
+}
+
+/* specific directions */
+.before-show-up {
+  transform: translateY(40px);
+}
+
+.before-show-left {
+  transform: translateX(-40px);
+}
+
+.before-show-right {
+  transform: translateX(40px);
+}
+
+/* visible states */
+.fade-in-up {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 1.4s ease, transform 1.4s ease;
+}
+
+.fade-in-left {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.fade-in-right {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+//
 
 @font-face {
   font-family: "SegoeUI";

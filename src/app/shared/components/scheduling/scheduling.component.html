@@ -16,18 +16,16 @@
     </mat-error>
   </mat-form-field>
 
-  <ng-container
-    *ngIf="schedulingService.schedulingForm.get('selectedTherapist')?.value"
-  >
+  @if (schedulingService.schedulingForm.get(SchedulingFormControls.SELECTED_THERAPIST)?.value){
     <mat-card class="therapist-card" appearance="outlined">
       <mat-card-header class="therapist-card--header">
         <mat-card-title-group class="title-group">
           <mat-card-title class="title">{{
-            schedulingService.schedulingForm.get("selectedTherapist")?.value
+            schedulingService.schedulingForm.get(SchedulingFormControls.SELECTED_THERAPIST)?.value
               .name
           }}</mat-card-title>
           <mat-card-subtitle class="subtitle">{{
-            schedulingService.schedulingForm.get("selectedTherapist")?.value
+            schedulingService.schedulingForm.get(SchedulingFormControls.SELECTED_THERAPIST)?.value
               .title
           }}</mat-card-subtitle>
         </mat-card-title-group>
@@ -36,7 +34,7 @@
           mat-card-sm-image
           src="{{
             'assets/images/' +
-              schedulingService.schedulingForm.get('selectedTherapist')?.value
+              schedulingService.schedulingForm.get(SchedulingFormControls.SELECTED_THERAPIST)?.value
                 .picture
           }}"
           alt="Therapist picture"
@@ -46,33 +44,21 @@
         ><div class="text">
           <p>
             {{
-              schedulingService.schedulingForm.get("selectedTherapist")?.value
+              schedulingService.schedulingForm.get(SchedulingFormControls.SELECTED_THERAPIST)?.value
                 .bio
             }}
           </p>
         </div>
       </mat-card-content>
     </mat-card>
-  </ng-container>
+}
+
 </div>
+@if (schedulingService.schedulingForm.get(SchedulingFormControls.SELECTED_THERAPIST)?.value){
+  <app-calendar *ngIf="availability.length" [availability]="availability" [calendarConfiguration]="calendarConfigurationObject"></app-calendar>
+}
 
-<ng-container
-  *ngIf="schedulingService.schedulingForm.get('selectedTherapist')?.value"
->
-  <app-radio-input
-    [inputConfiguration]="appointmentTypeConfiguration"
-  ></app-radio-input>
 
-  <app-calendar
-    *ngIf="availability.length"
-    [availability]="availability"
-    [calendarConfiguration]="calendarConfigurationObject"
-  ></app-calendar>
-</ng-container>
-
-<ng-container>
-  <app-availabilities
-    [availabilityConfiguration]="availabilityConfigurationObject"
-    (isSubmitted)="submit($event)"
-  ></app-availabilities>
-</ng-container>
+@if (schedulingService.schedulingForm.get(SchedulingFormControls.SELECTED_THERAPIST)?.value && schedulingService.schedulingForm.get(SchedulingFormControls.SELECTED_DAY)?.value) {
+    <app-availabilities [availabilityConfiguration]="availabilityConfigurationObject" (isSubmitted)="submit($event)"></app-availabilities>
+} 

@@ -6,7 +6,6 @@ import { AboutComponent } from './shared/components/about/about.component';
 import { Pages } from './shared/enums/pages.enum';
 import { ContactComponent } from './shared/components/contact/contact.component';
 import { SchedulingComponent } from './shared/components/scheduling/scheduling.component';
-import { ServiceComponent } from './shared/components/service/service.component';
 import { MindfulnessComponent } from './shared/components/mindfulness/mindfulness.component';
 import { AnaliseCorporalReichanaComponent } from './shared/components/analise-corporal-reichana/analise-corporal-reichana.component';
 
@@ -21,7 +20,6 @@ export const routes: Routes = [
   { path: Pages.CONTACT, component: ContactComponent },
   { path: Pages.SCHEDULING, component: SchedulingComponent },
   { path: Pages.BIO, component: BiographyComponent },
-  { path: Pages.BIO, component: BiographyComponent },
   { path: `${Pages.BIO}/:name`, component: BiographyComponent },
   { path: '**', redirectTo: '' },
 ];
@@ -29,8 +27,10 @@ export const routes: Routes = [
 @NgModule({
   imports: [
     RouterModule.forRoot(routes, {
-      anchorScrolling: 'enabled', // Enables anchor scroll
-      scrollOffset: [0, 80], // Optional: offset for fixed header
+      // anchorScrolling: 'enabled', // Enables anchor scroll
+      // scrollOffset: [0, 80], // Optional: offset for fixed header
+      scrollPositionRestoration: 'enabled', // 'enabled' or 'top'
+      anchorScrolling: 'disabled',
     }),
   ], // Configure the routes
   exports: [RouterModule], // Export RouterModule so it can be used in AppModule

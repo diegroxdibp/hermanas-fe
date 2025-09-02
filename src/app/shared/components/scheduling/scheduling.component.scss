@@ -1,6 +1,13 @@
+@use "../src/assets/styles/variables.scss" as variables;
+
 :host {
-  padding: 24px;
+  display: flex;
+  flex-direction: column;
   height: 100%;
+  width: 100%;
+  max-width: variables.$main-column-max-width;
+  margin: 0 auto;
+  padding: 24px;
 }
 
 .therapist-section {

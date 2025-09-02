@@ -1,4 +1,3 @@
-import { SchedulingService } from './../../services/scheduling.service';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -13,7 +12,6 @@ import { MaskitoDirective } from '@maskito/angular';
 import { AppConstants } from '../../../app-constants';
 import { MaskitoOptions } from '@maskito/core';
 import mask from '../../masks/date.mask';
-import { MatChipListbox, MatChipOption } from '@angular/material/chips';
 import { AvailabilityModel } from '../../models/availability.model';
 import { MatSelectModule } from '@angular/material/select';
 import {
@@ -31,8 +29,6 @@ import {
     MatDatepickerModule,
     MatNativeDateModule,
     MaskitoDirective,
-    MatChipListbox,
-    MatChipOption,
     FormsModule,
     MatSelectModule,
   ],

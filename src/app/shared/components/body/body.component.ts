@@ -15,6 +15,7 @@ import {
   trigger,
 } from '@angular/animations';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ScrollAnimateDirective } from '../../directives/scroll-animate.directive';
 
 @Component({
   selector: 'app-body',
@@ -23,6 +24,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     CommonModule,
     MatButtonModule,
     MatExpansionModule,
+    ScrollAnimateDirective,
   ],
   templateUrl: './body.component.html',
   styleUrl: './body.component.scss',

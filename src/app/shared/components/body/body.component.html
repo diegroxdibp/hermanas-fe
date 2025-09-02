@@ -1,23 +1,53 @@
 <app-hero class="hero-section"></app-hero>
-<section class="introduction">
+<section class="introduction" appScrollAnimate="fade-in-up">
   <content>
     <p>
-      Clínica Ampliada - RessignificAÇÕES (CARE) é uma formulação conceitual
-      bastante específica oriunda da saúde pública do Brasil, assim como, da
-      Política Nacional de Humanização, e fomentada por correntes internacionais
-      como a saúde pública do Reino Unido, Canadá e Itália.
+      <strong>Clínica Ampliada</strong> é uma formulação conceitual específica
+      oriunda da saúde pública brasileira e intrinsecamente ligado à Política
+      Nacional de Humanização (PNH). Sua formulação foi enriquecida e inspirada
+      por abordagens internacionais de saúde pública, notadamente as
+      desenvolvidas no Reino Unido, Canadá e Itália.
     </p>
+
+    <!-- <div class="pilares" appScrollAnimate="fade-in-up"></div> -->
+
+    <h3 class="pillar-title">
+      Este conceito se alicerça em pilares essenciais:
+    </h3>
+    <p class="centered-list-item">Cuidado centrado na pessoa</p>
+    <p class="centered-list-item">Modelo biopsicossocial</p>
+    <p class="centered-list-item">Abordagem integral</p>
+    <p class="centered-list-item">Trabalho transdisciplinar</p>
+
+    <p class="quotation">
+      A Clínica Ampliada - RessignificAÇÕES (CARE) adota esses pilares como seus
+      valores fundamentais.
+    </p>
+
     <p>
-      O conceito baseia-se em alguns pilares: *abordagem holística *cuidado
-      centrado na pessoa *modelo biopsicossocial *trabalho transdisciplinar A
-      CARE tem como alicerce os pilares supracitados e fomentar o acesso aos cu
+      Ressignificar perspectivas e ações sobre cuidado em saúde mental e
+      relacional é questionar modelos tradicionais que excluem o ser humano
+      dentro da sua expressão integral mas, sobretudo, a ideia de saúde
+      vinculada com ausência de doença.
     </p>
+
     <p class="quotation">
       “A saúde é um estado de completo bem-estar físico, mental e social e não
       somente ausência de afecções e enfermidades” - Organização Mundial da
       Saúde, 1946.
     </p>
-    <img src="assets/images/hermanas1.jpg" alt="Hero" />
+
+    <p class="quotation">
+      Nossa missão é impulsionar e garantir a acessibilidade a cuidados de saúde
+      mental e relacional, essenciais para o bem-estar individual e coletivo.
+    </p>
+
+    <p>
+      A CARE nasceu do encontro entre a visão da fundadora, Luane S. Bastos, e
+      sua sólida formação universitária em saúde pela Universidade Federal de
+      São Paulo (UNIFESP).
+    </p>
+    <!-- <img src="assets/images/hermanas1.jpg" alt="Hero" /> -->
   </content>
 </section>
 
@@ -63,14 +93,14 @@
             {{ serviceType.description }}
           </p>
           <div class="service-actions">
-            <button mat-raised-button (click)="navigateTo(Pages.SCHEDULING)">
-              <a>AGENDAR</a>
-            </button>
             <button
               mat-raised-button
               (click)="navigateTo(serviceType.knowMorePage)"
             >
               <a>SAIBA MAIS</a>
+            </button>
+            <button mat-raised-button (click)="navigateTo(Pages.SCHEDULING)">
+              <a>AGENDAR</a>
             </button>
           </div>
         </div>

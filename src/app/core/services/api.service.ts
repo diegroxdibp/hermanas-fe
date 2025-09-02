@@ -6,7 +6,6 @@ import { AvailabilityModel } from '../../shared/models/availability.model';
 import { TherapistModel } from '../../shared/models/therapist.model';
 import { Roles } from '../../shared/enums/roles.enum';
 import { AppointmentPayload } from '../../shared/models/appointment-payload.model';
-import { SchedulingFormControlNames } from '../../shared/enums/scheduling-form-control-names.enum';
 
 @Injectable({
   providedIn: 'root',
@@ -35,6 +34,12 @@ export class ApiService {
     );
   }
 
+    getAvailabilititesByTherapistId(therapistId: number): Observable<AvailabilityModel[]> {
+    return this.httpClient.get<AvailabilityModel[]>(
+      this.apiRootUrl + `/availability/therapist/${therapistId}`
+    );
+  }
+
   setAppointment(payload: AppointmentPayload) {
     //     {
     //     "clientId": 1,
@@ -46,6 +51,4 @@ export class ApiService {
     //     "type":"REMOTE"
     // }
   }
-
-
 }

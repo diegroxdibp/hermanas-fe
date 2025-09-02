@@ -4,7 +4,7 @@ import { emptyTherapist, TherapistModel } from '../models/therapist.model';
 import { AppointmentType } from '../enums/appointment-type.enum';
 import { AvailabilityModel } from '../models/availability.model';
 import { AppointmentPayload } from '../models/appointment-payload.model';
-import { SchedulingFormControlNames } from '../enums/scheduling-form-control-names.enum';
+import { SchedulingFormControls } from '../enums/scheduling-form-controls.enum';
 
 @Injectable({
   providedIn: 'root',
@@ -12,17 +12,21 @@ import { SchedulingFormControlNames } from '../enums/scheduling-form-control-nam
 export class SchedulingService {
   schedulingForm: FormGroup;
   availability: AvailabilityModel[] = [];
-  timeSlots: Map<string, string> = new Map<string, string>();
+  timeSlots = new Map<string, string[]>();
 
   constructor(private readonly fb: FormBuilder) {
     this.schedulingForm = this.fb.group({
-      clientId: this.fb.control(0, [Validators.required]),
-      therapistId: this.fb.control(0, [Validators.required]),
-      selectedDay: this.fb.control('', [Validators.required]),
-      selectedTimeSlot: this.fb.control('', [Validators.required]),
-      selectedTherapist: this.fb.control<TherapistModel | null>(null, [
+      [SchedulingFormControls.CLIENT_ID]: this.fb.control(0, [
         Validators.required,
       ]),
+      [SchedulingFormControls.SELECTED_DAY]: this.fb.control('', [
+        Validators.required,
+      ]),
+      [SchedulingFormControls.SELECTED_TIME_SLOT]: this.fb.control('', [
+        Validators.required,
+      ]),
+      [SchedulingFormControls.SELECTED_THERAPIST]:
+        this.fb.control<TherapistModel | null>(null, [Validators.required]),
       selectedType: this.fb.control<AppointmentType>(AppointmentType.ANY, [
         Validators.required,
       ]),
@@ -31,13 +35,12 @@ export class SchedulingService {
 
   getAppointmentPayload(): AppointmentPayload {
     const payload = {
-      clientId: this.schedulingForm.get(SchedulingFormControlNames.clientId)
+      clientId: this.schedulingForm.get(SchedulingFormControls.CLIENT_ID)
         ?.value,
-      therapistId: this.schedulingForm.get(
-        SchedulingFormControlNames.therapistId
-      )?.value,
+      therapistId: this.schedulingForm.get(SchedulingFormControls.THERAPIST_ID)
+        ?.value,
       appointmentDate: this.schedulingForm.get(
-        SchedulingFormControlNames.selectedDay
+        SchedulingFormControls.SELECTED_DAY
       )?.value,
       //     "startTime": "11:00:00",
       //     "endTime": "12:00:00",

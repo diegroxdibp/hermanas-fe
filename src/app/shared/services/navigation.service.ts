@@ -9,6 +9,7 @@ import { BehaviorSubject, filter } from 'rxjs';
   providedIn: 'root',
 })
 export class NavigationService {
+  Pages = Pages;
   navigationItems: NavigationItem[] = [
     { name: 'Home', destination: Pages.HOME },
     { name: 'About', destination: Pages.ABOUT },

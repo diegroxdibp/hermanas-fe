@@ -1,3 +1,4 @@
+import { AvailabilityModel } from './../../models/availability.model';
 import { TherapistModel } from './../../models/therapist.model';
 import { SchedulingService } from './../../services/scheduling.service';
 import { ApiService } from './../../../core/services/api.service';
@@ -12,7 +13,6 @@ import {
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { provideNativeDateAdapter, MatOption } from '@angular/material/core';
 import mask from '../../masks/date.mask';
-import { AvailabilityModel } from '../../models/availability.model';
 import { CalendarComponent } from '../calendar/calendar.component';
 import {
   emptyRadioInputConfiguration,
@@ -33,7 +33,9 @@ import {
   emptyAvailabilityConfiguration,
 } from '../../models/input-configuration-objects/availability-configuration-object';
 import { dayNumberToEnum } from '../../utils/day-to-number-enum.util';
-import { SchedulingFormControlNames } from '../../enums/scheduling-form-control-names.enum';
+import { SchedulingFormControls } from '../../enums/scheduling-form-controls.enum';
+import { take } from 'rxjs';
+
 @Component({
   selector: 'app-scheduling',
   imports: [
@@ -67,49 +69,95 @@ export class SchedulingComponent implements OnInit {
   therapists: TherapistModel[] = [];
   therapistControl = new FormControl('', Validators.required);
   availability: AvailabilityModel[] = [];
+  SchedulingFormControls = SchedulingFormControls;
   constructor(
     private apiService: ApiService,
     public schedulingService: SchedulingService
   ) {
     this.apiService
       .getTherapists()
+      .pipe(take(1))
       .subscribe((therapists: TherapistModel[]) => {
         console.log(therapists);
         this.therapists = therapists;
+      });
+    this.schedulingService.schedulingForm
+      .get(SchedulingFormControls.SELECTED_THERAPIST)
+      ?.valueChanges.subscribe((selectedTherapist: TherapistModel) => {
+        console.log(selectedTherapist);
+        this.apiService
+          .getAvailabilititesByTherapistId(selectedTherapist.id)
+          .pipe(take(1))
+          .subscribe((availabilitites: AvailabilityModel[]) => {
+            console.log('Availabilitites ->', availabilitites);
+            // this.setAvailabilityConfiguration();
+          });
+      });
+    this.schedulingService.schedulingForm
+      .get(SchedulingFormControls.SELECTED_DAY)
+      ?.valueChanges.subscribe((date) => {
+        console.log('date', date);
+        if (this.schedulingService.timeSlots.get(date)) {
+          // this.setAvailabilityConfiguration(
+          //   this.schedulingService.timeSlots.get(date)!
+          // );
+          console.log(
+            'TS to control',
+            this.schedulingService.timeSlots.get(date)
+          );
+        }
       });
     this.apiService
       .getAvailabilitites()
       .subscribe((availabilities: AvailabilityModel[]) => {
         this.schedulingService.availability = availabilities;
-        this.availability = availabilities;
+        this.availability = availabilities; //REMOVE, calendar some
+
         const now = new Date();
-        const endRange = new Date();
+        const maxDate = new Date(
+          new Date().setMonth(new Date().getMonth() + 2)
+        ); // Calendar limit
 
         for (const availability of availabilities) {
           const timeSlot = `${availability.startTime} - ${availability.endTime}`;
 
           if (availability.isRecurring) {
-            let current = new Date(now);
+            let current = new Date(
+              Math.max(
+                new Date(availability.startDate).getTime(),
+                now.getTime()
+              )
+            );
 
-            // Optionally, make recurring respect endDate if present
+            // End date = whichever comes first: therapist’s endDate OR calendar’s maxDate
             const recurringEnd = new Date(availability.endDate);
+            const end = recurringEnd < maxDate ? recurringEnd : maxDate;
 
-            while (current <= recurringEnd && current <= endRange) {
+            while (current <= end) {
               if (
                 dayNumberToEnum[current.getDay()] === availability.recurringDay
               ) {
                 const key = this.formatDateKey(current);
-                this.schedulingService.timeSlots.set(key, timeSlot);
+                if (!this.schedulingService.timeSlots.has(key)) {
+                  this.schedulingService.timeSlots.set(key, []);
+                }
+                this.schedulingService.timeSlots.get(key)!.push(timeSlot);
               }
               current.setDate(current.getDate() + 1);
             }
           } else {
-            // One-time availability
+            // One-time availability (only add if inside calendar range)
             const start = new Date(availability.startDate);
-            const key = this.formatDateKey(start);
-            this.schedulingService.timeSlots.set(key, timeSlot);
+            if (start <= maxDate) {
+              const key = this.formatDateKey(start);
+              if (!this.schedulingService.timeSlots.has(key)) {
+                this.schedulingService.timeSlots.set(key, []);
+              }
+              this.schedulingService.timeSlots.get(key)!.push(timeSlot);
+            }
           }
         }
+
         console.log('TIMESLOTS -> ', this.schedulingService.timeSlots);
       });
   }
@@ -138,16 +186,13 @@ export class SchedulingComponent implements OnInit {
     };
   }
 
-  setAvailabilityConfiguration() {
-    this.calendarConfigurationObject = {
-      title: 'Escolha uma data:',
-      dayControl: this.schedulingService.schedulingForm.get(
-        'selectedDay'
-      ) as FormControl,
+  setAvailabilityConfiguration(availability: AvailabilityModel[]): void {
+    this.availabilityConfigurationObject = {
+      title: 'Escolha uma disponibilidade:',
       timeSlotControl: this.schedulingService.schedulingForm.get(
-        'selectedTimeSlot'
+        SchedulingFormControls.SELECTED_TIME_SLOT
       ) as FormControl,
-      availability: this.availability,
+      availability: availability as AvailabilityModel[],
     };
   }
 
@@ -164,11 +209,11 @@ export class SchedulingComponent implements OnInit {
   selectTherapist(therapist: TherapistModel | null): void {
     if (therapist) {
       this.schedulingService.schedulingForm
-        .get(SchedulingFormControlNames.selectedTherapist)
+        .get(SchedulingFormControls.SELECTED_THERAPIST)
         ?.setValue(therapist);
     } else {
       this.schedulingService.schedulingForm
-        .get(SchedulingFormControlNames.selectedTherapist)
+        .get(SchedulingFormControls.SELECTED_THERAPIST)
         ?.setValue(null);
     }
   }
@@ -221,8 +266,10 @@ export class SchedulingComponent implements OnInit {
   }
 
   submit(isSubmitted: boolean) {
-    if(isSubmitted){
-      this.apiService.setAppointment(this.schedulingService.getAppointmentPayload());
+    if (isSubmitted) {
+      this.apiService.setAppointment(
+        this.schedulingService.getAppointmentPayload()
+      );
     }
   }
 }

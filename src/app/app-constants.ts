@@ -33,7 +33,7 @@ export const AppConstants = {
         {
           name: 'Mindfulness',
           description:
-            'Supera amiga, ja deu segue em frente ele nao te quer mais.',
+            'A prática em Mindfulness fomenta a regulação atencional e emocional por meio de propostas com o body scan, a respiração consciente, a meditação em movimento e a atenção plena nas atividades cotidianas.',
           knowMorePage: Pages.MINDFULLNESS,
         },
       ],
