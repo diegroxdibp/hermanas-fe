@@ -1,6 +1,13 @@
+import { Pages } from '../enums/pages.enum';
+
 export interface Service {
-    name: string;
-    cardImage: string;
-    cardDescription: string;
-    serviceType: string[];
+  name: string;
+  cardDescription: string;
+  serviceType: ServiceType[];
+}
+
+export interface ServiceType {
+  name: string;
+  description: string;
+  knowMorePage: Pages;
 }

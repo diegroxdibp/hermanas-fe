@@ -1,0 +1,202 @@
+// .phone-input-container {
+//   display: flex;
+//   gap: 12px;
+//   align-items: flex-start;
+// }
+
+// .country-field {
+//   width: 180px;
+//   flex-shrink: 0;
+// }
+
+// .phone-number-field {
+//   flex: 1;
+// }
+
+// .prefix {
+//   color: #666;
+//   font-size: 14px;
+//   white-space: nowrap;
+// }
+
+// ::ng-deep .mat-mdc-option {
+//   display: flex;
+//   align-items: center;
+//   gap: 12px;
+// }
+
+// ::ng-deep .mdc-list-item__primary-text {
+//   display: flex;
+//   align-items: center;
+// }
+
+// // ::ng-deep .mat-mdc-form-field .mdc-notched-outline__notch {
+// //   display: flex;
+// //   align-items: center;
+// // }
+
+// .fi {
+//   width: 20px;
+//   height: 20px;
+//   border-radius: 50%;
+//   flex-shrink: 0;
+//   display: inline-block;
+//   vertical-align: middle;
+// }
+
+// .country-flag {
+//   margin-right: 4px;
+// }
+
+// .country-info {
+//   font-size: 14px;
+//   line-height: 24px;
+// }
+
+// ::ng-deep .fi {
+//   background-size: contain;
+//   background-position: center;
+//   background-repeat: no-repeat;
+// }
+
+@use "../src/assets/styles/breakpoints.scss" as breakpoint;
+@use "../src/assets/styles/palette.scss" as palette;
+@use "../src/assets/styles/variables.scss" as variables;
+
+
+.circle {
+  border-radius: 50%;
+  padding: 4px;
+  box-sizing: unset;
+}
+
+.phone-input-area {
+  display: flex;
+  gap: 6px;
+  @media (min-width: breakpoint.$breakpoint-md) {
+    width: 100%;
+    gap: 7px;
+  }
+}
+
+.phone-number {
+  width: 100%;
+  margin-left: 4px;
+}
+
+.country-selection {
+  flex: 1;
+}
+
+.arrow {
+  &:focus {
+    border: none;
+  }
+}
+
+input[type="text"] {
+  padding-top: 20px;
+  //   font-family: $font-family-base;
+  //   color: $--color-default-black;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.input-container {
+  display: flex;
+  position: relative;
+  align-items: center;
+}
+
+.prefix {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+
+.phone-input {
+  width: 100%;
+}
+
+.content-title {
+  @media (min-width: breakpoint.$breakpoint-md) {
+    width: 600px;
+  }
+}
+
+.asterisk {
+  position: unset !important;
+  //   color: $--color-success-default;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  padding-right: 2px;
+  //   font-family: $font-family-base;
+}
+
+.success {
+  //   border-color: $--color-success-default !important;
+  //   color: $--color-default-black !important;
+}
+
+.error {
+  //   color: $--color-error-default !important;
+  //   border-color: $--color-error-default !important;
+}
+
+.cfg-input-group {
+  width: 480px;
+  @media (max-width: breakpoint.$breakpoint-md) {
+    width: 100%;
+    max-width: 480px;
+  }
+
+  &.sm {
+    width: 388px;
+    @media (max-width: breakpoint.$breakpoint-md) {
+      width: 100%;
+    }
+  }
+
+  &.lg {
+    width: 580px;
+    @media (max-width: breakpoint.$breakpoint-md) {
+      width: 100%;
+    }
+  }
+}
+
+.maxHeight {
+  height: fit-content;
+  max-height: calc(7 * 48px);
+}
+
+ul,
+li {
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.margin {
+  margin-right: 8px;
+}
+
+.phone-wrapper {
+  display: flex;
+  gap: 8px;
+
+  .country-selection {
+    width: 100%;
+    max-width: 180px;
+  }
+
+  .phone {
+    display: flex;
+    flex: 1;
+    width: 100%;
+  }
+}

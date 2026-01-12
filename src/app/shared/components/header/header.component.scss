@@ -1,16 +1,23 @@
+@use "../../../../assets/styles/breakpoints.scss" as breakpoint;
+@use "../../../../assets/styles/palette.scss" as palette;
+
 :host {
   display: flex;
-  height: 80px;
   width: 100%;
-  top: 0;
-  z-index: 100;
-  // mix-blend-mode: difference;
+
+  header {
+    display: flex;
+    height: 60px;
+    width: 100%;
+    z-index: 100;
+    border-bottom-color: rgb(87, 86, 91);
+    background-color: white;
+  }
 
   nav {
     display: flex;
     width: 100%;
     padding: 0 1em;
-    line-height: 1;
     align-items: center;
     z-index: 15;
 
@@ -38,12 +45,36 @@
         cursor: pointer;
 
         a {
-          color: white;
+          // color: white;
           font-family: Inter;
           font-size: 18px;
           font-weight: 600;
+
+          user-select: none;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
         }
       }
     }
+
+    .auth {
+      margin-left: 0;
+    }
   }
+}
+
+.account-button {
+  display: flex;
+  color: palette.$primaryColor;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.fixed {
+  position: fixed;
+  background-color: transparent;
+  top: 0;
+  transition: background-color 0.3s ease;
 }

@@ -1,0 +1,85 @@
+@use "assets/styles/palette.scss" as palette;
+@use "assets/styles/breakpoints.scss" as breakpoint;
+@use "assets/styles/variables.scss" as variables;
+
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  max-width: 388px;
+  margin: auto;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 24px;
+  padding: 24px;
+  background-color: white;
+  border-radius: 12px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+  @media (min-width: breakpoint.$breakpoint-md) {
+    max-width: 600px;
+  }
+}
+
+button {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin: 16px 0;
+  padding: 16px;
+  background-color: #f3f9fa;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+
+  span {
+    font-family: Roboto;
+    font-size: 16px;
+  }
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+
+  .divider-text {
+    display: block;
+    font-family: Roboto;
+    font-size: 14px;
+    padding: 0 16px;
+    white-space: nowrap;
+  }
+}
+
+.line {
+  height: 1px;
+  background-color: #cfdfe2;
+  width: 100%;
+}
+
+.social-login {
+  margin: 24px 0;
+  padding: 12px;
+  span {
+    line-height: 28px;
+  }
+}
+
+.other-options {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  margin-top: 24px;
+  font-size: 18px;
+
+  .sign-up {
+    font-size: 16px;
+    font-weight: normal;
+    line-height: normal;
+  }
+}

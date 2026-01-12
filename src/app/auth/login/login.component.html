@@ -1,0 +1,35 @@
+<form>
+  <app-text-input
+    [configurationObject]="emailConfigurationObject"
+  ></app-text-input>
+
+  <app-text-input
+    [configurationObject]="passwordConfigurationObject"
+  ></app-text-input>
+
+  <button class="login" (click)="signIn($event)">
+    <span>Sign In</span>
+  </button>
+
+  <div class="divider">
+    <div class="line"></div>
+    <span class="divider-text">Or sign in with</span>
+    <div class="line"></div>
+  </div>
+
+  <button class="social-login" (click)="signInWithGoogle($event)">
+    <logo [logoConfig]="googleButtonConfigurationObject"></logo>
+    <span>Sign in with Google</span>
+  </button>
+
+  <div class="other-options">
+    <span
+      >Don't you have an account?
+      <a class="sign-up" (click)="navigateTo(navigationService.Pages.SIGN_UP)"
+        >Sign up</a
+      ></span
+    >
+  </div>
+
+  <!-- <a (click)="navigateTo(navigationService.Pages.SIGN_IN)">Log in</a> -->
+</form>

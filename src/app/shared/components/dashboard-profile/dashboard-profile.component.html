@@ -1,0 +1,23 @@
+<img
+  [src]="sessionService.user()?.picture"
+  referrerpolicy="no-referrer"
+  alt="User profile"
+  class="profile-picture"
+/>
+<app-text-input
+  [configurationObject]="nameConfigurationObject"
+></app-text-input>
+
+<app-text-input
+  [configurationObject]="emailConfigurationObject"
+></app-text-input>
+
+<app-text-input
+  [configurationObject]="birthDateConfigurationObject"
+></app-text-input>
+
+<app-text-input
+  [configurationObject]="genderConfigurationObject"
+></app-text-input>
+
+<!-- <app-text-input [configurationObject]="bioConfigurationObject"></app-text-input> -->

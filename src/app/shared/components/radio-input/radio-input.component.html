@@ -1,0 +1,9 @@
+<mat-radio-group
+  class="modality"
+  aria-label="Select an option"
+  [formControl]="inputConfiguration.control"
+>
+  <ng-container *ngFor="let option of inputConfiguration.listOfOptions">
+    <mat-radio-button [value]="option">{{ option }}</mat-radio-button>
+  </ng-container>
+</mat-radio-group>

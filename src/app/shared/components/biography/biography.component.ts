@@ -3,10 +3,11 @@ import { Component, computed, OnInit, signal, Signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Bio } from '../../models/bio.model';
 import { CommonModule } from '@angular/common';
+import { ScrollAnimateDirective } from '../../directives/scroll-animate.directive';
 
 @Component({
   selector: 'app-biography',
-  imports: [CommonModule],
+  imports: [CommonModule, ScrollAnimateDirective],
   templateUrl: './biography.component.html',
   styleUrl: './biography.component.scss',
 })

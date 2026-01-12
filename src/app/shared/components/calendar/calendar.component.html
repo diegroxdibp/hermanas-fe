@@ -1,0 +1,17 @@
+<div class="calendar">
+  <mat-form-field class="example-full-width">
+    <mat-label>Choose a date</mat-label>
+    <input
+      matInput
+      [matDatepicker]="picker"
+      [min]="minDate"
+      [max]="maxDate"
+      [matDatepickerFilter]="isDateAllowed"
+      (dateInput)="onDateInput($event)"
+      placeholder="DD/MM/YYYY"
+      [maskito]="options"
+    />
+    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker [touchUi]="true"></mat-datepicker>
+  </mat-form-field>
+</div>

@@ -1,5 +1,6 @@
 @use "../src/assets/styles/breakpoints.scss" as breakpoint;
 @use "../src/assets/styles/palette.scss" as palette;
+@use "../src/assets/styles/variables.scss" as variables;
 
 * {
   box-sizing: border-box;
@@ -8,24 +9,34 @@
 html {
   height: 100%;
 }
+
 body,
 main {
   display: flex;
   flex-direction: column;
-  // align-items: center;
-  background-color: palette.$supportingColor2;
+  flex-grow: 1;
+  // background-color: palette.$supportingColor2;
+  background-color: #f0f0f0;
   margin: 0;
-}
-
-main {
-  height: 100%;
 }
 
 ul,
 li {
+  display: flex;
+  list-style: none;
+  font-family: Inter;
+  color: palette.$primaryColor;
+  font-size: 17px;
+  font-weight: 300;
+  // line-height: 28px;
+  line-height: auto;
+  text-align: justify;
   margin: 0;
   padding: 0;
-  list-style: none;
+}
+
+ul {
+  margin: 1.5em 0;
 }
 
 img,
@@ -37,47 +48,68 @@ svg {
   max-width: 100%;
 }
 
+picture {
+  img {
+    margin: auto;
+  }
+}
+
 h1 {
-  color: palette.$primaryColor;
   font-family: Inter;
+  color: palette.$primaryColor;
   font-size: 36px;
   letter-spacing: 1px;
   font-weight: 700;
   line-height: 1.2;
-  margin: 20px 0 0.2em 0;
-  @media (min-width: breakpoint.$breakpoint-lg) {
+  // margin: 20px 0 0.2em 0;
+  margin: 0;
+  @media (min-width: breakpoint.$breakpoint-md) {
     // font-size: 42px;
-    font-size: 60px;
+    font-size: 48px;
   }
 }
 
 h2 {
-  font-family: Acumin;
+  font-family: Inter;
   color: palette.$primaryColor;
   font-weight: 700;
-  font-size: 20px;
+  font-size: 24px;
   margin: 0;
+
+  @media (min-width: breakpoint.$breakpoint-md) {
+    font-size: 32px;
+  }
+}
+
+h3 {
+  font-family: Inter;
+  color: palette.$primaryColor;
+  font-weight: 700;
+  font-size: 18px;
+  margin: 0;
+  @media (min-width: breakpoint.$breakpoint-md) {
+    font-size: 24px;
+  }
 }
 
 p {
-  color: palette.$primaryColor;
   font-family: Inter;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1.2;
+  color: palette.$primaryColor;
+  font-size: 17px;
+  font-weight: 300;
+  line-height: 28px;
   text-align: justify;
-  margin: 0 0 0.5em 0;
+  margin: 0;
 
   @media (min-width: breakpoint.$breakpoint-sm) {
-    font-size: 18px;
     letter-spacing: 1.1px;
   }
-  
+
   @media (min-width: breakpoint.$breakpoint-md) {
     // font-size: 18px;
-    font-size: 22px;
-    line-height: 32px;
-    letter-spacing: 1.2px;
+    // font-size: 20px;
+    // line-height: 36px;
+    // letter-spacing: 1.3px;
   }
 }
 
@@ -88,12 +120,169 @@ a:visited,
 a:link {
   color: palette.$primaryColor;
   font-family: Inter;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
   line-height: 1.2;
   cursor: pointer;
   text-decoration: none;
 }
+
+span {
+  font-family: Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+    sans-serif;
+
+  & a {
+    font-family: Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+      "Helvetica Neue", sans-serif;
+  }
+}
+
+section {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: variables.$main-column-max-width;
+  align-items: center;
+  padding: 0 variables.$mobile-lateral-padding;
+
+  content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 1.5em;
+
+    .quotation {
+      text-align: center;
+      font-weight: 500;
+      font-style: italic;
+      margin: 1.5em;
+    }
+  }
+}
+
+.services {
+  display: flex;
+  flex-direction: column;
+  padding: 4em 0;
+  max-width: 100%;
+  gap: 3em;
+
+  .service {
+    display: flex;
+    flex-direction: column;
+    max-width: variables.$main-column-max-width;
+    padding: 0 variables.$mobile-lateral-padding;
+    gap: 1em;
+
+    .service-type {
+      // display: grid;
+      // grid-template-columns: 1fr auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 8px;
+
+      .service-name {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        align-items: center;
+        cursor: pointer;
+      }
+
+      .service-box {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+
+        .service-description {
+          font-size: 16px;
+          line-height: 30px;
+          letter-spacing: normal;
+        }
+
+        .service-actions {
+          display: flex;
+          width: 100%;
+          justify-content: right;
+          padding: 20px;
+          gap: 16px;
+        }
+      }
+    }
+  }
+
+  @media (min-width: breakpoint.$breakpoint-md) {
+    width: 100%;
+    padding: 6em 0;
+    // max-width: 800px;
+    .services {
+      gap: 3em;
+      padding: 6em 2em;
+
+      .service {
+        p {
+          font-size: 18px;
+        }
+      }
+    }
+  }
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5em;
+}
+
+.centered-list-item {
+  display: block;
+  width: 100%;
+  text-align: center;
+  line-height: normal;
+}
+
+.invert {
+  transform: rotate(180deg);
+}
+
+// For scroll animate
+.before-show {
+  opacity: 0;
+}
+
+/* specific directions */
+.before-show-up {
+  transform: translateY(40px);
+}
+
+.before-show-left {
+  transform: translateX(-40px);
+}
+
+.before-show-right {
+  transform: translateX(40px);
+}
+
+/* visible states */
+.fade-in-up {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 1.4s ease, transform 1.4s ease;
+}
+
+.fade-in-left {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.fade-in-right {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+//
 
 @font-face {
   font-family: "SegoeUI";
@@ -289,4 +478,118 @@ a:link {
   src: url("/assets/font/Acumin-BdItPro.otf") format("opentype");
   font-weight: 700;
   font-style: italic;
+}
+
+// html, body { height: 100%; }
+// body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.cfg-input-group {
+  @media (max-width: breakpoint.$breakpoint-md) {
+    width: 100%;
+    max-width: 480px;
+  }
+
+  &.sm {
+    width: 388px;
+
+    @media (max-width: breakpoint.$breakpoint-md) {
+      width: 100%;
+    }
+  }
+
+  &.md2 {
+    width: 503px;
+    @media (max-width: breakpoint.$breakpoint-md) {
+      width: 100%;
+    }
+  }
+
+  &.lg {
+    width: 580px;
+
+    @media (max-width: breakpoint.$breakpoint-md) {
+      width: 100%;
+    }
+  }
+}
+
+.phone-input-area {
+  display: flex;
+  gap: 6px;
+  @media (min-width: breakpoint.$breakpoint-md) {
+    width: 100%;
+    gap: 7px;
+  }
+}
+
+.country-selection {
+  flex: 1;
+}
+
+.cfg-input-label {
+  // font-family: $font-family-base;
+  // color: $--color-default-black;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.phone-number {
+  width: 100%;
+  margin-left: 4px;
+}
+
+.input-container {
+  display: flex;
+  position: relative;
+  align-items: center;
+}
+
+.label {
+  // font-family: $font-family-base;
+  // color: $--color-default-black;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 9px;
+  display: inline-block;
+}
+
+.prefix {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+
+.phone-input {
+  width: 100%;
+}
+
+:root {
+  --panel-width: 100%;
+}
+
+.cdk-overlay-pane:has(.full-width-panel) {
+  width: var(--panel-width) !important;
+  max-width: var(--panel-width) !important;
+}
+
+.full-width-panel.mat-mdc-select-panel {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+}
+
+.dashboard-header {
+  height: 66px;
+}
+
+mat-divider {
+  margin: 8px 0 16px 0 !important;
 }

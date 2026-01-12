@@ -1,0 +1,19 @@
+<form>
+  <app-text-input
+    [configurationObject]="nameConfigurationObject"
+  ></app-text-input>
+
+  <app-calendar
+    [calendarConfiguration]="birthDateConfigurationObject"
+  ></app-calendar>
+
+  <app-phone-input></app-phone-input>
+
+  <app-drop-down
+    [dropDownConfigurationObject]="genderConfigurationObject"
+  ></app-drop-down>
+
+  <button class="submit" (click)="submitOnboarding($event)">
+    <span>Finish Onboarding</span>
+  </button>
+</form>
