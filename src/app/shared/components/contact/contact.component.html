@@ -1,6 +1,42 @@
-<main>
-  <p style="margin-top: 200px">
-    MIM LIGA PUFAVO PRECISO DE CRIENTE! +351 915 784 896
-  </p>
-  <p>{{ courses$ | async | json }}</p>
-</main>
+<mat-card class="therapist-card" appearance="outlined">
+  <mat-card-header class="therapist-card--header">
+    <mat-card-title-group class="title-group">
+      <mat-card-title class="title">Contato</mat-card-title>
+      <mat-card-subtitle class="subtitle"
+        >Tire suas dúvidas, envie-nos uma mensagem:</mat-card-subtitle
+      >
+    </mat-card-title-group>
+  </mat-card-header>
+  <mat-divider></mat-divider>
+  <mat-card-content
+    ><div class="text">
+      <form class="text-area">
+        <mat-form-field class="example-full-width">
+          <mat-label>Assunto:</mat-label>
+          <input
+            #subject
+            matInput
+            placeholder="Terapia"
+            value="Análise Corporal Reichiana"
+          />
+        </mat-form-field>
+
+        <mat-form-field class="example-full-width">
+          <mat-label>Mensagem:</mat-label>
+          <textarea
+            #body
+            matInput
+            placeholder="Ex. Gostaria de marcar um agendamento para segunda-feira as 18 horas..."
+          ></textarea>
+        </mat-form-field>
+      </form>
+    </div>
+    <button
+      mat-raised-button
+      class="submit--button"
+      (click)="handleScheduleButton()"
+    >
+      <a>ENVIAR</a>
+    </button>
+  </mat-card-content>
+</mat-card>

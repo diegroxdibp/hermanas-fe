@@ -2,10 +2,33 @@ import { NavbarBackground } from './shared/enums/navbar-background.enum';
 import { Pages } from './shared/enums/pages.enum';
 import { Service } from './shared/models/service.model';
 
+const apiRootUrl = 'http://localhost:8080';
+
 export const AppConstants = {
   authentication: {
-    exists: false,
+    exists: true,
+    emailInputTitle: 'Email:',
+    passwordInputTitle: 'Password:',
+    nameInputTitle: 'Nome:',
+    poneNumberTitle: 'Telefone:',
+    birthdateTitle: 'Birthdate:',
+    genderTitle: 'Gênero:',
+    bioTitle: 'Bio:'
   },
+
+  apiEndpoints: {
+    root: apiRootUrl,
+    me: `${apiRootUrl}/api/auth/me`,
+    register: `${apiRootUrl}/api/user/register`,
+    onboarding: `${apiRootUrl}/api/user/onboarding`,
+    updateProfile: `${apiRootUrl}/api/user/profile`,
+    getProfile: `${apiRootUrl}/api/user/profile`,
+    login: `${apiRootUrl}/api/auth/login`,
+    logout: `${apiRootUrl}/api/auth/logout`,
+    loginWithGoogle: `${apiRootUrl}/oauth2/authorization/google`,
+  },
+
+  defaultCountry: 'pt',
 
   navigation: {
     background: NavbarBackground.White,
@@ -15,6 +38,11 @@ export const AppConstants = {
   scheduling: {
     minDate: new Date(),
     maxDate: new Date(new Date().setMonth(new Date().getMonth() + 2)),
+  },
+
+  birthdate: {
+    minDate: new Date(),
+    maxDate: new Date(new Date().setFullYear(new Date().getFullYear() - 100)),
   },
 
   services: [
@@ -59,32 +87,5 @@ export const AppConstants = {
         },
       ],
     } as Service,
-    // {
-    //   name: 'Oficinas de autorregulação',
-    //   cardImage: 'assets/images/autoregulacao.jpg',
-    //   cardDescription:
-    //     'Oficiniares iares regulares ares. Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...',
-    //   serviceType: [
-    //     'mindfulness',
-    //     'de movimento',
-    //     'escrita terapêutica',
-    //     'relaxamento',
-    //     'mandala',
-    //   ],
-    // } as Service,
-    // {
-    //   name: 'Grupos',
-    //   cardImage: 'assets/images/grupos.jpg',
-    //   cardDescription:
-    //     'Grupos grupais grupasticos. Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...',
-    //   serviceType: ['de estudo', 'de leitura', 'supervisão'],
-    // } as Service,
-    // {
-    //   name: 'Linha de suporte para crises',
-    //   cardImage: 'assets/images/surtando.jpg',
-    //   cardDescription:
-    //     'Linha de prevencao suicida disque sucidio agora. Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...',
-    //   serviceType: ['crises com ideação suicida', 'crises pontuais'],
-    // } as Service,
   ],
 };

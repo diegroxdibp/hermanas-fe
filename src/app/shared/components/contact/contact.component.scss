@@ -1,0 +1,53 @@
+@use "../src/assets/styles/variables.scss" as variables;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  max-width: variables.$main-column-max-width;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.therapist-section {
+  display: flex;
+  flex-direction: column;
+
+  .therapist-selection {
+    width: 100%;
+  }
+
+  .therapist-card {
+    display: flex;
+    flex-direction: column;
+
+    .therapist-card--header {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      .title-group {
+        // margin-bottom: 16px;
+        .title {
+          color: #005a89;
+        }
+        .subtitle {
+          font-weight: 300;
+          color: #005a89;
+        }
+      }
+    }
+  }
+}
+
+.text-area {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.submit--button {
+  width: 100%;
+}

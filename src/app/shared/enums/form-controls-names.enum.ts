@@ -1,0 +1,17 @@
+export enum FormControlsNames {
+  TEXT = 'text',
+  EMAIL = 'email',
+  PASSWORD = 'password',
+  NAME = 'name',
+  GENDER = 'gender',
+  BIRTHDATE = 'birthdate',
+  PHONE = 'phone',
+  PHONE_PREFIX = 'phone-prefix',
+  NAME_PROFILE = 'name-profile',
+  EMAIL_PROFILE = 'email-profile',
+  GENDER_PROFILE = 'gender-profile',
+  BIO_PROFILE = 'bio-profile',
+  BIRTHDATE_PROFILE = 'birthdate-profile',
+  PHONE_PROFILE = 'phone-profile',
+  PHONE_PREFIX_PROFILE = 'phone-prefix-profile',
+}

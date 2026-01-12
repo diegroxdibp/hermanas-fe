@@ -1,0 +1,220 @@
+<!-- <div class="phone-input-container">
+      <mat-form-field appearance="outline" class="country-field">
+        <mat-label>Country</mat-label>
+        <mat-select 
+          [(value)]="selectedCountry"
+          (selectionChange)="onCountryChange()"
+          [disabled]="isDisabled">
+          <mat-option 
+            *ngFor="let country of countries" 
+            [value]="country">
+            <span class="country-flag" [ngClass]="['fi', 'fis', 'fi-' + country.code]"></span>
+            <span class="country-info">{{ country.name }} (+{{ country.InternationalAreaCode }})</span>
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="phone-number-field">
+        <mat-label>Phone Number</mat-label>
+        <span matTextPrefix class="prefix">
+          +{{ selectedCountry().InternationalAreaCode }}
+          <span *ngIf="selectedCountry().code === 'de'">(0)</span>
+          &nbsp;
+        </span>
+        <input 
+          matInput 
+          type="tel"
+          [(ngModel)]="phoneNumber"
+          (ngModelChange)="onPhoneChange()"
+          (input)="onInput($event)"
+          [disabled]="isDisabled"
+          [maxlength]="maxLength"
+          placeholder="Enter phone number">
+      </mat-form-field>
+    </div> -->
+
+<div class="phone-wrapper" #phoneWrapper>
+  <mat-form-field class="country-selection">
+    <mat-label aria-label="Land" for="countrySelect">Land</mat-label>
+    <mat-select
+      #countrySelect
+      panelClass="full-width-panel"
+      id="countrySelect"
+      [formControl]="prefixControl"
+      (valueChange)="clearInput()"
+      required
+    >
+      @for (country of countries; track country.name) {
+      <mat-option
+        [value]="country"
+        (click)="formService.currentCountryPhone.next(country)"
+      >
+        <span
+          [appLazyLoadingFlagDirective]="'fi-' + country.code"
+          class="circle fi fis"
+          aria-hidden="true"
+        ></span>
+        <span class="text"
+          >{{ country.name }} (+{{ country.InternationalAreaCode }})</span
+        ></mat-option
+      >
+
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field class="phone">
+    <mat-label>Telephone</mat-label>
+    <span class="margin" matTextPrefix>{{
+      "+" + formService.currentCountryPhone.value.InternationalAreaCode
+    }}</span>
+    <input
+      matInput
+      placeholder="555-555-1234"
+      id="phoneNumber"
+      type="tel"
+      name="phoneNumber"
+      [formControl]="control"
+      [minLength]="phoneInputConfiguration.minLength"
+      [maxLength]="phoneInputConfiguration.maxLength"
+    />
+  </mat-form-field>
+</div>
+
+<!-- <div class="cfg-input-group">
+  <div class="phone-input-area">
+    <div class="country-selection">
+      <label
+        class="cfg-input-label"
+        aria-label="Ländervorwahl"
+        for="countrySelect"
+        ><span class="asterisk" aria-hidden="true">*</span>Land</label
+      >
+      <div
+        #countrySelect
+        tabindex="0"
+        id="countrySelect"
+        (keydown)="openDropDownCountry($event)"
+        class="cfg-input-field success"
+        style="width: 100px"
+        (click)="openDropDown($event)"
+        (focus)="onFocus($event)"
+        (blur)="onBlur($event)"
+        [class.selection-active]="
+          countrySelectionIsOpen || isFocusedCountrySelect
+        "
+      >
+        <span
+          aria-hidden="true"
+          [ngClass]="[
+            'circle',
+            'fi',
+            'fis',
+            'fi-' + formService.currentCountryPhone.value.code
+          ]"
+        ></span>
+        <span class="arrow" id="arrowDown">
+          <i-tabler
+            *ngIf="!countrySelectionIsOpen"
+            name="chevron-down"
+            aria-hidden="true"
+          ></i-tabler>
+          <i-tabler
+            *ngIf="countrySelectionIsOpen"
+            name="chevron-up"
+            aria-hidden="true"
+          ></i-tabler>
+        </span>
+      </div>
+    </div>
+
+    <div class="phone-number">
+      <label class="cfg-input-label" for="phoneNumber"
+        ><span
+          class="asterisk"
+          [ngClass]="{ error: showError() }"
+          aria-hidden="true"
+          >*</span
+        >Handynummer</label
+      >
+      <div class="input-container">
+        <span #prefix class="label prefix phone-prefix-color"
+          >+{{ formService.currentCountryPhone.value.InternationalAreaCode
+          }}<span
+            class="phone-prefix-color"
+            *ngIf="formService.currentCountryPhone.value.name === 'Germany'"
+            >(0)</span
+          ></span
+        >
+        <input
+          #phoneNumberInput
+          id="phoneNumber"
+          class="cfg-input-field lg phone-input"
+          type="tel"
+          name="phoneNumber"
+          [formControl]="control"
+          [minlength]="phoneInputConfiguration.minLength"
+          [ngClass]="{ success: showSuccess(), error: showError() }"
+          [maxlength]="phoneInputConfiguration.maxLength"
+        />
+        <i-tabler
+          *ngIf="showSuccess()"
+          name="circle-check"
+          class="circle-check"
+          aria-hidden="true"
+        ></i-tabler>
+        <i-tabler
+          *ngIf="showError()"
+          name="exclamation-circle"
+          class="icon-exclamation"
+          aria-hidden="true"
+        ></i-tabler>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="drop-down maxHeight"
+    #countryDropdown
+    *ngIf="countrySelectionIsOpen"
+    (keydown)="toggleDropdownCountries($event)"
+    role="combobox"
+    aria-controls="countriesList"
+  >
+    <ul id="countriesList" role="listbox">
+      <li
+        *ngFor="let country of countries; let i = index"
+        #countryDropdownItem
+        (click)="formService.currentCountryPhone.next(country)"
+        (click)="toggleCountrySelection($event)"
+        (keydown)="formService.currentCountryPhone.next(country)"
+        (keydown)="toggleCountrySelection($event)"
+        class="country"
+        [class.selected-country]="
+          formService.currentCountryPhone.value.name === country.name
+        "
+        [class.focus]="activeIndexCountry === i && isFocused"
+        role="option"
+        [id]="'id' + country.name"
+      >
+        <span
+          [appLazyLoadingFlagDirective]="'fi-' + country.code"
+          class="circle fi fis"
+          aria-hidden="true"
+        ></span>
+        <span class="text"
+          >{{ country.name }} (+{{ country.InternationalAreaCode }})</span
+        >
+        <i-tabler *ngIf="formService.currentCountryPhone.value.name === country.name" name="check" class="icon-check" aria-hidden="true"></i-tabler>
+      </li>
+    </ul>
+  </div>
+
+  <p *ngIf="!countrySelectionIsOpen && !showError()" class="tip">
+    {{ getTipMessage() }}
+  </p>
+
+  <p *ngIf="!countrySelectionIsOpen && showError()" class="validation">
+    {{ getErrorMessage() }}
+  </p>
+</div> -->

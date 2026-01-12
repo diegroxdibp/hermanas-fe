@@ -1,42 +1,49 @@
 import { SchedulingService } from './../../shared/services/scheduling.service';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AvailabilityModel } from '../../shared/models/availability.model';
 import { TherapistModel } from '../../shared/models/therapist.model';
 import { Roles } from '../../shared/enums/roles.enum';
 import { AppointmentPayload } from '../../shared/models/appointment-payload.model';
+import { AppConstants } from '../../app-constants';
+
+import { HttpClient } from '@angular/common/http';
+import { User } from '../../auth/user.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ApiService {
-  apiRootUrl: string = 'http://localhost:8080';
-  constructor(
-    private httpClient: HttpClient,
-    private schedulingService: SchedulingService
-  ) {}
+  private readonly http = inject(HttpClient);
+
+  constructor(private schedulingService: SchedulingService) {}
 
   getCourses() {
-    return this.httpClient.get(this.apiRootUrl + '/api/courses');
+    return this.http.get(AppConstants.apiEndpoints.root + '/api/courses');
   }
 
   getTherapists(): Observable<TherapistModel[]> {
-    return this.httpClient.post<TherapistModel[]>(
-      this.apiRootUrl + '/users/findByRole',
-      { role: Roles.THERAPIST }
+    return this.http.post<TherapistModel[]>(
+      AppConstants.apiEndpoints.root + '/api/user/findByRole',
+      { role: Roles.THERAPIST },
+      { withCredentials: true }
     );
   }
 
   getAvailabilitites(): Observable<AvailabilityModel[]> {
-    return this.httpClient.get<AvailabilityModel[]>(
-      this.apiRootUrl + '/availability/getAll'
+    return this.http.get<AvailabilityModel[]>(
+      AppConstants.apiEndpoints.root + '/api/availability/getAll',
+      { withCredentials: true }
     );
   }
 
-    getAvailabilititesByTherapistId(therapistId: number): Observable<AvailabilityModel[]> {
-    return this.httpClient.get<AvailabilityModel[]>(
-      this.apiRootUrl + `/availability/therapist/${therapistId}`
+  getAvailabilititesByTherapistId(
+    therapistId: number
+  ): Observable<AvailabilityModel[]> {
+    return this.http.get<AvailabilityModel[]>(
+      AppConstants.apiEndpoints.root +
+        `/api/availability/therapist/${therapistId}`,
+      { withCredentials: true }
     );
   }
 
@@ -50,5 +57,17 @@ export class ApiService {
     //     "isRecurring": true,
     //     "type":"REMOTE"
     // }
+  }
+
+  sendEmail(subject: string, body: string) {
+    this.http
+      .post(`${AppConstants.apiEndpoints.root}/email/send`, {
+        to: 'diegrox.rox@gmail.com',
+        subject,
+        body,
+      })
+      .subscribe((response) => {
+        console.log(response);
+      });
   }
 }

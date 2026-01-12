@@ -1,0 +1,71 @@
+@use "../../../../assets/styles/breakpoints.scss" as breakpoint;
+@use "../../../../assets/styles/palette.scss" as palette;
+
+:host {
+  display: flex;
+  flex-grow: 1;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 8px;
+  padding: 8px;
+
+  @media (min-width: breakpoint.$breakpoint-sm) {
+    flex-direction: row;
+  }
+}
+
+.dashboard-menu {
+  display: flex;
+  width: 280px;
+
+  .dashboard-nav {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    gap: 4px;
+    letter-spacing: 1px;
+
+    a {
+      font-size: 16px;
+      font-weight: 400;
+      font-family: Roboto;
+      color: rgb(123 123 124);
+    }
+
+    .active {
+      font-size: 16px;
+      font-weight: 500;
+      color: rgb(32, 32, 46);
+    }
+  }
+  // dashboard.component.scss
+  nav a {
+    display: block;
+    padding: 12px 16px;
+    color: #666;
+    text-decoration: none;
+    transition: all 0.2s;
+
+    &:hover {
+      background: #f5f5f5;
+      color: #333;
+    }
+
+    &.active {
+      background: #e3f2fd;
+      color: #1976d2;
+      font-weight: 600;
+      border-left: 3px solid #1976d2;
+    }
+  }
+}
+
+.dashboard-view {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}

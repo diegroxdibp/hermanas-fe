@@ -1,21 +1,37 @@
-<mat-accordion class="example-headers-align" multi>
+<mat-accordion class="availability-headers-align" multi>
   @for (availability of availabilityConfiguration.availability; track
   availability.id) {
   <mat-expansion-panel>
     <mat-expansion-panel-header>
-      <mat-panel-title> {{availability.startTime}} - {{availability.endTime}}</mat-panel-title>
+      <mat-panel-title>
+        {{ formatTime(availability.startTime) }} -
+        {{ formatTime(availability.endTime) }}</mat-panel-title
+      >
       <mat-panel-description>
         Type your name and age
         <mat-icon>account_circle</mat-icon>
       </mat-panel-description>
     </mat-expansion-panel-header>
-    <mat-button-toggle-group name="fontStyle" aria-label="Font Style">
-      <mat-button-toggle value="bold" disabled>Qualquer</mat-button-toggle>
-      <mat-button-toggle value="italic" disabled>Presencial</mat-button-toggle>
-      <mat-button-toggle value="underline">Remoto</mat-button-toggle>
-    </mat-button-toggle-group>
-    <button mat-raised-button disabled="">Disabled</button>
-    <button mat-raised-button (click)="scheduleAppointment()">Agendar</button>
+    <div class="availability-content">
+      <mat-button-toggle-group name="fontStyle" aria-label="Font Style">
+        <mat-button-toggle
+          [value]="AvailabilityType.LOCAL"
+          [disabled]="availability.type === AvailabilityType.REMOTE"
+          >Presencial</mat-button-toggle
+        >
+        <mat-button-toggle
+          [value]="AvailabilityType.REMOTE"
+          [disabled]="availability.type === AvailabilityType.LOCAL"
+          >Remoto</mat-button-toggle
+        >
+        <mat-button-toggle
+          [value]="AvailabilityType.ANY"
+          [disabled]="availability.type !== AvailabilityType.ANY"
+          >Qualquer</mat-button-toggle
+        >
+      </mat-button-toggle-group>
+      <button mat-raised-button (click)="scheduleAppointment()">Agendar</button>
+    </div>
   </mat-expansion-panel>
   } @empty {
   <h3>Sem disponibilidade para esse dia.</h3>

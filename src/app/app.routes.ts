@@ -1,3 +1,4 @@
+import { OnboardingComponent } from './shared/components//onboarding/onboarding.component';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { BodyComponent } from './shared/components/body/body.component';
@@ -8,6 +9,12 @@ import { ContactComponent } from './shared/components/contact/contact.component'
 import { SchedulingComponent } from './shared/components/scheduling/scheduling.component';
 import { MindfulnessComponent } from './shared/components/mindfulness/mindfulness.component';
 import { AnaliseCorporalReichanaComponent } from './shared/components/analise-corporal-reichana/analise-corporal-reichana.component';
+import { UserDashboardComponent } from './shared/components/user-dashboard/user-dashboard.component';
+import { AccessGuard } from './auth/auth.guard';
+import { AuthOnlyGuard } from './auth/authOnly.guard';
+import { DashboardProfileComponent } from './shared/components/dashboard-profile/dashboard-profile.component';
+import { DashboardScheduleComponent } from './shared/components/dashboard-schedule/dashboard-schedule.component';
+import { DashboardNotificationsComponent } from './shared/components/dashboard-notifications/dashboard-notifications.component';
 
 export const routes: Routes = [
   { path: Pages.HOME, component: BodyComponent },
@@ -18,9 +25,48 @@ export const routes: Routes = [
   { path: Pages.MINDFULLNESS, component: MindfulnessComponent },
   { path: Pages.ABOUT, component: AboutComponent },
   { path: Pages.CONTACT, component: ContactComponent },
-  { path: Pages.SCHEDULING, component: SchedulingComponent },
+
   { path: Pages.BIO, component: BiographyComponent },
   { path: `${Pages.BIO}/:name`, component: BiographyComponent },
+  {
+    path: 'auth',
+    loadChildren: () => import('./auth/auth.module').then((m) => m.AuthModule),
+  },
+  {
+    path: 'onboarding',
+    canMatch: [AuthOnlyGuard],
+    loadComponent: () =>
+      import('./shared/components//onboarding/onboarding.component').then(
+        (m) => m.OnboardingComponent
+      ),
+  },
+  {
+    path: '',
+    canMatch: [AccessGuard],
+    children: [
+      {
+        path: Pages.DASHBOARD,
+        loadComponent: () =>
+          import(
+            './shared/components/user-dashboard/user-dashboard.component'
+          ).then((m) => m.UserDashboardComponent),
+        children: [
+          { path: '', redirectTo: 'profile', pathMatch: 'full' },
+          { path: 'profile', component: DashboardProfileComponent },
+          { path: 'schedule', component: DashboardScheduleComponent },
+          { path: 'notifications', component: DashboardNotificationsComponent },
+          // { path: 'mensagens', component: MensagensComponent },
+        ],
+      },
+      {
+        path: Pages.SCHEDULING,
+        loadComponent: () =>
+          import('./shared/components/scheduling/scheduling.component').then(
+            (m) => m.SchedulingComponent
+          ),
+      },
+    ],
+  },
   { path: '**', redirectTo: '' },
 ];
 

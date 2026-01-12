@@ -9,7 +9,7 @@
   background-color: #f0f0f0;
   width: 100%;
   align-items: center;
-  margin-bottom: 8em;
+  margin-bottom: 2em;
 
   .introduction {
     margin: 3em 0;
@@ -17,6 +17,10 @@
 
   .services {
     background: #c7ebff;
+
+    ul {
+      flex-direction: column;
+    }
   }
 
   @media (min-width: breakpoint.$breakpoint-md) {

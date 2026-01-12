@@ -1,0 +1,40 @@
+<label [for]="configurationObject.title">{{ configurationObject.title }}</label>
+
+@if(!configurationObject.disabled){
+<input
+  [name]="configurationObject.title"
+  [type]="configurationObject.inputType"
+  [formControl]="configurationObject.control"
+  [placeholder]="configurationObject.placeHolder"
+/>
+} @if(configurationObject.disabled){
+<input
+  [name]="configurationObject.title"
+  [type]="configurationObject.inputType"
+  [value]="
+    configurationObject.control.value
+      | dynamicFormat : configurationObject.formatType!
+  "
+  [placeholder]="configurationObject.placeHolder"
+  [disabled]="true"
+/>
+
+} @if(configurationObject.title ===
+AppConstants.authentication.passwordInputTitle &&
+configurationObject.showValidationTips){
+
+<div class="password-rules">
+  <span [class.valid]="passwordStatus.minLength">✔ Min 8 characters</span>
+  <span [class.valid]="passwordStatus.maxLength">✔ Max 128 characters</span>
+  <span [class.valid]="passwordStatus.lowercase"
+    >✔ At least 1 lowercase letter</span
+  >
+  <span [class.valid]="passwordStatus.uppercase"
+    >✔ At least 1 uppercase letter</span
+  >
+  <span [class.valid]="passwordStatus.digit">✔ At least 1 number</span>
+  <span [class.valid]="passwordStatus.specialChar"
+    >✔ At least 1 special character</span
+  >
+</div>
+}

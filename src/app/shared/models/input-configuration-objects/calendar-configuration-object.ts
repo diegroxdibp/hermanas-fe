@@ -1,16 +1,14 @@
 import { FormControl } from '@angular/forms';
-import { AvailabilityModel } from '../availability.model';
+import { CalendarType } from '../../enums/calendar-type.enum';
 
 export interface CalendarConfigurationObject {
   title?: string;
-  dayControl: FormControl;
-  timeSlotControl: FormControl;
-  availability: AvailabilityModel[];
+  control: FormControl;
+  calendarType: CalendarType;
 }
 
 export const emptyCalendarConfiguration: CalendarConfigurationObject = {
   title: '',
-  dayControl: new FormControl(),
-  timeSlotControl: new FormControl(),
-  availability: [],
+  control: new FormControl(),
+  calendarType: CalendarType.SCHEDULING,
 };

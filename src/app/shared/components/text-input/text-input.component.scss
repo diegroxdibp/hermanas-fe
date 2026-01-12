@@ -1,0 +1,43 @@
+label {
+  display: inline-block;
+  font-family: Roboto;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+input {
+  font-family: Roboto;
+  font-size: 16px;
+  width: 100%;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #d4d7e3;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+
+  &:focus-visible {
+    outline: 1px solid blue;
+  }
+
+  &::placeholder {
+    color: #8897ad;
+  }
+}
+
+.password-rules {
+  display: flex;
+  flex-direction: column;
+}
+
+.password-rules span {
+  font-family: Roboto;
+  font-weight: 400;
+  font-size: 12px;
+  color: #ccc;
+  font-size: 13px;
+}
+
+.password-rules span.valid {
+  color: #23a25b;
+  font-weight: 400;
+}

@@ -14,7 +14,6 @@ import {
   transition,
   trigger,
 } from '@angular/animations';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ScrollAnimateDirective } from '../../directives/scroll-animate.directive';
 
 @Component({

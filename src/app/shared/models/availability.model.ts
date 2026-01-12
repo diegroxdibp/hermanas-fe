@@ -1,5 +1,5 @@
-import { DayOfWeek } from "../enums/day-of-week.enum";
-
+import { AvailabilityType } from '../enums/availability-type.enum';
+import { DayOfWeek } from '../enums/day-of-week.enum';
 export interface AvailabilityModel {
   id: number;
   therapistId: number;
@@ -9,15 +9,19 @@ export interface AvailabilityModel {
   endTime: string;
   isRecurring: boolean;
   recurringDay: DayOfWeek;
+  type: AvailabilityType;
+  appointments: [];
 }
 
 export const emptyAvailability: AvailabilityModel = {
   id: 1,
   therapistId: 1,
-  startDate: "",
-  endDate: "",
-  startTime: "",
-  endTime: "",
+  startDate: '',
+  endDate: '',
+  startTime: '',
+  endTime: '',
   isRecurring: false,
-  recurringDay: DayOfWeek.MONDAY
+  recurringDay: DayOfWeek.MONDAY,
+  type: AvailabilityType.ANY,
+  appointments: []
 };

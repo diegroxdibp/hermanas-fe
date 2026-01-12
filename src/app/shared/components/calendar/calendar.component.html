@@ -4,8 +4,8 @@
     <input
       matInput
       [matDatepicker]="picker"
-      [min]="AppConstants.scheduling.minDate"
-      [max]="AppConstants.scheduling.maxDate"
+      [min]="minDate"
+      [max]="maxDate"
       [matDatepickerFilter]="isDateAllowed"
       (dateInput)="onDateInput($event)"
       placeholder="DD/MM/YYYY"
@@ -15,9 +15,3 @@
     <mat-datepicker #picker [touchUi]="true"></mat-datepicker>
   </mat-form-field>
 </div>
-
-<!-- <mat-chip-listbox class="mat-mdc-chip-set-stacked" aria-label="Time slots">
-  @for (timeSlot of timeSlots; track $index) {
-  <mat-chip-option selected>{{ timeSlot }}</mat-chip-option>
-  }
-</mat-chip-listbox> -->

@@ -2,7 +2,9 @@ import {
   Component,
   ElementRef,
   HostListener,
+  inject,
   Renderer2,
+  ViewChild,
 } from '@angular/core';
 import { NavigationBarService } from '../../services/navigation-bar.service';
 import { ScreenSizeService } from '../../services/screen-size.service';
@@ -10,32 +12,60 @@ import { FullscreenMenuComponent } from '../fullscreen-menu/fullscreen-menu.comp
 import { NavigationService } from '../../services/navigation.service';
 import { Pages } from '../../enums/pages.enum';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../../auth/auth.service';
+import { MatIcon } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-header',
-  imports: [FullscreenMenuComponent, CommonModule],
+  imports: [
+    FullscreenMenuComponent,
+    CommonModule,
+    MatIcon,
+    MatMenuModule,
+    MatButtonModule,
+  ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
   standalone: true,
 })
 export class HeaderComponent {
+  readonly authService = inject(AuthService);
+  readonly navbarService = inject(NavigationBarService);
+  readonly screenSizeService = inject(ScreenSizeService);
+  readonly navigationService = inject(NavigationService);
+  readonly renderer = inject(Renderer2);
+
+  fixedHeader = true;
+  heroHeight: string = '100vh';
+  backgroundColor: string = 'white';
+  @ViewChild('header') el!: ElementRef;
   @HostListener('window:scroll', [])
   onWindowScroll() {
-    this.checkScroll();
+    if (this.navigationService.currentUrl.value === '/') {
+      this.checkScroll();
+    }
   }
-  Pages = Pages;
-  heroHeight: string = '100vh';
-  backgroundColor: string = '#ffffff';
-  constructor(
-    public navbarService: NavigationBarService,
-    public screenSizeService: ScreenSizeService,
-    public navigationService: NavigationService,
-    private el: ElementRef,
-    private renderer: Renderer2
-  ) {}
+
+  constructor() {
+    this.navigationService.currentUrl.subscribe((url: string) => {
+      if (url === '/') {
+        this.fixedHeader = true;
+        this.backgroundColor = 'transparent';
+      } else {
+        this.fixedHeader = false;
+        this.backgroundColor = 'white';
+      }
+    });
+  }
 
   navigateTo(page: Pages) {
     this.navigationService.navigateTo(page);
+  }
+
+  logOut(): void {
+    this.authService.logout();
   }
 
   private checkScroll() {
@@ -70,11 +100,7 @@ export class HeaderComponent {
   }
 
   private addBackground() {
-    this.renderer.setStyle(
-      this.el.nativeElement,
-      'background-color',
-      this.backgroundColor
-    );
+    this.renderer.setStyle(this.el.nativeElement, 'background-color', 'white');
     this.renderer.setStyle(
       this.el.nativeElement,
       'transition',

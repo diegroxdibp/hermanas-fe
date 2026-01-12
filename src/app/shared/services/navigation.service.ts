@@ -44,7 +44,9 @@ export class NavigationService {
       (route) => cleanUrl === route || cleanUrl.startsWith(route)
     );
   }
+
   navigateTo(page: Pages): void {
+    console.log('Navigating to: ', page)
     this.router.navigate([page]);
   }
 }

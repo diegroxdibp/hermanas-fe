@@ -1,4 +1,4 @@
-import { DayOfWeek } from '../enums/day-of-week.enum';
+import { DayOfWeek } from './day-of-week.enum';
 
 export const dayNumberToEnum: Record<number, DayOfWeek> = {
   0: DayOfWeek.SUNDAY,

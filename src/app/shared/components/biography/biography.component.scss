@@ -17,7 +17,6 @@
     display: flex;
     justify-content: center;
     width: 100%;
-    padding: 1em 0;
     max-width: 1140px;
     gap: 1.5em;
 
@@ -27,9 +26,9 @@
     }
 
     picture {
-      width: 100%; /* Set the desired container width */
+      width: 100%;
       max-width: 400px;
-      overflow: hidden; /* Ensures content doesn't overflow */
+      overflow: hidden;
       position: relative;
       margin: 0;
       height: auto;
@@ -49,6 +48,7 @@
       display: flex;
       flex-direction: column;
       max-width: variables.$main-column-max-width;
+      gap: 3em;
 
       ul {
         display: flex;
@@ -57,7 +57,6 @@
         gap: 1em;
 
         @media (min-width: breakpoint.$breakpoint-md) {
-          margin: 1.5em;
         }
       }
     }
@@ -71,15 +70,20 @@
     font-size: 18px;
     letter-spacing: 1.1px;
     font-style: italic;
+    margin-bottom: 1.5em;
   }
 
   @media (min-width: breakpoint.$breakpoint-sm) {
     max-width: unset;
     padding: 2em 3em 0 3em;
+
+    section {
+       max-width: variables.$main-column-max-width;
+    }
+
     .bio {
       gap: 32px;
       padding: 0;
-      // height: fit-content;
     }
 
     h2 {
@@ -88,14 +92,19 @@
     }
   }
 
+   @media (min-width: breakpoint.$breakpoint-sm) {
+    gap: 3em;
+  }
+
   @media (min-width: breakpoint.$breakpoint-md) {
     padding: 3em;
-    gap: 7em;
+    gap: 5em;
     padding: 1em 0;
 
     .bio {
       flex-direction: row;
       gap: 64px;
+      max-width: variables.$main-column-max-width-md;
 
       content,
       picture {
@@ -139,17 +148,13 @@
 
 .books {
   max-height: 250px !important;
-  max-width: 100% !important;
-  img {
-    width: 100% !important;
+
+  @media (min-width: breakpoint.$breakpoint-sm) {
+    max-width: 100% !important;
   }
 
   @media (min-width: breakpoint.$breakpoint-md) {
-    max-height: 600px !important;
-    max-width: 50% !important;
-
-    img {
-      width: initial;
-    }
+    max-height: 500px !important;
+     max-width: 400px !important;
   }
 }

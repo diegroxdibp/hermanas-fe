@@ -1,0 +1,9 @@
+<h4>{{ dropDownConfigurationObject.title }}</h4>
+<mat-form-field>
+  <mat-label>{{ dropDownConfigurationObject.label }}</mat-label>
+  <mat-select [formControl]="dropDownConfigurationObject.control">
+    @for (value of dropDownConfigurationObject.values; track value) {
+    <mat-option [value]="value">{{ value }}</mat-option>
+    }
+  </mat-select>
+</mat-form-field>

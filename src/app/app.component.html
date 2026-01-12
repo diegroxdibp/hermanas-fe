@@ -1,28 +1,4 @@
-<!-- <app-header></app-header> -->
-<header #header
-  [class]="{ fixed: fixedHeader }"
-  [style]="{ backgroundColor: backgroundColor }"
->
-  <nav id="navbar">
-    @if(screenSizeService.isDesktop()){
-    <ul>
-      <li *ngFor="let navigationItem of navigationService.navigationItems">
-        <a (click)="navigateTo(navigationItem.destination)" class="menu-item">{{
-          navigationItem.name
-        }}</a>
-      </li>
-    </ul>
-
-    @if (navbarService.authentication) {
-    <ul>
-      <li><a href="">Log in</a></li>
-      <li><a href="">Sign up</a></li>
-    </ul>
-    } } @if(!screenSizeService.isDesktop()){
-    <app-fullscreen-menu></app-fullscreen-menu>
-    }
-  </nav>
-</header>
+<app-header></app-header>
 
 <main>
   <router-outlet />

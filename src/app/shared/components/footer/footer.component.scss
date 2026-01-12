@@ -1,22 +1,26 @@
 @use "../../../../assets/styles/palette.scss" as palette;
 
 :host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60px;
+//   background-color: palette.$supportingColor3;
+
+  ul {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 60px;
-    background-color: palette.$supportingColor3;
+    gap: 1em;
+    padding: 0;
 
-    ul {
-        display: flex;
-        gap: 1em;
-        padding: 0;
-
-        li {
-            font-family: Inter;
-            font-weight: 700;
-            color: palette.$primaryColor;
-            cursor: pointer;
-        }
+    li {
+      font-family: Inter;
+      font-weight: 700;
+      color: palette.$primaryColor;
+      cursor: pointer;
     }
+  }
+}
+
+.footer-text {
+  color: #959cb6;
 }
