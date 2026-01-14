@@ -1,19 +1,12 @@
-import { HttpClient } from '@angular/common/http';
 import { AvailabilityModel } from './../../models/availability.model';
 import { TherapistModel } from './../../models/therapist.model';
 import { SchedulingService } from './../../services/scheduling.service';
 import { ApiService } from './../../../core/services/api.service';
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import {
-  FormControl,
-  FormsModule,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { provideNativeDateAdapter, MatOption } from '@angular/material/core';
-import mask from '../../masks/future-date.mask';
 import { CalendarComponent } from '../calendar/calendar.component';
 import {
   emptyRadioInputConfiguration,
@@ -35,10 +28,10 @@ import {
 import { SchedulingFormControls } from '../../enums/scheduling-form-controls.enum';
 import { take } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
-import { dayNumberToEnum } from '../../enums/day-to-number-enum.util';
 import { CalendarType } from '../../enums/calendar-type.enum';
 import { parseDate } from '../../utils/date-helper.util';
 import { MatIcon } from '@angular/material/icon';
+import { AvailabilityType } from '../../enums/availability-type.enum';
 
 @Component({
   selector: 'app-scheduling',
@@ -144,8 +137,13 @@ export class SchedulingComponent implements OnInit {
 
     this.availabilityConfigurationObject = {
       title: 'Escolha uma disponibilidade:',
-      timeSlotControl: this.schedulingService.schedulingForm.get(
-        SchedulingFormControls.SELECTED_TIME_SLOT
+      selectedDate: parseDate(
+        this.schedulingService.schedulingForm.get(
+          SchedulingFormControls.SELECTED_DAY
+        )?.value
+      ).toLocaleDateString('pt-PT'),
+      control: this.schedulingService.schedulingForm.get(
+        SchedulingFormControls.SELECTED_DAY
       ) as FormControl,
       availability: filteredAvailability,
     };
@@ -220,12 +218,14 @@ export class SchedulingComponent implements OnInit {
     input.value = value; // Update the input value in real-time
   }
 
-  submit(isSubmitted: boolean) {
-    if (isSubmitted) {
-      this.apiService.setAppointment(
-        this.schedulingService.getAppointmentPayload()
-      );
-    }
+  bookAppointment(availabilityType: AvailabilityType) {
+    availabilityType;
+    this.schedulingService.schedulingForm
+      .get(SchedulingFormControls.SELECTED_TYPE)
+      ?.setValue(availabilityType);
+    const payload = this.schedulingService.getAppointmentPayload();
+    console.log(payload);
+    this.apiService.setAppointment(payload);
   }
 
   handleScheduleButton() {

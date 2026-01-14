@@ -1,4 +1,4 @@
-<mat-accordion class="availability-headers-align" multi>
+<mat-accordion class="availability-headers-align">
   @for (availability of availabilityConfiguration.availability; track
   availability.id) {
   <mat-expansion-panel>
@@ -8,12 +8,16 @@
         {{ formatTime(availability.endTime) }}</mat-panel-title
       >
       <mat-panel-description>
-        Type your name and age
+        {{ availabilityConfiguration.selectedDate }}
         <mat-icon>account_circle</mat-icon>
       </mat-panel-description>
     </mat-expansion-panel-header>
     <div class="availability-content">
-      <mat-button-toggle-group name="fontStyle" aria-label="Font Style">
+      <mat-button-toggle-group
+        [(ngModel)]="typeSelection"
+        name="fontStyle"
+        aria-label="Font Style"
+      >
         <mat-button-toggle
           [value]="AvailabilityType.LOCAL"
           [disabled]="availability.type === AvailabilityType.REMOTE"

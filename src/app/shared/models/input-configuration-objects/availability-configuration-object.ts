@@ -3,12 +3,14 @@ import { AvailabilityModel } from '../availability.model';
 
 export interface AvailabilityConfigurationObject {
   title?: string;
-  timeSlotControl: FormControl;
+  selectedDate: string;
+  control: FormControl;
   availability: AvailabilityModel[];
 }
 
 export const emptyAvailabilityConfiguration: AvailabilityConfigurationObject = {
   title: '',
-  timeSlotControl: new FormControl(),
+  selectedDate: '',
+  control: new FormControl(),
   availability: [],
 };

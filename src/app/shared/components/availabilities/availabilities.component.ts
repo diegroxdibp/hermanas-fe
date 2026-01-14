@@ -11,6 +11,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { ApiService } from '../../../core/services/api.service';
 import { formatTime } from '../../utils/date-helper.util';
 import { AvailabilityType } from '../../enums/availability-type.enum';
+import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-availabilities',
   imports: [
@@ -19,6 +20,7 @@ import { AvailabilityType } from '../../enums/availability-type.enum';
     MatIconModule,
     MatDividerModule,
     MatButtonToggleModule,
+    FormsModule
   ],
   templateUrl: './availabilities.component.html',
   styleUrl: './availabilities.component.scss',
@@ -27,13 +29,13 @@ export class AvailabilitiesComponent {
   @Input({ required: true })
   availabilityConfiguration: AvailabilityConfigurationObject =
     emptyAvailabilityConfiguration;
-  @Output('isSubmitted') isSubmitted = new EventEmitter<boolean>();
+  @Output('isSubmitted') isSubmitted = new EventEmitter<AvailabilityType>();
+  typeSelection = AvailabilityType.ANY;
   formatTime = formatTime;
   AvailabilityType = AvailabilityType;
-  constructor(private apiService: ApiService) {}
 
   scheduleAppointment(): void {
-    console.log('Sched');
-    this.isSubmitted.emit(true);
+    console.log(this.typeSelection);
+    this.isSubmitted.emit(this.typeSelection);
   }
 }

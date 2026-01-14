@@ -6,7 +6,12 @@ import { AvailabilityModel } from '../models/availability.model';
 import { AppointmentPayload } from '../models/appointment-payload.model';
 import { SchedulingFormControls } from '../enums/scheduling-form-controls.enum';
 import { dayNumberToEnum } from '../enums/day-to-number-enum.util';
-import { dayName, isBetween, parseDate, sameDay } from '../utils/date-helper.util';
+import {
+  dayName,
+  isBetween,
+  parseDate,
+  sameDay,
+} from '../utils/date-helper.util';
 
 @Injectable({
   providedIn: 'root',
@@ -30,9 +35,11 @@ export class SchedulingService {
       ]),
       [SchedulingFormControls.SELECTED_THERAPIST]:
         this.fb.control<TherapistModel | null>(null, [Validators.required]),
-      selectedType: this.fb.control<AppointmentType>(AppointmentType.ANY, [
-        Validators.required,
-      ]),
+
+      [SchedulingFormControls.SELECTED_TYPE]: this.fb.control<AppointmentType>(
+        AppointmentType.ANY,
+        [Validators.required]
+      ),
     });
   }
 
@@ -45,10 +52,11 @@ export class SchedulingService {
       appointmentDate: this.schedulingForm.get(
         SchedulingFormControls.SELECTED_DAY
       )?.value,
-      //     "startTime": "11:00:00",
-      //     "endTime": "12:00:00",
-      //     "isRecurring": true,
-      //     "type":"REMOTE"
+      startTime: '',
+      endTime: '',
+      isRecurring: true,
+      type: this.schedulingForm.get(SchedulingFormControls.SELECTED_TYPE)
+        ?.value,
     } as AppointmentPayload;
     return payload;
   }
