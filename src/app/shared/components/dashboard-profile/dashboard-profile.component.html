@@ -1,9 +1,20 @@
-<img
-  [src]="sessionService.user()?.picture"
-  referrerpolicy="no-referrer"
-  alt="User profile"
-  class="profile-picture"
-/>
+  <!-- @if (sessionService.user()?.picture ?? "") {} -->
+
+
+  <ng-container *ngIf="sessionService.user()?.picture as picture; else defaultIcon">
+    <img
+      class="therapist-card--picture"
+      mat-card-sm-image
+      [src]="picture"
+      alt="Therapist picture"
+    />
+  </ng-container>
+
+  <ng-template #defaultIcon>
+    <mat-icon class="therapist-card--picture therapist-card--icon">
+      account_circle
+    </mat-icon>
+  </ng-template>
 <app-text-input
   [configurationObject]="nameConfigurationObject"
 ></app-text-input>

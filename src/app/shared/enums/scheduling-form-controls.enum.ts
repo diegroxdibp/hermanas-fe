@@ -1,8 +1,8 @@
 export enum SchedulingFormControls {
   CLIENT_ID = 'clientId',
-  THERAPIST_ID = 'therapistId',
+  PROFESSIONAL_ID = 'professionalId',
   SELECTED_DAY = 'selectedDay',
   SELECTED_TIME_SLOT = 'selectedTimeSlot',
-  SELECTED_THERAPIST = 'selectedTherapist',
+  SELECTED_PROFESSIONAL = 'selectedProfessional',
   SELECTED_TYPE = 'selectedType',
 }

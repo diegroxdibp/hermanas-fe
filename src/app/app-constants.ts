@@ -19,7 +19,7 @@ export const AppConstants = {
   apiEndpoints: {
     root: apiRootUrl,
     me: `${apiRootUrl}/api/auth/me`,
-    register: `${apiRootUrl}/api/user/register`,
+    register: `${apiRootUrl}/api/auth/register`,
     onboarding: `${apiRootUrl}/api/user/onboarding`,
     updateProfile: `${apiRootUrl}/api/user/profile`,
     getProfile: `${apiRootUrl}/api/user/profile`,

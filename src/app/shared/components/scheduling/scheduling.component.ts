@@ -1,5 +1,4 @@
 import { AvailabilityModel } from './../../models/availability.model';
-import { TherapistModel } from './../../models/therapist.model';
 import { SchedulingService } from './../../services/scheduling.service';
 import { ApiService } from './../../../core/services/api.service';
 import { CommonModule } from '@angular/common';
@@ -32,6 +31,7 @@ import { CalendarType } from '../../enums/calendar-type.enum';
 import { parseDate } from '../../utils/date-helper.util';
 import { MatIcon } from '@angular/material/icon';
 import { AvailabilityType } from '../../enums/availability-type.enum';
+import { ProfessionalModel } from '../../models/professional.model';
 
 @Component({
   selector: 'app-scheduling',
@@ -75,22 +75,22 @@ export class SchedulingComponent implements OnInit {
     this.apiService
       .getTherapists()
       .pipe(take(1))
-      .subscribe((therapists: TherapistModel[]) => {
-        console.log(therapists);
-        this.schedulingService.therapists = therapists;
+      .subscribe((professionals: ProfessionalModel[]) => {
+        console.log(professionals);
+        this.schedulingService.professionals = professionals;
       });
 
     this.schedulingService.schedulingForm
-      .get(SchedulingFormControls.SELECTED_THERAPIST)
-      ?.valueChanges.subscribe((selectedTherapist: TherapistModel) => {
-        console.log(selectedTherapist);
+      .get(SchedulingFormControls.SELECTED_PROFESSIONAL)
+      ?.valueChanges.subscribe((selectedProfessional: ProfessionalModel) => {
+        console.log(selectedProfessional);
         this.apiService
-          .getAvailabilititesByTherapistId(selectedTherapist.id)
+          .getAvailabilititesByProfessionalId(selectedProfessional.id)
           .pipe(take(1))
           .subscribe((availabilities: AvailabilityModel[]) => {
             console.log(
               'availabilities of ->',
-              selectedTherapist,
+              selectedProfessional,
               availabilities
             );
             this.schedulingService.setAvailabilitites(availabilities);
@@ -159,14 +159,14 @@ export class SchedulingComponent implements OnInit {
     };
   }
 
-  selectTherapist(therapist: TherapistModel | null): void {
-    if (therapist) {
+  selectTherapist(professional: ProfessionalModel | null): void {
+    if (professional) {
       this.schedulingService.schedulingForm
-        .get(SchedulingFormControls.SELECTED_THERAPIST)
-        ?.setValue(therapist);
+        .get(SchedulingFormControls.SELECTED_PROFESSIONAL)
+        ?.setValue(professional);
     } else {
       this.schedulingService.schedulingForm
-        .get(SchedulingFormControls.SELECTED_THERAPIST)
+        .get(SchedulingFormControls.SELECTED_PROFESSIONAL)
         ?.setValue(null);
     }
   }
@@ -199,7 +199,7 @@ export class SchedulingComponent implements OnInit {
     );
   };
 
-  trackById = (index: number, item: TherapistModel) => item.id;
+  trackById = (index: number, item: ProfessionalModel) => item.id;
 
   restrictInput(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -241,7 +241,7 @@ export class SchedulingComponent implements OnInit {
     );
   }
 
-  getTherapistPicture(): string {
+  getProfessionalPicture(): string {
     return '';
   }
 }

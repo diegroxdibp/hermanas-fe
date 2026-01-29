@@ -18,7 +18,6 @@ import { FormService } from '../../../core/services/form.service';
     RouterOutlet,
     RouterLink,
     RouterLinkActive,
-    JsonPipe,
   ],
   templateUrl: './user-dashboard.component.html',
   styleUrl: './user-dashboard.component.scss',

@@ -10,33 +10,24 @@
   padding: 24px;
 }
 
-.therapist-section {
+.therapist-card {
   display: flex;
   flex-direction: column;
 
-  .therapist-selection {
-    width: 100%;
-  }
-
-  .therapist-card {
+  .therapist-card--header {
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
 
-    .therapist-card--header {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-
-      .title-group {
-        // margin-bottom: 16px;
-        .title {
-          color: #005a89;
-        }
-        .subtitle {
-          font-weight: 300;
-          color: #005a89;
-        }
+    .title-group {
+      // margin-bottom: 16px;
+      .title {
+        color: #005a89;
+      }
+      .subtitle {
+        font-weight: 300;
+        color: #005a89;
       }
     }
   }

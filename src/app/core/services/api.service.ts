@@ -2,13 +2,13 @@ import { SchedulingService } from './../../shared/services/scheduling.service';
 import { inject, Injectable, signal } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AvailabilityModel } from '../../shared/models/availability.model';
-import { TherapistModel } from '../../shared/models/therapist.model';
 import { Roles } from '../../shared/enums/roles.enum';
 import { AppointmentPayload } from '../../shared/models/appointment-payload.model';
 import { AppConstants } from '../../app-constants';
 
 import { HttpClient } from '@angular/common/http';
 import { User } from '../../auth/user.model';
+import { ProfessionalModel } from '../../shared/models/professional.model';
 
 @Injectable({
   providedIn: 'root',
@@ -22,8 +22,8 @@ export class ApiService {
     return this.http.get(AppConstants.apiEndpoints.root + '/api/courses');
   }
 
-  getTherapists(): Observable<TherapistModel[]> {
-    return this.http.post<TherapistModel[]>(
+  getTherapists(): Observable<ProfessionalModel[]> {
+    return this.http.post<ProfessionalModel[]>(
       AppConstants.apiEndpoints.root + '/api/user/findByRole',
       { role: Roles.THERAPIST },
       { withCredentials: true }
@@ -37,12 +37,12 @@ export class ApiService {
     );
   }
 
-  getAvailabilititesByTherapistId(
-    therapistId: number
+  getAvailabilititesByProfessionalId(
+    professionalId: number
   ): Observable<AvailabilityModel[]> {
     return this.http.get<AvailabilityModel[]>(
       AppConstants.apiEndpoints.root +
-        `/api/availability/therapist/${therapistId}`,
+        `/api/availability/professional/${professionalId}`,
       { withCredentials: true }
     );
   }

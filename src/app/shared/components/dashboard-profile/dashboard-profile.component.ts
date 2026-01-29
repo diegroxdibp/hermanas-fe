@@ -11,10 +11,12 @@ import { FormControl } from '@angular/forms';
 import { FormatType } from '../../enums/format-type.enum';
 import { FormService } from '../../../core/services/form.service';
 import { SessionService } from '../../services/session.service';
+import { MatIcon } from '@angular/material/icon';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-dashboard-profile',
-  imports: [TextInputComponent],
+  imports: [TextInputComponent, MatIcon,CommonModule],
   templateUrl: './dashboard-profile.component.html',
   styleUrl: './dashboard-profile.component.scss',
 })

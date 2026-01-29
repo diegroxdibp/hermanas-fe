@@ -6,7 +6,6 @@ import { Genders } from './../../shared/enums/genders.enum';
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SchedulingFormControls } from '../../shared/enums/scheduling-form-controls.enum';
-import { TherapistModel } from '../../shared/models/therapist.model';
 import { AvailabilityModel } from '../../shared/models/availability.model';
 import { AppointmentType } from '../../shared/enums/appointment-type.enum';
 import { FormControlsNames } from '../../shared/enums/form-controls-names.enum';
@@ -17,6 +16,7 @@ import { getEnumKeyByValue } from '../../shared/utils/getEnumKeyByValue';
 import { OnboardingPayload } from '../../shared/models/onboarding-payload.model';
 import { ProfileView } from '../../shared/models/profile-view.model';
 import { User } from '../../auth/user.model';
+import { ProfessionalModel } from '../../shared/models/professional.model';
 
 @Injectable({
   providedIn: 'root',
@@ -28,7 +28,7 @@ export class FormService {
   schedulingForm: FormGroup;
   availability: AvailabilityModel[] = [];
   timeSlots = new Map<string, string[]>();
-  therapists: TherapistModel[] = [];
+  professionals: ProfessionalModel[] = [];
 
   currentCountryPhone: BehaviorSubject<CountryModel> =
     new BehaviorSubject<CountryModel>(defaultCountry);
@@ -101,8 +101,8 @@ export class FormService {
       [SchedulingFormControls.SELECTED_TIME_SLOT]: this.fb.control('', [
         Validators.required,
       ]),
-      [SchedulingFormControls.SELECTED_THERAPIST]:
-        this.fb.control<TherapistModel | null>(null, [Validators.required]),
+      [SchedulingFormControls.SELECTED_PROFESSIONAL]:
+        this.fb.control<ProfessionalModel | null>(null, [Validators.required]),
       selectedType: this.fb.control<AppointmentType>(AppointmentType.ANY, [
         Validators.required,
       ]),

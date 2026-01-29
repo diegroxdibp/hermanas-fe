@@ -1,6 +1,5 @@
 import { Injectable, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { emptyTherapist, TherapistModel } from '../models/therapist.model';
 import { AppointmentType } from '../enums/appointment-type.enum';
 import { AvailabilityModel } from '../models/availability.model';
 import { AppointmentPayload } from '../models/appointment-payload.model';
@@ -12,6 +11,7 @@ import {
   parseDate,
   sameDay,
 } from '../utils/date-helper.util';
+import { ProfessionalModel } from '../models/professional.model';
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +20,7 @@ export class SchedulingService {
   schedulingForm: FormGroup;
   availability = signal<AvailabilityModel[]>([]);
   timeSlots = new Map<string, string[]>();
-  therapists: TherapistModel[] = [];
+  professionals: ProfessionalModel[] = [];
 
   constructor(private readonly fb: FormBuilder) {
     this.schedulingForm = this.fb.group({
@@ -33,8 +33,8 @@ export class SchedulingService {
       [SchedulingFormControls.SELECTED_TIME_SLOT]: this.fb.control('', [
         Validators.required,
       ]),
-      [SchedulingFormControls.SELECTED_THERAPIST]:
-        this.fb.control<TherapistModel | null>(null, [Validators.required]),
+      [SchedulingFormControls.SELECTED_PROFESSIONAL]:
+        this.fb.control<ProfessionalModel | null>(null, [Validators.required]),
 
       [SchedulingFormControls.SELECTED_TYPE]: this.fb.control<AppointmentType>(
         AppointmentType.ANY,
@@ -47,8 +47,9 @@ export class SchedulingService {
     const payload = {
       clientId: this.schedulingForm.get(SchedulingFormControls.CLIENT_ID)
         ?.value,
-      therapistId: this.schedulingForm.get(SchedulingFormControls.THERAPIST_ID)
-        ?.value,
+      therapistId: this.schedulingForm.get(
+        SchedulingFormControls.PROFESSIONAL_ID
+      )?.value,
       appointmentDate: this.schedulingForm.get(
         SchedulingFormControls.SELECTED_DAY
       )?.value,

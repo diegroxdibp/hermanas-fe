@@ -12,10 +12,32 @@
   object-fit: cover;
   border: 3px solid #e0e0e0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .profile-picture:hover {
   transform: scale(1.05);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.therapist-card--picture {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  margin: 8px 0;
+
+  &:not(.therapist-card--icon) {
+    object-fit: cover; /* only for images */
+  }
+}
+
+.therapist-card--icon {
+  font-size: 120px; /* match the container size */
+  color: #bbb; /* light gray color for the icon */
+  border: none; /* remove border for icon */
+  box-shadow: none; /* remove shadow for icon */
 }

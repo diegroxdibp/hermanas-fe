@@ -1,7 +1,7 @@
 <div class="therapist-section">
-  @if(schedulingService.therapists.length) {
+  @if(schedulingService.professionals.length) {
   <mat-form-field
-    *ngIf="schedulingService.therapists.length"
+    *ngIf="schedulingService.professionals.length"
     class="therapist-selection"
   >
     <mat-label>Choose a therapist</mat-label>
@@ -9,7 +9,7 @@
       <mat-option (click)="selectTherapist(null)" value="">--</mat-option>
       <ng-container
         *ngFor="
-          let therapist of schedulingService.therapists;
+          let therapist of schedulingService.professionals;
           trackBy: trackById
         "
       >
@@ -26,22 +26,22 @@
   </mat-form-field>
 
   @if
-  (schedulingService.schedulingForm.get(SchedulingFormControls.SELECTED_THERAPIST)?.value){
+  (schedulingService.schedulingForm.get(SchedulingFormControls.SELECTED_PROFESSIONAL)?.value){
   <mat-card class="therapist-card" appearance="outlined">
     <mat-card-header class="therapist-card--header">
       <mat-card-title-group class="title-group">
         <mat-card-title class="title">{{
           schedulingService.schedulingForm.get(
-            SchedulingFormControls.SELECTED_THERAPIST
+            SchedulingFormControls.SELECTED_PROFESSIONAL
           )?.value.name
         }}</mat-card-title>
         <mat-card-subtitle class="subtitle">{{
           schedulingService.schedulingForm.get(
-            SchedulingFormControls.SELECTED_THERAPIST
+            SchedulingFormControls.SELECTED_PROFESSIONAL
           )?.value.title
         }}</mat-card-subtitle>
       </mat-card-title-group>
-      <ng-container *ngIf="getTherapistPicture() as picture; else defaultIcon">
+      <ng-container *ngIf="getProfessionalPicture() as picture; else defaultIcon">
         <img
           class="therapist-card--picture"
           mat-card-sm-image
@@ -61,7 +61,7 @@
         <p>
           {{
             schedulingService.schedulingForm.get(
-              SchedulingFormControls.SELECTED_THERAPIST
+              SchedulingFormControls.SELECTED_PROFESSIONAL
             )?.value.bio
           }}
         </p>
@@ -69,14 +69,14 @@
     </mat-card-content>
   </mat-card>
   @if
-  (schedulingService.schedulingForm.get(SchedulingFormControls.SELECTED_THERAPIST)?.value){
+  (schedulingService.schedulingForm.get(SchedulingFormControls.SELECTED_PROFESSIONAL)?.value){
   <app-calendar
     *ngIf="schedulingService.availability().length"
     [availability]="schedulingService.availability()"
     [calendarConfiguration]="calendarConfigurationObject"
   ></app-calendar>
   } @if
-  (schedulingService.schedulingForm.get(SchedulingFormControls.SELECTED_THERAPIST)?.value
+  (schedulingService.schedulingForm.get(SchedulingFormControls.SELECTED_PROFESSIONAL)?.value
   &&
   schedulingService.schedulingForm.get(SchedulingFormControls.SELECTED_DAY)?.value)
   {

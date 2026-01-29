@@ -1,4 +1,4 @@
-export interface TherapistModel {
+export interface ProfessionalModel {
   id: number;
   name: string;
   email: string;
@@ -9,10 +9,10 @@ export interface TherapistModel {
   roles: string[];
 }
 
-export const emptyTherapist: TherapistModel = {
+export const emptyProfessional: ProfessionalModel = {
   id: 1,
-  name: 'THERAPIST_NAME',
-  email: 'THERAPIST_EMAIL',
+  name: 'PROFESSIONAL_NAME',
+  email: 'PROFESSIONAL_EMAIL',
   phone: '0',
   roles: ['THERAPIST'],
   bio: 'Bio description',

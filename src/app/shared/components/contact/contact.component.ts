@@ -8,7 +8,13 @@ import { MatDivider } from '@angular/material/divider';
 
 @Component({
   selector: 'app-contact',
-  imports: [MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatDivider],
+  imports: [
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatDivider,
+  ],
   templateUrl: './contact.component.html',
   styleUrl: './contact.component.scss',
 })
@@ -20,13 +26,22 @@ export class ContactComponent {
   handleScheduleButton() {
     this.apiService.sendEmail(
       this.subject?.nativeElement.value,
-      this.body?.nativeElement.value
+      this.body?.nativeElement.value,
     );
     console.log(
       'Subject:',
       this.body?.nativeElement.value,
       'Body:',
-      this.body?.nativeElement.value
+      this.body?.nativeElement.value,
     );
+  }
+
+  handleEmailButton() {
+    const subjectText = this.subject?.nativeElement.value;
+    const bodyText = this.body?.nativeElement.value;
+
+    const mailtoLink = `mailto:seu-email@exemplo.com?subject=${encodeURIComponent(subjectText)}&body=${encodeURIComponent(bodyText)}`;
+
+    window.location.href = mailtoLink;
   }
 }
