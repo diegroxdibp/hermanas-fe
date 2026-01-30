@@ -9,13 +9,13 @@ export interface User {
   gender?: Genders;
   bio?: string;
   picture?: string;
-  roles: Set<string>;
+  roles: string[];
   profileCompleted: boolean;
 }
 
 export const emptyUser: User = {
   name: 'SAMPLE_NAME',
   email: 'SAMPLE_EMAIL@EMAIL.COM',
-  roles: new Set(Roles.USER),
+  roles: [Roles.USER],
   profileCompleted: false,
 };

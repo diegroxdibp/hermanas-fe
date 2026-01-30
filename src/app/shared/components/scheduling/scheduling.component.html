@@ -1,91 +1,102 @@
 <div class="therapist-section">
-  @if(schedulingService.professionals.length) {
-  <mat-form-field
-    *ngIf="schedulingService.professionals.length"
-    class="therapist-selection"
-  >
-    <mat-label>Choose a therapist</mat-label>
-    <mat-select required>
-      <mat-option (click)="selectTherapist(null)" value="">--</mat-option>
-      <ng-container
-        *ngFor="
-          let therapist of schedulingService.professionals;
-          trackBy: trackById
-        "
-      >
-        <mat-option
-          (click)="selectTherapist(therapist)"
-          [value]="therapist.id"
-          >{{ therapist.name }}</mat-option
+  @if (schedulingService.professionals.length) {
+    <mat-form-field class="therapist-selection">
+      <mat-label>Choose a therapist</mat-label>
+      <mat-select required>
+        <mat-option (click)="selectTherapist(null)" value="">--</mat-option>
+        <ng-container
+          *ngFor="
+            let therapist of schedulingService.professionals;
+            trackBy: trackById
+          "
         >
-      </ng-container>
-    </mat-select>
-    <!-- <mat-error *ngIf="therapistControl.hasError('required')">
+          <mat-option
+            (click)="selectTherapist(therapist)"
+            [value]="therapist.id"
+            >{{ therapist.name }}</mat-option
+          >
+        </ng-container>
+      </mat-select>
+      <!-- <mat-error *ngIf="therapistControl.hasError('required')">
       Please choose a therapist.
     </mat-error> -->
-  </mat-form-field>
+    </mat-form-field>
 
-  @if
-  (schedulingService.schedulingForm.get(SchedulingFormControls.SELECTED_PROFESSIONAL)?.value){
-  <mat-card class="therapist-card" appearance="outlined">
-    <mat-card-header class="therapist-card--header">
-      <mat-card-title-group class="title-group">
-        <mat-card-title class="title">{{
-          schedulingService.schedulingForm.get(
-            SchedulingFormControls.SELECTED_PROFESSIONAL
-          )?.value.name
-        }}</mat-card-title>
-        <mat-card-subtitle class="subtitle">{{
-          schedulingService.schedulingForm.get(
-            SchedulingFormControls.SELECTED_PROFESSIONAL
-          )?.value.title
-        }}</mat-card-subtitle>
-      </mat-card-title-group>
-      <ng-container *ngIf="getProfessionalPicture() as picture; else defaultIcon">
-        <img
-          class="therapist-card--picture"
-          mat-card-sm-image
-          [src]="picture"
-          alt="Therapist picture"
-        />
-      </ng-container>
+    @if (
+      schedulingService.schedulingForm.get(
+        SchedulingFormControls.SELECTED_PROFESSIONAL
+      )?.value
+    ) {
+      <mat-card class="therapist-card" appearance="outlined">
+        <mat-card-header class="therapist-card--header">
+          <mat-card-title-group class="title-group">
+            <mat-card-title class="title">{{
+              schedulingService.schedulingForm.get(
+                SchedulingFormControls.SELECTED_PROFESSIONAL
+              )?.value.name
+            }}</mat-card-title>
+            <mat-card-subtitle class="subtitle">{{
+              schedulingService.schedulingForm.get(
+                SchedulingFormControls.SELECTED_PROFESSIONAL
+              )?.value.title
+            }}</mat-card-subtitle>
+          </mat-card-title-group>
+          <ng-container
+            *ngIf="getProfessionalPicture() as picture; else defaultIcon"
+          >
+            <img
+              class="therapist-card--picture"
+              mat-card-sm-image
+              [src]="picture"
+              alt="Therapist picture"
+            />
+          </ng-container>
 
-      <ng-template #defaultIcon>
-        <mat-icon class="therapist-card--picture therapist-card--icon">
-          account_circle
-        </mat-icon>
-      </ng-template>
-    </mat-card-header>
-    <mat-card-content class="therapist-card--content-area"
-      ><div class="text">
-        <p>
-          {{
-            schedulingService.schedulingForm.get(
-              SchedulingFormControls.SELECTED_PROFESSIONAL
-            )?.value.bio
-          }}
-        </p>
-      </div>
-    </mat-card-content>
-  </mat-card>
-  @if
-  (schedulingService.schedulingForm.get(SchedulingFormControls.SELECTED_PROFESSIONAL)?.value){
-  <app-calendar
-    *ngIf="schedulingService.availability().length"
-    [availability]="schedulingService.availability()"
-    [calendarConfiguration]="calendarConfigurationObject"
-  ></app-calendar>
-  } @if
-  (schedulingService.schedulingForm.get(SchedulingFormControls.SELECTED_PROFESSIONAL)?.value
-  &&
-  schedulingService.schedulingForm.get(SchedulingFormControls.SELECTED_DAY)?.value)
-  {
-  <app-availabilities
-    [availabilityConfiguration]="availabilityConfigurationObject"
-    (isSubmitted)="bookAppointment($event)"
-  ></app-availabilities>
-  } } } @else{
-  <!-- <mat-card class="therapist-card" appearance="outlined">
+          <ng-template #defaultIcon>
+            <mat-icon class="therapist-card--picture therapist-card--icon">
+              account_circle
+            </mat-icon>
+          </ng-template>
+        </mat-card-header>
+        <mat-card-content class="therapist-card--content-area"
+          ><div class="text">
+            <p>
+              {{
+                schedulingService.schedulingForm.get(
+                  SchedulingFormControls.SELECTED_PROFESSIONAL
+                )?.value.bio
+              }}
+            </p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+      @if (
+        schedulingService.schedulingForm.get(
+          SchedulingFormControls.SELECTED_PROFESSIONAL
+        )?.value
+      ) {
+        <app-calendar
+          *ngIf="schedulingService.availability().length"
+          [availability]="schedulingService.availability()"
+          [calendarConfiguration]="calendarConfigurationObject"
+        ></app-calendar>
+      }
+      @if (
+        schedulingService.schedulingForm.get(
+          SchedulingFormControls.SELECTED_PROFESSIONAL
+        )?.value &&
+        schedulingService.schedulingForm.get(
+          SchedulingFormControls.SELECTED_DAY
+        )?.value
+      ) {
+        <app-availabilities
+          [availabilityConfiguration]="availabilityConfigurationObject"
+          (isSubmitted)="bookAppointment($event)"
+        ></app-availabilities>
+      }
+    }
+  } @else {
+    <!-- <mat-card class="therapist-card" appearance="outlined">
     <mat-card-header class="therapist-card--header">
       <mat-card-title-group class="title-group">
         <mat-card-title class="title">Agendamento</mat-card-title>

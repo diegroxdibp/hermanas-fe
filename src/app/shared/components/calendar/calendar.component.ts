@@ -42,10 +42,9 @@ export class CalendarComponent implements OnInit {
   calendarConfiguration: CalendarConfigurationObject =
     emptyCalendarConfiguration;
   @Input({ required: false }) availability: AvailabilityModel[] = [];
-  // timeSlots: string[] = [];
   readonly AppConstants = AppConstants;
   readonly options: MaskitoOptions = pastDateMask;
-  allowedRecurringDays: Set<number> = new Set(); // e.g., 1 for Monday
+  allowedRecurringDays: Set<number> = new Set();
   allowedSpecificDates: Date[] = [];
 
   constructor(private datePipe: DatePipe) {}
@@ -53,9 +52,6 @@ export class CalendarComponent implements OnInit {
   ngOnInit() {
     console.log('init', this.availability);
     for (const availability of this.availability) {
-      // const timeSlot = `${availability.startTime} - ${availability.endTime}`;
-      // this.timeSlots.push(timeSlot);
-
       if (availability.isRecurring && availability.recurringDay) {
         const dayOfWeek = this.getDayNumber(availability.recurringDay);
         this.allowedRecurringDays.add(dayOfWeek);
@@ -63,15 +59,6 @@ export class CalendarComponent implements OnInit {
         this.allowedSpecificDates.push(new Date(availability.startDate));
       }
     }
-
-    // this.calendarConfiguration.dayControl.valueChanges.subscribe((date) => {
-    //   if (date) {
-    //     const formattedDate = this.datePipe.transform(date, 'yyyy-MM-dd');
-    //     console.log(formattedDate); // Output: "2025-07-29"
-    //     console.log('Form', this.calendarConfiguration.dayControl.value); // Output: "2025-07-29"
-    //     this.calendarConfiguration.dayControl.setValue(formattedDate);
-    //   }
-    // });
   }
 
   onDateInput(event: MatDatepickerInputEvent<Date>) {

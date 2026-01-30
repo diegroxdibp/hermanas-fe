@@ -1,0 +1,120 @@
+ .expense-calculator {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    .input-section {
+      background: #f5f5f5;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 8px;
+    }
+
+    .input-section h3 {
+      margin-top: 0;
+      color: #555;
+    }
+
+    .form-group {
+      margin: 10px 0;
+    }
+
+    .form-group label {
+      display: inline-block;
+      width: 150px;
+      font-weight: bold;
+    }
+
+    .form-group input {
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      width: 200px;
+    }
+
+    .calculate-btn {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 20px 0;
+    }
+
+    .calculate-btn:hover {
+      background: #45a049;
+    }
+
+    .error-message {
+      background: #ffebee;
+      color: #c62828;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+      border-left: 4px solid #c62828;
+      font-weight: bold;
+    }
+
+    .results {
+      margin-top: 30px;
+    }
+
+    .result-card {
+      background: white;
+      border: 2px solid #e0e0e0;
+      padding: 20px;
+      margin: 15px 0;
+      border-radius: 8px;
+    }
+
+    .result-card h4 {
+      margin-top: 0;
+      color: #333;
+      border-bottom: 2px solid #4CAF50;
+      padding-bottom: 10px;
+    }
+
+    .result-card p {
+      margin: 10px 0;
+    }
+
+    .balance {
+      font-size: 18px;
+      padding: 10px;
+      border-radius: 4px;
+      margin-top: 15px;
+    }
+
+    .balance.owes {
+      background: #ffebee;
+      color: #c62828;
+    }
+
+    .balance.receives {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .summary {
+      background: #fff3e0;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+
+    .summary p {
+      margin: 8px 0;
+      font-size: 16px;
+    }

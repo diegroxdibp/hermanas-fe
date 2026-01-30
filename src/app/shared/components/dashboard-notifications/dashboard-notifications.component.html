@@ -1,1 +1,162 @@
-<p>dashboard-notifications works!</p>
+@if (sessionService.user()?.roles?.includes(Roles.ADMIN)) {
+  <div class="expense-calculator">
+    <h2>Proportional Expense Calculator</h2>
+
+    <div class="input-section">
+      <h3>Person 1</h3>
+      <div class="form-group">
+        <label>Name:</label>
+        <input
+          type="text"
+          [(ngModel)]="person1.name"
+          placeholder="Enter name"
+        />
+      </div>
+      <div class="form-group">
+        <label>Earnings:</label>
+        <input
+          type="number"
+          [(ngModel)]="person1.earnings"
+          placeholder="Enter earning"
+        />
+      </div>
+      <div class="form-group">
+        <label>Already Paid:</label>
+        <input
+          type="number"
+          [(ngModel)]="person1.alreadyPaid"
+          placeholder="Enter paid amount"
+        />
+      </div>
+    </div>
+
+    <div class="input-section">
+      <h3>Person 2</h3>
+      <div class="form-group">
+        <label>Name:</label>
+        <input
+          type="text"
+          [(ngModel)]="person2.name"
+          placeholder="Enter name"
+        />
+      </div>
+      <div class="form-group">
+        <label>Earnings:</label>
+        <input
+          type="number"
+          [(ngModel)]="person2.earnings"
+          placeholder="Enter earning"
+        />
+      </div>
+      <div class="form-group">
+        <label>Already Paid:</label>
+        <input
+          type="number"
+          [(ngModel)]="person2.alreadyPaid"
+          placeholder="Enter paid amount"
+        />
+      </div>
+    </div>
+
+    <div class="input-section">
+      <h3>Total Expenses</h3>
+      <div class="form-group">
+        <label>Total Amount:</label>
+        <input type="number" [(ngModel)]="totalExpenses" placeholder="800" />
+      </div>
+    </div>
+
+    <button (click)="calculate()" class="calculate-btn">Calculate</button>
+
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="result" class="results">
+      <h3>Results</h3>
+
+      <div class="result-card">
+        <h4>{{ person1.name || "Person 1" }}</h4>
+        <p>
+          <strong>Earnings Percentage:</strong>
+          {{ result.person1.percentage.toFixed(2) }}%
+        </p>
+        <p>
+          <strong>Should Pay (Total):</strong> ${{
+            result.person1.totalShouldPay.toFixed(2)
+          }}
+        </p>
+        <p>
+          <strong>Already Paid:</strong> ${{
+            (person1.alreadyPaid || 0).toFixed(2)
+          }}
+        </p>
+        <p
+          class="balance"
+          [ngClass]="{
+            owes: result.person1.stillOwes > 0,
+            receives: result.person1.stillOwes < 0,
+          }"
+        >
+          <strong>Balance:</strong>
+          <span *ngIf="result.person1.stillOwes > 0"
+            >Owes ${{ result.person1.stillOwes.toFixed(2) }}</span
+          >
+          <span *ngIf="result.person1.stillOwes < 0"
+            >Receives ${{ Math.abs(result.person1.stillOwes).toFixed(2) }}</span
+          >
+          <span *ngIf="result.person1.stillOwes === 0">All settled ✓</span>
+        </p>
+      </div>
+
+      <div class="result-card">
+        <h4>{{ person2.name || "Person 2" }}</h4>
+        <p>
+          <strong>Earnings Percentage:</strong>
+          {{ result.person2.percentage.toFixed(2) }}%
+        </p>
+        <p>
+          <strong>Should Pay (Total):</strong> ${{
+            result.person2.totalShouldPay.toFixed(2)
+          }}
+        </p>
+        <p>
+          <strong>Already Paid:</strong> ${{
+            (person2.alreadyPaid || 0).toFixed(2)
+          }}
+        </p>
+        <p
+          class="balance"
+          [ngClass]="{
+            owes: result.person2.stillOwes > 0,
+            receives: result.person2.stillOwes < 0,
+          }"
+        >
+          <strong>Balance:</strong>
+          <span *ngIf="result.person2.stillOwes > 0"
+            >Owes ${{ result.person2.stillOwes.toFixed(2) }}</span
+          >
+          <span *ngIf="result.person2.stillOwes < 0"
+            >Receives ${{ Math.abs(result.person2.stillOwes).toFixed(2) }}</span
+          >
+          <span *ngIf="result.person2.stillOwes === 0">All settled ✓</span>
+        </p>
+      </div>
+
+      <div class="summary">
+        <p>
+          <strong>Total Expenses:</strong> ${{
+            (totalExpenses || 0).toFixed(2)
+          }}
+        </p>
+        <p>
+          <strong>Total Already Paid:</strong> ${{
+            ((person1.alreadyPaid || 0) + (person2.alreadyPaid || 0)).toFixed(2)
+          }}
+        </p>
+      </div>
+    </div>
+  </div>
+} @else {
+  <p>Em construção!</p>
+}

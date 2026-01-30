@@ -40,7 +40,7 @@ export class ContactComponent {
     const subjectText = this.subject?.nativeElement.value;
     const bodyText = this.body?.nativeElement.value;
 
-    const mailtoLink = `mailto:seu-email@exemplo.com?subject=${encodeURIComponent(subjectText)}&body=${encodeURIComponent(bodyText)}`;
+    const mailtoLink = `mailto:luanebastos88@gmail.com?subject=${encodeURIComponent(subjectText)}&body=${encodeURIComponent(bodyText)}`;
 
     window.location.href = mailtoLink;
   }
