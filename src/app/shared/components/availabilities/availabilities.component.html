@@ -19,18 +19,18 @@
         aria-label="Font Style"
       >
         <mat-button-toggle
-          [value]="AvailabilityType.LOCAL"
-          [disabled]="availability.type === AvailabilityType.REMOTE"
+          [value]="ProfessionalServiceModality.LOCAL"
+          [disabled]="availability.services[0].modality ===  ProfessionalServiceModality.REMOTE"
           >Presencial</mat-button-toggle
         >
         <mat-button-toggle
-          [value]="AvailabilityType.REMOTE"
-          [disabled]="availability.type === AvailabilityType.LOCAL"
+          [value]="ProfessionalServiceModality.REMOTE"
+          [disabled]="availability.services[0].modality === ProfessionalServiceModality.LOCAL"
           >Remoto</mat-button-toggle
         >
         <mat-button-toggle
-          [value]="AvailabilityType.ANY"
-          [disabled]="availability.type !== AvailabilityType.ANY"
+          [value]="ProfessionalServiceModality.ANY"
+          [disabled]="availability.services[0].modality === ProfessionalServiceModality.ANY"
           >Qualquer</mat-button-toggle
         >
       </mat-button-toggle-group>

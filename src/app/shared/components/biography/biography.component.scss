@@ -74,7 +74,7 @@
 
   @media (min-width: breakpoint.$breakpoint-sm) {
     max-width: unset;
-    padding: 2em 3em 0 3em;
+    padding: 2em 3em;
 
     section {
        max-width: variables.$main-column-max-width;
