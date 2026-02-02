@@ -1,10 +1,19 @@
+import { environment } from './../environments/environment';
 import { NavbarBackground } from './shared/enums/navbar-background.enum';
 import { Pages } from './shared/enums/pages.enum';
 import { Service } from './shared/models/service.model';
 
-const apiRootUrl = 'http://localhost:8080';
-
 export const AppConstants = {
+  apiEndpoints: {
+    me: `${environment.apiUrl}/api/auth/me`,
+    register: `${environment.apiUrl}/api/auth/register`,
+    onboarding: `${environment.apiUrl}/api/user/onboarding`,
+    updateProfile: `${environment.apiUrl}/api/user/profile`,
+    getProfile: `${environment.apiUrl}/api/user/profile`,
+    login: `${environment.apiUrl}/api/auth/login`,
+    logout: `${environment.apiUrl}/api/auth/logout`,
+    loginWithGoogle: `${environment.apiUrl}/oauth2/authorization/google`,
+  },
   authentication: {
     exists: true,
     emailInputTitle: 'Email:',
@@ -13,19 +22,7 @@ export const AppConstants = {
     poneNumberTitle: 'Telefone:',
     birthdateTitle: 'Birthdate:',
     genderTitle: 'Gênero:',
-    bioTitle: 'Bio:'
-  },
-
-  apiEndpoints: {
-    root: apiRootUrl,
-    me: `${apiRootUrl}/api/auth/me`,
-    register: `${apiRootUrl}/api/auth/register`,
-    onboarding: `${apiRootUrl}/api/user/onboarding`,
-    updateProfile: `${apiRootUrl}/api/user/profile`,
-    getProfile: `${apiRootUrl}/api/user/profile`,
-    login: `${apiRootUrl}/api/auth/login`,
-    logout: `${apiRootUrl}/api/auth/logout`,
-    loginWithGoogle: `${apiRootUrl}/oauth2/authorization/google`,
+    bioTitle: 'Bio:',
   },
 
   defaultCountry: 'pt',
