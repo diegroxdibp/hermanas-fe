@@ -20,7 +20,7 @@
 
 .dashboard-menu {
   display: flex;
-  width: 280px;
+  width: 100%;
 
   .dashboard-nav {
     display: flex;
@@ -42,7 +42,7 @@
       color: rgb(32, 32, 46);
     }
   }
-  // dashboard.component.scss
+
   nav a {
     display: block;
     padding: 12px 16px;
@@ -61,6 +61,10 @@
       font-weight: 600;
       border-left: 3px solid #1976d2;
     }
+  }
+
+  @media (min-width: breakpoint.$breakpoint-sm) {
+    width: 280px;
   }
 }
 

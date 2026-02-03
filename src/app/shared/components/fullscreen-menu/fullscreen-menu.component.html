@@ -60,6 +60,28 @@
   *ngIf="isMenuOpen"
 >
   <nav>
+    @if (navbarService.showAuthLinks()) {
+      <ul class="auth">
+        <li>
+          <a (click)="navigateTo(navigationService.Pages.SIGN_IN)">Sign In</a>
+        </li>
+      </ul>
+    }
+    @if (navbarService.showUserMenu()) {
+      <ul>
+        <li>
+          <a
+            (click)="navigateTo(navigationService.Pages.DASHBOARD)"
+            class="menu-item"
+            >Dashboard</a
+          >
+        </li>
+        <li>
+          <a (click)="logOut()" class="menu-item">Sign Out</a>
+        </li>
+      </ul>
+      <mat-divider></mat-divider>
+    }
     <ul>
       <li *ngFor="let navigationItem of navigationService.navigationItems">
         <a (click)="navigateTo(navigationItem.destination)" class="menu-item">{{

@@ -37,7 +37,7 @@ export const routes: Routes = [
     canMatch: [AuthOnlyGuard],
     loadComponent: () =>
       import('./shared/components//onboarding/onboarding.component').then(
-        (m) => m.OnboardingComponent
+        (m) => m.OnboardingComponent,
       ),
   },
   {
@@ -47,14 +47,31 @@ export const routes: Routes = [
       {
         path: Pages.DASHBOARD,
         loadComponent: () =>
-          import(
-            './shared/components/user-dashboard/user-dashboard.component'
-          ).then((m) => m.UserDashboardComponent),
+          import('./shared/components/user-dashboard/user-dashboard.component').then(
+            (m) => m.UserDashboardComponent,
+          ),
         children: [
-          { path: '', redirectTo: 'profile', pathMatch: 'full' },
-          { path: 'profile', component: DashboardProfileComponent },
-          { path: 'schedule', component: DashboardScheduleComponent },
-          { path: 'notifications', component: DashboardNotificationsComponent },
+          {
+            path: '',
+            redirectTo: 'profile',
+            pathMatch: 'full',
+            data: { title: 'Profile', subtitle: 'Manage your profile' },
+          },
+          {
+            path: 'profile',
+            component: DashboardProfileComponent,
+            data: { title: 'Profile', subtitle: 'Manage your profile' },
+          },
+          {
+            path: 'schedule',
+            component: DashboardScheduleComponent,
+            data: { title: 'Schedule', subtitle: 'Manage availability' },
+          },
+          {
+            path: 'notifications',
+            component: DashboardNotificationsComponent,
+            data: { title: 'Notifications', subtitle: 'Your notifications' },
+          },
           // { path: 'mensagens', component: MensagensComponent },
         ],
       },
@@ -62,7 +79,7 @@ export const routes: Routes = [
         path: Pages.SCHEDULING,
         loadComponent: () =>
           import('./shared/components/scheduling/scheduling.component').then(
-            (m) => m.SchedulingComponent
+            (m) => m.SchedulingComponent,
           ),
       },
     ],

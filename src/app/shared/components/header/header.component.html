@@ -4,32 +4,41 @@
   [style]="{ backgroundColor: backgroundColor }"
 >
   <nav id="navbar">
-    @if(screenSizeService.isTablet() || screenSizeService.isDesktop()){
-    <ul>
-      <li *ngFor="let navigationItem of navigationService.navigationItems">
-        <a (click)="navigateTo(navigationItem.destination)" class="menu-item">{{
-          navigationItem.name
-        }}</a>
-      </li>
-    </ul>
+    @if (screenSizeService.isTablet() || screenSizeService.isDesktop()) {
+      <ul>
+        <li *ngFor="let navigationItem of navigationService.navigationItems">
+          <a
+            (click)="navigateTo(navigationItem.destination)"
+            class="menu-item"
+            >{{ navigationItem.name }}</a
+          >
+        </li>
+      </ul>
 
-    @if (navbarService.showAuthLinks()) {
-    <ul class="auth">
-      <li>
-        <a (click)="navigateTo(navigationService.Pages.SIGN_IN)">Sign In</a>
-      </li>
-    </ul>
-    } @if (navbarService.showUserMenu()) {
-
-    <button class="account-button" matButton [matMenuTriggerFor]="menu">
-      <mat-icon>account_circle</mat-icon>
-    </button>
-    <mat-menu #menu="matMenu">
-      <button mat-menu-item (click)="navigateTo(navigationService.Pages.DASHBOARD)">Dashboard</button>
-      <button mat-menu-item (click)="logOut()">Sign Out</button>
-    </mat-menu>
-    } } @if(!(screenSizeService.isTablet() || screenSizeService.isDesktop())){
-    <app-fullscreen-menu></app-fullscreen-menu>
+      @if (navbarService.showAuthLinks()) {
+        <ul class="auth">
+          <li>
+            <a (click)="navigateTo(navigationService.Pages.SIGN_IN)">Sign In</a>
+          </li>
+        </ul>
+      }
+      @if (navbarService.showUserMenu()) {
+        <button class="account-button" matButton [matMenuTriggerFor]="menu">
+          <mat-icon>account_circle</mat-icon>
+        </button>
+        <mat-menu #menu="matMenu">
+          <button
+            mat-menu-item
+            (click)="navigateTo(navigationService.Pages.DASHBOARD)"
+          >
+            Dashboard
+          </button>
+          <button mat-menu-item (click)="logOut()">Sign Out</button>
+        </mat-menu>
+      }
+    }
+    @if (!(screenSizeService.isTablet() || screenSizeService.isDesktop())) {
+      <app-fullscreen-menu></app-fullscreen-menu>
     }
   </nav>
 </header>

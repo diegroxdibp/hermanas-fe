@@ -18,6 +18,7 @@ import { LoaderService } from '../../core/services/loader.service';
 import { Pages } from '../../shared/enums/pages.enum';
 import { NavigationService } from '../../shared/services/navigation.service';
 import { FormControlsNames } from '../../shared/enums/form-controls-names.enum';
+import { SessionService } from '../../shared/services/session.service';
 
 @Component({
   selector: 'app-login',
@@ -31,6 +32,7 @@ export class LoginComponent implements OnInit {
   private readonly loaderService = inject(LoaderService);
   private readonly router = inject(Router);
   public readonly navigationService = inject(NavigationService);
+  private readonly sessionService = inject(SessionService);
 
   emailConfigurationObject: TextInputConfigurationObject =
     emptyTextInputConfigurationObject;
@@ -43,7 +45,6 @@ export class LoginComponent implements OnInit {
 
   constructor() {}
   ngOnInit(): void {
-    console.log(this.formService.authForm);
     this.setConfiguration();
   }
 
@@ -53,7 +54,7 @@ export class LoginComponent implements OnInit {
       title: AppConstants.authentication.emailInputTitle,
       placeHolder: 'Example@email.com',
       control: this.formService.authForm.get(
-        FormControlsNames.EMAIL
+        FormControlsNames.EMAIL,
       ) as FormControl,
     };
 
@@ -61,7 +62,7 @@ export class LoginComponent implements OnInit {
       inputType: InputType.PASSWORD,
       title: AppConstants.authentication.passwordInputTitle,
       control: this.formService.authForm.get(
-        FormControlsNames.PASSWORD
+        FormControlsNames.PASSWORD,
       ) as FormControl,
     };
 
@@ -81,7 +82,7 @@ export class LoginComponent implements OnInit {
       .pipe(
         finalize(() => {
           this.loaderService.stopLoader();
-        })
+        }),
       )
       .subscribe({
         next: () => {
@@ -103,7 +104,4 @@ export class LoginComponent implements OnInit {
   navigateTo(page: Pages) {
     this.navigationService.navigateTo(page);
   }
-}
-function showError(arg0: string) {
-  throw new Error('Function not implemented.');
 }

@@ -12,7 +12,6 @@ import { formatTime } from '../../utils/date-helper.util';
 import { AvailabilityType } from '../../enums/availability-type.enum';
 import { FormsModule } from '@angular/forms';
 import { ProfessionalServiceModality } from '../../enums/professional-service-modality.enum';
-import { JsonPipe } from '@angular/common';
 @Component({
   selector: 'app-availabilities',
   imports: [
@@ -22,7 +21,6 @@ import { JsonPipe } from '@angular/common';
     MatDividerModule,
     MatButtonToggleModule,
     FormsModule,
-    JsonPipe
   ],
   templateUrl: './availabilities.component.html',
   styleUrl: './availabilities.component.scss',
@@ -34,23 +32,10 @@ export class AvailabilitiesComponent {
   @Output('isSubmitted') isSubmitted = new EventEmitter<AvailabilityType>();
   typeSelection = AvailabilityType.ANY;
   formatTime = formatTime;
-  AvailabilityType = AvailabilityType;
   ProfessionalServiceModality = ProfessionalServiceModality;
 
   scheduleAppointment(): void {
     console.log(this.typeSelection);
     this.isSubmitted.emit(this.typeSelection);
-  }
-
-  isLocalDisabled(modality: ProfessionalServiceModality): boolean {
-    return modality === ProfessionalServiceModality.REMOTE;
-  }
-
-  isRemoteDisabled(modality: ProfessionalServiceModality): boolean {
-    return modality === ProfessionalServiceModality.LOCAL;
-  }
-
-  isAnyDisabled(modality: ProfessionalServiceModality): boolean {
-    return modality !== ProfessionalServiceModality.ANY;
   }
 }
