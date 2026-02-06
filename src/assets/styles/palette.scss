@@ -1,29 +1,15 @@
 //Palette
-// $primaryColor: #064C4C;
-// $primaryColorLighter: #316F5F;
-// $primaryColorDarker: #21362C;
 
-// $secondaryColorBrownish: #5C3327;
-// $secondaryColorRedish: #86353A;
-// $secondaryColorOrangish: #BB6146;
-// $secondaryColorYellowish: #E5BE60;
-
-// $supportingColor1: #F2DBD5;
-// $supportingColor2: #E4E1DF;
-// $supportingColor3: #90AFAE;
-
-// Primary Colors (Blue-based)
-$primaryColor: #005a89; // Deep blue base
-$primaryColorLighter: #316b8f; // Lighter blue
-$primaryColorDarker: #213645; // Dark navy
+// Primary Colors (Blue and Purple)
+$primaryColorBlue: #22326e; // Deep Blue
+$primaryColorPurple: #8E7FAE; // Light Purple
 
 // Secondary Colors (Complementary & Supporting)
-$secondaryColorPurplish: #563b6f; // Deep purple for depth
-$secondaryColorPeriwinkle: #6b5b8e; // Muted periwinkle
-$secondaryColorLavender: #8b7ab8; // Soft lavender
-$secondaryColorSkyBlue: #7cb7d4; // Light sky blue
+$secondaryColorPurple: #42458E; // Blue (lighther than primary blue)
+$secondaryColorCyan: #77C5D5; // Cyan
+$secondaryColorGreen: #56B093; // Green
+$secondaryColorPink: #CCAED0; // Pink
 
 // Supporting Colors (Neutral & Light)
-$supportingColor1: #d5e4f2; // Very light blue-tinted white
-$supportingColor2: #dfe4e9; // Light neutral with blue undertone
-$supportingColor3: #90a7b8; // Muted blue-gray
+$supportingColorBlack: #212322; // Black
+$supportingColorWhite: #ffffff; // White

@@ -13,6 +13,7 @@ import { AvailabilityType } from '../../enums/availability-type.enum';
 import { FormsModule } from '@angular/forms';
 import { ProfessionalServiceModality } from '../../enums/professional-service-modality.enum';
 import { SnackbarService } from '../../services/snackbar.service';
+
 @Component({
   selector: 'app-availabilities',
   imports: [
@@ -37,8 +38,9 @@ export class AvailabilitiesComponent {
   ProfessionalServiceModality = ProfessionalServiceModality;
 
   scheduleAppointment(): void {
-    console.log(this.typeSelection);
     this.isSubmitted.emit(this.typeSelection);
-    this.snackbarService.openSnackBar({ message: 'Serviço de agendamento em construção!' });
+    this.snackbarService.openSnackBar({
+      message: 'Serviço de agendamento em construção!',
+    });
   }
 }

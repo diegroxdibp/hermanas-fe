@@ -13,8 +13,6 @@ import {
 } from '../../shared/models/input-configuration-objects/text-input-configuration-object';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
-import { finalize } from 'rxjs';
-import { LoaderService } from '../../core/services/loader.service';
 import { Pages } from '../../shared/enums/pages.enum';
 import { NavigationService } from '../../shared/services/navigation.service';
 import { FormControlsNames } from '../../shared/enums/form-controls-names.enum';
@@ -29,7 +27,6 @@ import { SessionService } from '../../shared/services/session.service';
 export class LoginComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly formService = inject(FormService);
-  private readonly loaderService = inject(LoaderService);
   private readonly router = inject(Router);
   public readonly navigationService = inject(NavigationService);
   private readonly sessionService = inject(SessionService);
@@ -73,27 +70,19 @@ export class LoginComponent implements OnInit {
 
   signIn(event: Event) {
     event.preventDefault();
-    this.loaderService.startLoader();
 
     this.error = null;
 
-    this.authService
-      .signIn(this.formService.signInPayload())
-      .pipe(
-        finalize(() => {
-          this.loaderService.stopLoader();
-        }),
-      )
-      .subscribe({
-        next: () => {
-          this.router.navigate(['/dashboard']);
-        },
-        error: (err) => {
-          if (err.status === 401) {
-            this.error = err.error?.error ?? 'Invalid email or password!';
-          }
-        },
-      });
+    this.authService.signIn(this.formService.signInPayload()).subscribe({
+      next: () => {
+        this.router.navigate(['/dashboard']);
+      },
+      error: (err) => {
+        if (err.status === 401) {
+          this.error = err.error?.error ?? 'Invalid email or password!';
+        }
+      },
+    });
   }
 
   signInWithGoogle(event: Event) {

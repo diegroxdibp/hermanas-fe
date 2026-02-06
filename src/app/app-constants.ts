@@ -61,6 +61,13 @@ export const AppConstants = {
             'A prática em Mindfulness fomenta a regulação atencional e emocional por meio de propostas com o body scan, a respiração consciente, a meditação em movimento e a atenção plena nas atividades cotidianas.',
           knowMorePage: Pages.MINDFULLNESS,
         },
+
+        {
+          name: 'Somatic Experience®',
+          description:
+            'Whaterevers revsdervs nervs rergvs drevs nergrsvs deris guervs.',
+          knowMorePage: Pages.SOMATIC_EXPERIENCE,
+        },
       ],
     } as Service,
 
@@ -70,17 +77,25 @@ export const AppConstants = {
         'Atendimentos em grupo com psicóloga, visando o autoconhecimento e o restabelecimento da saúde mental.',
       serviceType: [
         {
-          name: 'Supervisão',
-          description:
-            'Supervisão supervisiona da Luane pra você ficar 100% na terapeutica #CONFIA.',
-        },
-        {
           name: 'Grupo de Mulheres',
           description: 'Mulher, só que em grupo.',
         },
         {
           name: 'Grupo de Leitura',
           description: 'Leitura, só que em grupo.',
+        },
+      ],
+    } as Service,
+
+    {
+      name: 'Para profissionais',
+      cardDescription: 'Serviços orientados para profissionais.',
+      serviceType: [
+        {
+          name: 'Supervisão',
+          description:
+            'Supervisão supervisiona da Luane pra você ficar 100% na terapeutica #CONFIA.',
+          knowMorePage: Pages.SUPERVISION,
         },
       ],
     } as Service,

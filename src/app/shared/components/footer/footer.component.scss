@@ -1,4 +1,5 @@
 @use "../../../../assets/styles/palette.scss" as palette;
+@use "../src/assets/styles/typography.scss" as typography;
 
 :host {
   display: flex;
@@ -19,7 +20,7 @@
       li {
         font-family: Inter;
         font-weight: 700;
-        color: palette.$primaryColor;
+        color: palette.$primaryColorBlue;
         cursor: pointer;
       }
     }
@@ -27,5 +28,6 @@
 }
 
 .footer-text {
-  color: #959cb6;
+  font-family: typography.$inter;
+  color: palette.$primaryColorBlue;
 }

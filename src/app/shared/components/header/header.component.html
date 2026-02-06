@@ -1,3 +1,5 @@
+<div [class]="{ filler: fixedHeader && !isHomePage }"></div>
+
 <header
   #header
   [class]="{ fixed: fixedHeader }"
@@ -31,9 +33,9 @@
             mat-menu-item
             (click)="navigateTo(navigationService.Pages.DASHBOARD)"
           >
-            Dashboard
+            Conta
           </button>
-          <button mat-menu-item (click)="logOut()">Sign Out</button>
+          <button mat-menu-item (click)="logOut()">Terminar Sesssão</button>
         </mat-menu>
       }
     }

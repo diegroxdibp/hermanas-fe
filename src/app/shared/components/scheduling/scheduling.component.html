@@ -95,7 +95,8 @@
         ></app-availabilities>
       }
     }
-  } @else {
+  }
+  @if (!loader.isHttpLoading() && !schedulingService.professionals.length) {
     <h1>Serviço temporariamente fora do ar.</h1>
   }
 </div>

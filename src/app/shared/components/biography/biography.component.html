@@ -13,14 +13,14 @@
       profissional até hoje.
     </p>
   </content>
-  <picture class="hero-container">
-    <img class="hero-image" [src]="bio.image" alt="Hero" />
+  <picture class="picture">
+    <img [src]="bio.image" [alt]="'Foto de ' + bio.name" />
   </picture>
 </section>
 
 <section class="bio reversed" appScrollAnimate="fade-in-right">
-  <picture class="hero-container books">
-    <img class="hero-image" src="assets/images/books1.jpg" alt="Hero" />
+  <picture class="picture books">
+    <img src="assets/images/books1.jpg" alt="Imagem de livros." />
   </picture>
 
   <content>
@@ -52,38 +52,38 @@
   <content class="lists" appScrollAnimate="fade-in-up">
     <div class="academic">
       <h2>Formação Acadêmica e Especializações</h2>
-          <ul>
-            <title>Formação Acadêmica e Especializações</title>
-            <li>
-              2013: Graduação em Psicologia pela Universidade Federal de São Paulo
-              (UNIFESP).
-            </li>
-            <li>
-              2016: Pós-graduação (Residência Multiprofissional) pela Universidade
-              Federal do Rio de Janeiro (UFRJ)
-            </li>
-            <li>
-              2017: Estudos em Psicoterapia Reichiana no Instituto de Formação e
-              Pesquisa Wilhelm Reich (IFP), Rio de Janeiro.
-            </li>
-            <li>
-              2020: Pós-graduação em Sociologia e Estudos sobre as Mulheres pela
-              Universidade Nova de Lisboa (NOVA), Portugal.
-            </li>
-            <li>
-              2021: Estudos em Psicoterapia Reichiana no Centro Português de Estudos
-              Reichianos (CPER), Lisboa.
-            </li>
-            <li>
-              Atualmente: Em formação em Trauma, utilizando o método Somatic
-              Experiencing de Peter Levine, pela Associação Brasileira de Trauma
-              (ABT).
-            </li>
-          </ul>
+      <ul>
+        <title>Formação Acadêmica e Especializações</title>
+        <li>
+          2013: Graduação em Psicologia pela Universidade Federal de São Paulo
+          (UNIFESP).
+        </li>
+        <li>
+          2016: Pós-graduação (Residência Multiprofissional) pela Universidade
+          Federal do Rio de Janeiro (UFRJ)
+        </li>
+        <li>
+          2017: Estudos em Psicoterapia Reichiana no Instituto de Formação e
+          Pesquisa Wilhelm Reich (IFP), Rio de Janeiro.
+        </li>
+        <li>
+          2020: Pós-graduação em Sociologia e Estudos sobre as Mulheres pela
+          Universidade Nova de Lisboa (NOVA), Portugal.
+        </li>
+        <li>
+          2021: Estudos em Psicoterapia Reichiana no Centro Português de Estudos
+          Reichianos (CPER), Lisboa.
+        </li>
+        <li>
+          Atualmente: Em formação em Trauma, utilizando o método Somatic
+          Experiencing de Peter Levine, pela Associação Brasileira de Trauma
+          (ABT).
+        </li>
+      </ul>
     </div>
 
     <div class="academic">
-      <h2>Experiência Profissional e Contribuiçõe</h2>
+      <h2>Experiência Profissional e Contribuições</h2>
       <ul>
         <title>Experiência Profissional e Contribuições</title>
         <li>
@@ -100,70 +100,10 @@
           migração.
         </li>
         <li>
-          Produção Acadêmica: Autoria de dois capítulos em livros especializados.
+          Produção Acadêmica: Autoria de dois capítulos em livros
+          especializados.
         </li>
       </ul>
     </div>
   </content>
 </section>
-
-<!-- <ng-container *ngIf="screenSize.isMobile()">
-  <h1>{{ bio.name }}</h1>
-  <svg
-    class="separator"
-    viewBox="0 0 800 2"
-    xmlns="http://www.w3.org/2000/svg"
-    preserveAspectRatio="none"
-  >
-    <line x1="0" y1="1" x2="800" y2="1" stroke="#0a4c6e" stroke-width="2" />
-  </svg>
-  <h2>{{ bio.title }}</h2>
-  <svg
-    class="separator"
-    viewBox="0 0 800 2"
-    xmlns="http://www.w3.org/2000/svg"
-    preserveAspectRatio="none"
-  >
-    <line x1="0" y1="1" x2="800" y2="1" stroke="#0a4c6e" stroke-width="2" />
-  </svg>
-  <picture class="hero-container">
-    <img class="hero-image" [src]="bio.image" alt="Hero" />
-  </picture>
-  <section class="description">
-    <p *ngFor="let paragraph of bio.description">{{ paragraph }}</p>
-  </section>
-</ng-container>
-
-<ng-container *ngIf="!screenSize.isMobile()">
-  <section class="bio">
-    <div class="info">
-      <h1>{{ bio.name }}</h1>
-      <svg
-        class="separator"
-        viewBox="0 0 800 1"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <line x1="0" y1="1" x2="800" y2="1" stroke="#0a4c6e" stroke-width="1" />
-      </svg>
-      <h2>{{ bio.title }}</h2>
-      <svg
-        class="separator"
-        viewBox="0 0 800 1"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <line x1="0" y1="1" x2="800" y2="1" stroke="#0a4c6e" stroke-width="1" />
-      </svg>
-      <p>{{ bio.description[0] }}</p>
-    </div>
-
-    <picture class="hero-container">
-      <img class="hero-image" [src]="bio.image" alt="Hero" />
-    </picture>
-  </section>
-
-  <section class="description">
-    <ng-container *ngFor="let paragraph of bio.description; let i = index">
-      <p *ngIf="i !== 0">{{ paragraph }}</p>
-    </ng-container>
-  </section>
-</ng-container> -->

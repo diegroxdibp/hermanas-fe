@@ -40,21 +40,21 @@ export class HeaderComponent {
   fixedHeader = true;
   heroHeight: string = '100vh';
   backgroundColor: string = 'white';
+  isHomePage: boolean = true;
   @ViewChild('header') el!: ElementRef;
   @HostListener('window:scroll', [])
   onWindowScroll() {
-    if (this.navigationService.currentUrl.value === '/') {
-      this.checkScroll();
-    }
+    this.checkScroll();
   }
 
   constructor() {
     this.navigationService.currentUrl.subscribe((url: string) => {
       if (url === '/') {
+        this.isHomePage = true;
         this.fixedHeader = true;
         this.backgroundColor = 'transparent';
       } else {
-        this.fixedHeader = false;
+        this.isHomePage = false;
         this.backgroundColor = 'white';
       }
     });
@@ -104,7 +104,7 @@ export class HeaderComponent {
     this.renderer.setStyle(
       this.el.nativeElement,
       'transition',
-      'background-color 0.3s ease'
+      'background-color 0.3s ease',
     );
   }
 
@@ -112,12 +112,12 @@ export class HeaderComponent {
     this.renderer.setStyle(
       this.el.nativeElement,
       'background-color',
-      'transparent'
+      'transparent',
     );
     this.renderer.setStyle(
       this.el.nativeElement,
       'transition',
-      'background-color 0.3s ease'
+      'background-color 0.3s ease',
     );
   }
 }

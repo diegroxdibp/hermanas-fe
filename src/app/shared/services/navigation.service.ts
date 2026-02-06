@@ -12,9 +12,9 @@ export class NavigationService {
   Pages = Pages;
   navigationItems: NavigationItem[] = [
     { name: 'Home', destination: Pages.HOME },
-    { name: 'About', destination: Pages.ABOUT },
-    { name: 'Contact', destination: Pages.CONTACT },
-    { name: 'Scheduling', destination: Pages.SCHEDULING },
+    { name: 'Sobre', destination: Pages.ABOUT },
+    { name: 'Contato', destination: Pages.CONTACT },
+    { name: 'Agendar', destination: Pages.SCHEDULING },
     // { name: 'AR', destination: Pages.ANALISE_REICHANA },
   ];
   private routesWithAnchor = [`/${Pages.ATENDIMENTO}`, '/', '/contact'];

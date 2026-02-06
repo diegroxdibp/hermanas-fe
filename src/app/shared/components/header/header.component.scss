@@ -1,5 +1,6 @@
 @use "../../../../assets/styles/breakpoints.scss" as breakpoint;
-@use "../../../../assets/styles/palette.scss" as palette;
+@use "../src/assets/styles/palette.scss" as palette;
+@use "../src/assets/styles/typography.scss" as typography;
 
 :host {
   display: flex;
@@ -34,7 +35,8 @@
     ul {
       display: flex;
       gap: 1em;
-      height: fit-content;
+      // height: fit-content;
+      height: 100%;
       display: flex;
       align-items: center;
       margin-left: auto;
@@ -46,9 +48,10 @@
 
         a {
           // color: white;
-          font-family: Inter;
+          font-family: typography.$inter;
           font-size: 18px;
           font-weight: 600;
+          font-style: normal;
 
           user-select: none;
           -webkit-user-select: none;
@@ -66,10 +69,16 @@
 
 .account-button {
   display: flex;
-  color: palette.$primaryColor;
+  height: 100%;
+  align-items: center;
+  color: palette.$primaryColorBlue;
   background-color: transparent;
   border: none;
   cursor: pointer;
+}
+
+button {
+  color: palette.$primaryColorBlue;
 }
 
 .fixed {
@@ -77,4 +86,11 @@
   background-color: transparent;
   top: 0;
   transition: background-color 0.3s ease;
+}
+
+.filler {
+  display: flex;
+  height: 60px;
+  width: 100%;
+  z-index: 100;
 }

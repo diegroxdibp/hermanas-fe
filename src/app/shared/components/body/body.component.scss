@@ -1,12 +1,12 @@
 @use "../../../../assets/styles/breakpoints.scss" as breakpoint;
 @use "../../../../assets/styles/palette.scss" as palette;
+@use "../src/assets/styles/variables.scss" as variables;
 
 :host {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  // background-color: palette.$supportingColor2;
-  background-color: #f0f0f0;
+  background-color: palette.$supportingColorWhite;
   width: 100%;
   align-items: center;
 
@@ -15,16 +15,89 @@
   }
 
   .services {
-    background: #c7ebff;
+    display: flex;
+    flex-direction: column;
+    padding: 4em 0;
+    max-width: 100%;
+    gap: 3em;
+    background: palette.$secondaryColorPurple;
 
     ul {
+      width: 100%;
       flex-direction: column;
+    }
+
+    .service {
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+      max-width: variables.$main-column-max-width;
+      padding: 0 variables.$mobile-lateral-padding;
+      gap: 1em;
+
+      h2,
+      h3,
+      p,
+      svg {
+        color: palette.$supportingColorWhite;
+        fill: palette.$supportingColorWhite;
+      }
+
+      .service-type {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 8px;
+
+        .service-name {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+          align-items: center;
+          cursor: pointer;
+        }
+
+        .service-box {
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+
+          .service-description {
+            font-size: 16px;
+            line-height: 30px;
+            letter-spacing: normal;
+          }
+
+          .service-actions {
+            display: flex;
+            width: 100%;
+            justify-content: right;
+            padding: 1em;
+            gap: 16px;
+          }
+        }
+      }
+    }
+
+    @media (min-width: breakpoint.$breakpoint-md) {
+      width: 100%;
+      padding: 6em 0;
+      .services {
+        gap: 3em;
+        padding: 6em 2em;
+
+        .service {
+          p {
+            font-size: 18px;
+          }
+        }
+      }
     }
   }
 
   @media (min-width: breakpoint.$breakpoint-md) {
     width: 100%;
-    // max-width: 800px;
 
     .introduction {
       margin: 6em 0;
@@ -32,7 +105,6 @@
 
     content {
       width: 100%;
-      // max-width: 1000px;
     }
   }
 }
@@ -44,5 +116,4 @@
 svg {
   cursor: pointer;
   height: 40px;
-  color: palette.$primaryColor;
 }

@@ -2,7 +2,13 @@ import { AvailabilityModel } from './../../models/availability.model';
 import { SchedulingService } from './../../services/scheduling.service';
 import { ApiService } from './../../../core/services/api.service';
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { provideNativeDateAdapter, MatOption } from '@angular/material/core';
@@ -32,6 +38,7 @@ import { parseDate } from '../../utils/date-helper.util';
 import { MatIcon } from '@angular/material/icon';
 import { AvailabilityType } from '../../enums/availability-type.enum';
 import { ProfessionalModel } from '../../models/professional.model';
+import { LoadingService } from '../../../core/services/loading.service';
 
 @Component({
   selector: 'app-scheduling',
@@ -55,6 +62,7 @@ import { ProfessionalModel } from '../../models/professional.model';
   styleUrl: './scheduling.component.scss',
 })
 export class SchedulingComponent implements OnInit {
+  loader = inject(LoadingService);
   @ViewChild('body') body: ElementRef | undefined;
   @ViewChild('subject') subject: ElementRef | undefined;
   calendarConfigurationObject: CalendarConfigurationObject =
@@ -70,7 +78,7 @@ export class SchedulingComponent implements OnInit {
 
   constructor(
     private apiService: ApiService,
-    public schedulingService: SchedulingService
+    public schedulingService: SchedulingService,
   ) {
     this.apiService
       .getTherapists()
@@ -91,7 +99,7 @@ export class SchedulingComponent implements OnInit {
             console.log(
               'availabilities of ->',
               selectedProfessional,
-              availabilities
+              availabilities,
             );
             this.schedulingService.setAvailabilitites(availabilities);
           });
@@ -104,7 +112,7 @@ export class SchedulingComponent implements OnInit {
         if (this.schedulingService.timeSlots.get(date)) {
           this.setAvailabilityConfiguration(
             this.schedulingService.availability(),
-            parseDate(date)
+            parseDate(date),
           );
         }
       });
@@ -119,7 +127,7 @@ export class SchedulingComponent implements OnInit {
     this.calendarConfigurationObject = {
       title: 'Escolha uma data:',
       control: this.schedulingService.schedulingForm.get(
-        SchedulingFormControls.SELECTED_DAY
+        SchedulingFormControls.SELECTED_DAY,
       ) as FormControl,
       calendarType: CalendarType.SCHEDULING,
     };
@@ -127,23 +135,23 @@ export class SchedulingComponent implements OnInit {
 
   setAvailabilityConfiguration(
     availability: AvailabilityModel[],
-    selectedDate: Date
+    selectedDate: Date,
   ): void {
     const filteredAvailability =
       this.schedulingService.filterAvailabilityForDay(
         availability,
-        selectedDate
+        selectedDate,
       );
 
     this.availabilityConfigurationObject = {
       title: 'Escolha uma disponibilidade:',
       selectedDate: parseDate(
         this.schedulingService.schedulingForm.get(
-          SchedulingFormControls.SELECTED_DAY
-        )?.value
+          SchedulingFormControls.SELECTED_DAY,
+        )?.value,
       ).toLocaleDateString('pt-PT'),
       control: this.schedulingService.schedulingForm.get(
-        SchedulingFormControls.SELECTED_DAY
+        SchedulingFormControls.SELECTED_DAY,
       ) as FormControl,
       availability: filteredAvailability,
     };
@@ -153,7 +161,7 @@ export class SchedulingComponent implements OnInit {
     this.appointmentTypeConfiguration = {
       title: 'Escolha uma tipe de atendimento:',
       control: this.schedulingService.schedulingForm.get(
-        'selectedType'
+        'selectedType',
       ) as FormControl,
       listOfOptions: Object.values(AppointmentType),
     };
@@ -195,7 +203,7 @@ export class SchedulingComponent implements OnInit {
       (allowed) =>
         allowed.getFullYear() === date.getFullYear() &&
         allowed.getMonth() === date.getMonth() &&
-        allowed.getDate() === date.getDate()
+        allowed.getDate() === date.getDate(),
     );
   };
 
@@ -231,13 +239,13 @@ export class SchedulingComponent implements OnInit {
   handleScheduleButton() {
     this.apiService.sendEmail(
       this.subject?.nativeElement.value,
-      this.body?.nativeElement.value
+      this.body?.nativeElement.value,
     );
     console.log(
       'Subject:',
       this.body?.nativeElement.value,
       'Body:',
-      this.body?.nativeElement.value
+      this.body?.nativeElement.value,
     );
   }
 

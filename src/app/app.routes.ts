@@ -1,4 +1,3 @@
-import { OnboardingComponent } from './shared/components//onboarding/onboarding.component';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { BodyComponent } from './shared/components/body/body.component';
@@ -6,15 +5,15 @@ import { BiographyComponent } from './shared/components/biography/biography.comp
 import { AboutComponent } from './shared/components/about/about.component';
 import { Pages } from './shared/enums/pages.enum';
 import { ContactComponent } from './shared/components/contact/contact.component';
-import { SchedulingComponent } from './shared/components/scheduling/scheduling.component';
 import { MindfulnessComponent } from './shared/components/mindfulness/mindfulness.component';
 import { AnaliseCorporalReichanaComponent } from './shared/components/analise-corporal-reichana/analise-corporal-reichana.component';
-import { UserDashboardComponent } from './shared/components/user-dashboard/user-dashboard.component';
 import { AccessGuard } from './auth/auth.guard';
 import { AuthOnlyGuard } from './auth/authOnly.guard';
 import { DashboardProfileComponent } from './shared/components/dashboard-profile/dashboard-profile.component';
 import { DashboardScheduleComponent } from './shared/components/dashboard-schedule/dashboard-schedule.component';
 import { DashboardNotificationsComponent } from './shared/components/dashboard-notifications/dashboard-notifications.component';
+import { SomaticExperienceComponent } from './shared/components/somatic-experience/somatic-experience.component';
+import { SupervisionComponent } from './shared/components/supervision/supervision.component';
 
 export const routes: Routes = [
   { path: Pages.HOME, component: BodyComponent },
@@ -23,6 +22,8 @@ export const routes: Routes = [
   { path: Pages.ATENDIMENTO_GRUPO, component: BodyComponent },
   { path: Pages.ANALISE_REICHANA, component: AnaliseCorporalReichanaComponent },
   { path: Pages.MINDFULLNESS, component: MindfulnessComponent },
+  { path: Pages.SOMATIC_EXPERIENCE, component: SomaticExperienceComponent },
+  { path: Pages.SUPERVISION, component: SupervisionComponent },
   { path: Pages.ABOUT, component: AboutComponent },
   { path: Pages.CONTACT, component: ContactComponent },
 

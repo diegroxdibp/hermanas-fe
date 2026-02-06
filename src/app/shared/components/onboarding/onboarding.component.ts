@@ -8,7 +8,6 @@ import { AppConstants } from '../../../app-constants';
 import { FormControlsNames } from '../../enums/form-controls-names.enum';
 import { Router } from '@angular/router';
 import { NavigationService } from '../../services/navigation.service';
-import { LoaderService } from '../../../core/services/loader.service';
 import { FormService } from '../../../core/services/form.service';
 import { CalendarComponent } from '../calendar/calendar.component';
 import {
@@ -29,8 +28,8 @@ import {
   TextInputConfigurationObject,
 } from '../../models/input-configuration-objects/text-input-configuration-object';
 import { InputType } from '../../enums/input-type.enum';
-import { User } from '../../../auth/user.model';
 import { OnboardingResponse } from '../../models/onboarding-response.model';
+import { LoadingService } from '../../../core/services/loading.service';
 
 @Component({
   selector: 'app-onboarding',
@@ -48,7 +47,7 @@ export class OnboardingComponent {
   private readonly formService = inject(FormService);
   private readonly sessionService = inject(SessionService);
   readonly userService = inject(UserService);
-  private readonly loaderService = inject(LoaderService);
+  private readonly loaderService = inject(LoadingService);
   private readonly router = inject(Router);
   public readonly navigationService = inject(NavigationService);
   nameConfigurationObject: TextInputConfigurationObject =
@@ -62,7 +61,7 @@ export class OnboardingComponent {
 
   error: any;
   phoneControl = new FormControl('');
-  constructor() {}
+
   ngOnInit(): void {
     this.setConfiguration();
   }
@@ -73,7 +72,7 @@ export class OnboardingComponent {
       title: AppConstants.authentication.nameInputTitle,
       placeHolder: 'Bruxo Voador da Silva',
       control: this.formService.onboardingForm.get(
-        FormControlsNames.NAME
+        FormControlsNames.NAME,
       ) as FormControl,
     };
 
@@ -81,15 +80,14 @@ export class OnboardingComponent {
       title: AppConstants.authentication.emailInputTitle,
       calendarType: CalendarType.BIRTHDATE,
       control: this.formService.onboardingForm.get(
-        FormControlsNames.BIRTHDATE
+        FormControlsNames.BIRTHDATE,
       ) as FormControl,
     };
 
     this.genderConfigurationObject = {
-      title: 'Escolha um cu',
       label: 'Gênero',
       control: this.formService.onboardingForm.get(
-        FormControlsNames.GENDER
+        FormControlsNames.GENDER,
       ) as FormControl,
       values: Object.values(Genders),
     };
@@ -97,21 +95,15 @@ export class OnboardingComponent {
 
   submitOnboarding(event: Event) {
     event.preventDefault();
-    this.loaderService.startLoader();
 
     this.error = null;
     console.log(this.formService.onboardingPayload());
     this.userService
       .onboarding(this.formService.onboardingPayload())
-      .pipe(
-        finalize(() => {
-          this.loaderService.stopLoader();
-        })
-      )
       .subscribe({
         next: (userPartial: OnboardingResponse) => {
           this.sessionService.updateUser(userPartial);
-          console.log('User',this.sessionService.user())
+          console.log('User', this.sessionService.user());
           this.router.navigate(['/dashboard']);
         },
         error: (err: any) => {

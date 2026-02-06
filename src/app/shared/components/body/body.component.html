@@ -14,13 +14,15 @@
     <h3 class="pillar-title">
       Este conceito se alicerça em pilares essenciais:
     </h3>
-    <p class="centered-list-item">Cuidado centrado na pessoa</p>
-    <p class="centered-list-item">Modelo biopsicossocial</p>
-    <p class="centered-list-item">Abordagem integral</p>
-    <p class="centered-list-item">Trabalho transdisciplinar</p>
+    <ul class="list">
+      <li><span>Cuidado centrado na pessoa</span></li>
+      <li><span>Modelo biopsicossocial</span></li>
+      <li><span>Abordagem integral</span></li>
+      <li><span>Trabalho transdisciplinar</span></li>
+    </ul>
 
     <p class="quotation">
-      A Clínica Ampliada - RessignificAÇÕES (CARE) adota esses pilares como seus
+      A Clínica Ampliada - Ressignificações (CARE) adota esses pilares como seus
       valores fundamentais.
     </p>
 
@@ -43,18 +45,16 @@
     </p>
 
     <p>
-      A CARE nasceu do encontro entre a visão da fundadora, Luane S. Bastos, e
-      sua sólida formação universitária em saúde pela Universidade Federal de
-      São Paulo (UNIFESP).
+      A CARE nasceu do encontro entre a visão da fundadora, Luane Bastos, e sua
+      sólida formação universitária em saúde pela Universidade Federal de São
+      Paulo (UNIFESP).
     </p>
-    <!-- <img src="assets/images/hermanas1.jpg" alt="Hero" /> -->
   </content>
 </section>
 
 <section class="services">
   <content
     class="service"
-    id="atendimento"
     *ngFor="let service of AppConstants.services; let serviceIndex = index"
   >
     <h2>{{ service.name }}</h2>
@@ -71,7 +71,6 @@
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 100 125"
-            fill="#005a89"
             [class.invert]="expandedItems[serviceIndex + '-' + typeIndex]"
             class="expand-icon"
           >

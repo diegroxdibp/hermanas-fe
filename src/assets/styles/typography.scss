@@ -1,29 +1,356 @@
-//Palette
-// $primaryColor: #064C4C;
-// $primaryColorLighter: #316F5F;
-// $primaryColorDarker: #21362C;
+$inter: Inter;
+$sourceSans: Source Sans;
+$sourceSerif: Source Serif; // Light Purple
 
-// $secondaryColorBrownish: #5C3327;
-// $secondaryColorRedish: #86353A;
-// $secondaryColorOrangish: #BB6146;
-// $secondaryColorYellowish: #E5BE60;
+//Source Sans Pro
+@font-face {
+  font-family: "Source Sans";
+  src: url("/assets/font/SourceSans3-ExtraLight.ttf") format("truetype");
+  font-weight: 200;
+  font-style: nomal;
+}
 
-// $supportingColor1: #F2DBD5;
-// $supportingColor2: #E4E1DF;
-// $supportingColor3: #90AFAE;
+@font-face {
+  font-family: "Source Sans";
+  src: url("/assets/font/SourceSans3-ExtraLightItalic.ttf") format("truetype");
+  font-weight: 200;
+  font-style: italic;
+}
 
-// Primary Colors (Blue-based)
-$primaryColor: #0a4c6e; // Deep blue base
-$primaryColorLighter: #316b8f; // Lighter blue
-$primaryColorDarker: #213645; // Dark navy
+@font-face {
+  font-family: "Source Sans";
+  src: url("/assets/font/SourceSans3-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+}
 
-// Secondary Colors (Complementary & Supporting)
-$secondaryColorPurplish: #563b6f; // Deep purple for depth
-$secondaryColorPeriwinkle: #6b5b8e; // Muted periwinkle
-$secondaryColorLavender: #8b7ab8; // Soft lavender
-$secondaryColorSkyBlue: #7cb7d4; // Light sky blue
+@font-face {
+  font-family: "Source Sans";
+  src: url("/assets/font/SourceSans3-LightItalic.ttf") format("truetype");
+  font-weight: 300;
+  font-style: italic;
+}
 
-// Supporting Colors (Neutral & Light)
-$supportingColor1: #d5e4f2; // Very light blue-tinted white
-$supportingColor2: #dfe4e9; // Light neutral with blue undertone
-$supportingColor3: #90a7b8; // Muted blue-gray
+@font-face {
+  font-family: "Source Sans";
+  src: url("/assets/font/SourceSans3-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Source Sans";
+  src: url("/assets/font/SourceSans3-Italic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Source Sans";
+  src: url("/assets/font/SourceSans3-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Source Sans";
+  src: url("/assets/font/SourceSans3-MediumItalic.ttf") format("truetype");
+  font-weight: 500;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Source Sans";
+  src: url("/assets/font/SourceSans3-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Source Sans";
+  src: url("/assets/font/SourceSans3-SemiBoldItalic.ttf") format("truetype");
+  font-weight: 600;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Source Sans";
+  src: url("/assets/font/SourceSans3-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Source Sans";
+  src: url("/assets/font/SourceSans3-BoldItalic.ttf") format("truetype");
+  font-weight: 700;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Source Sans";
+  src: url("/assets/font/SourceSans3-ExtraBold.ttf") format("truetype");
+  font-weight: 800;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Source Sans";
+  src: url("/assets/font/SourceSans3-ExtraBoldItalic.ttf") format("truetype");
+  font-weight: 800;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Source Sans";
+  src: url("/assets/font/SourceSans3-Black.ttf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Source Sans";
+  src: url("/assets/font/SourceSans3-BlackItalic.ttf") format("truetype");
+  font-weight: 900;
+  font-style: italic;
+}
+
+//Source Serif Pro
+@font-face {
+  font-family: "Source Serif";
+  src: url("/assets/font/SourceSerif4-ExtraLight.ttf") format("truetype");
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Source Serif";
+  src: url("/assets/font/SourceSerif4-ExtraLightItalic.ttf") format("truetype");
+  font-weight: 200;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Source Serif";
+  src: url("/assets/font/SourceSerif4-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Source Serif";
+  src: url("/assets/font/SourceSerif4-LightItalic.ttf") format("truetype");
+  font-weight: 300;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Source Serif";
+  src: url("/assets/font/SourceSerif4-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Source Serif";
+  src: url("/assets/font/SourceSerif4-Italic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Source Serif";
+  src: url("/assets/font/SourceSerif4-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Source Serif";
+  src: url("/assets/font/SourceSerif4-MediumItalic.ttf") format("truetype");
+  font-weight: 500;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Source Serif";
+  src: url("/assets/font/SourceSerif4-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Source Serif";
+  src: url("/assets/font/SourceSerif4-SemiBoldItalic.ttf") format("truetype");
+  font-weight: 600;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Source Serif";
+  src: url("/assets/font/SourceSerif4-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Source Serif";
+  src: url("/assets/font/SourceSerif4-BoldItalic.ttf") format("truetype");
+  font-weight: 700;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Source Serif";
+  src: url("/assets/font/SourceSerif4-ExtraBold.ttf") format("truetype");
+  font-weight: 800;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Source Serif";
+  src: url("/assets/font/SourceSerif4-ExtraBoldItalic.ttf") format("truetype");
+  font-weight: 800;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Source Serif";
+  src: url("/assets/font/SourceSerif4-Black.ttf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Source Serif";
+  src: url("/assets/font/SourceSerif4-BlackItalic.ttf") format("truetype");
+  font-weight: 900;
+  font-style: italic;
+}
+
+//Inter
+@font-face {
+  font-family: "Inter";
+  src: url("/assets/font/Inter_18pt-Thin.ttf") format("truetype");
+  font-weight: 100;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/assets/font/Inter_18pt-ThinItalic.ttf") format("truetype");
+  font-weight: 100;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/assets/font/Inter_18pt-ExtraLight.ttf") format("truetype");
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/assets/font/Inter_18pt-ExtraLightItalic.ttf") format("truetype");
+  font-weight: 200;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/assets/font/Inter_18pt-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/assets/font/Inter_18pt-LightItalic.ttf") format("truetype");
+  font-weight: 300;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/assets/font/Inter_18pt-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/assets/font/Inter_18pt-Italic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/assets/font/Inter_18pt-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/assets/font/Inter_18pt-MediumItalic.ttf") format("truetype");
+  font-weight: 500;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/assets/font/Inter_18pt-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/assets/font/Inter_18pt-SemiBoldItalic.ttf") format("truetype");
+  font-weight: 600;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/assets/font/Inter_18pt-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/assets/font/Inter_18pt-BoldItalic.ttf") format("truetype");
+  font-weight: 700;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/assets/font/Inter_18pt-ExtraBold.ttf") format("truetype");
+  font-weight: 800;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/assets/font/Inter_18pt-ExtraBoldItalic.ttf") format("truetype");
+  font-weight: 800;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/assets/font/Inter_18pt-Black.ttf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/assets/font/Inter_18pt-BlackItalic.ttf") format("truetype");
+  font-weight: 900;
+  font-style: italic;
+}

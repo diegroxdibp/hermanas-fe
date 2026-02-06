@@ -1,4 +1,3 @@
-import { LoaderService } from './../../core/services/loader.service';
 import { Component, inject } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { AppConstants } from '../../app-constants';
@@ -28,7 +27,6 @@ import { NavigationService } from '../../shared/services/navigation.service';
 export class RegisterComponent {
   private readonly authService = inject(AuthService);
   private readonly formService = inject(FormService);
-  private readonly loaderService = inject(LoaderService);
   public readonly navigationService = inject(NavigationService);
 
   private readonly router = inject(Router);
@@ -53,7 +51,7 @@ export class RegisterComponent {
       title: AppConstants.authentication.emailInputTitle,
       placeHolder: 'Example@email.com',
       control: this.formService.authForm.get(
-        FormControlsNames.EMAIL
+        FormControlsNames.EMAIL,
       ) as FormControl,
     };
 
@@ -61,7 +59,7 @@ export class RegisterComponent {
       inputType: InputType.PASSWORD,
       title: AppConstants.authentication.passwordInputTitle,
       control: this.formService.authForm.get(
-        FormControlsNames.PASSWORD
+        FormControlsNames.PASSWORD,
       ) as FormControl,
       showValidationTips: true,
     };
@@ -70,7 +68,7 @@ export class RegisterComponent {
       inputType: InputType.PASSWORD,
       title: AppConstants.authentication.passwordInputTitle,
       control: this.formService.authForm.get(
-        FormControlsNames.PASSWORD
+        FormControlsNames.PASSWORD,
       ) as FormControl,
       showValidationTips: true,
     };
@@ -82,25 +80,17 @@ export class RegisterComponent {
 
   signUp(event: Event) {
     event.preventDefault();
-    this.loaderService.startLoader();
 
     this.error = null;
 
-    this.authService
-      .signUp(this.formService.signUpPayload())
-      .pipe(
-        finalize(() => {
-          this.loaderService.stopLoader();
-        })
-      )
-      .subscribe({
-        next: () => {
-          this.router.navigate(['/dashboard']);
-        },
-        error: (err) => {
-          this.error = err.error?.error ?? 'Signup failed';
-        },
-      });
+    this.authService.signUp(this.formService.signUpPayload()).subscribe({
+      next: () => {
+        this.router.navigate(['/dashboard']);
+      },
+      error: (err) => {
+        this.error = err.error?.error ?? 'Signup failed';
+      },
+    });
   }
 
   signInWithGoogle(event: Event) {

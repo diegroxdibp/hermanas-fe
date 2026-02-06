@@ -16,7 +16,7 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-dashboard-profile',
-  imports: [TextInputComponent, MatIcon,CommonModule],
+  imports: [TextInputComponent, MatIcon, CommonModule],
   templateUrl: './dashboard-profile.component.html',
   styleUrl: './dashboard-profile.component.scss',
 })

@@ -1,6 +1,7 @@
 @use "../src/assets/styles/breakpoints.scss" as breakpoint;
-@use "../src/assets/styles/palette.scss" as palette;
 @use "../src/assets/styles/variables.scss" as variables;
+@use "../src/assets/styles/palette.scss" as palette;
+@use "../src/assets/styles/typography.scss" as typography;
 
 * {
   box-sizing: border-box;
@@ -15,8 +16,7 @@ main {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  // background-color: palette.$supportingColor2;
-  background-color: #f0f0f0;
+  background-color: palette.$supportingColorWhite;
   margin: 0;
 }
 
@@ -24,13 +24,12 @@ ul,
 li {
   display: flex;
   list-style: none;
-  font-family: Inter;
-  color: palette.$primaryColor;
-  font-size: 17px;
-  font-weight: 300;
-  // line-height: 28px;
-  line-height: auto;
-  text-align: justify;
+  font-family: typography.$sourceSans;
+  color: palette.$primaryColorBlue;
+  font-size: 18px;
+  font-weight: 500;
+  font-style: italic;
+  justify-content: center;
   margin: 0;
   padding: 0;
 }
@@ -51,8 +50,8 @@ picture {
 }
 
 h1 {
-  font-family: Inter;
-  color: palette.$primaryColor;
+  font-family: typography.$sourceSans;
+  color: palette.$primaryColorBlue;
   font-size: 36px;
   letter-spacing: 1px;
   font-weight: 700;
@@ -66,8 +65,8 @@ h1 {
 }
 
 h2 {
-  font-family: Inter;
-  color: palette.$primaryColor;
+  font-family: typography.$sourceSans;
+  color: palette.$primaryColorBlue;
   font-weight: 700;
   font-size: 24px;
   margin: 0;
@@ -78,8 +77,8 @@ h2 {
 }
 
 h3 {
-  font-family: Inter;
-  color: palette.$primaryColor;
+  font-family: typography.$sourceSans;
+  color: palette.$primaryColorBlue;
   font-weight: 700;
   font-size: 18px;
   margin: 0;
@@ -89,17 +88,13 @@ h3 {
 }
 
 p {
-  font-family: Inter;
-  color: palette.$primaryColor;
+  font-family: typography.$sourceSans;
+  color: palette.$primaryColorBlue;
   font-size: 17px;
-  font-weight: 300;
+  font-weight: 400;
   line-height: 28px;
   text-align: justify;
   margin: 0;
-
-  @media (min-width: breakpoint.$breakpoint-sm) {
-    letter-spacing: 1.1px;
-  }
 
   @media (min-width: breakpoint.$breakpoint-md) {
     // font-size: 18px;
@@ -114,8 +109,8 @@ a:visited,
 a:active,
 a:visited,
 a:link {
-  color: palette.$primaryColor;
-  font-family: Inter;
+  color: palette.$primaryColorBlue;
+  font-family: typography.$sourceSans;
   font-size: 12px;
   font-weight: 700;
   line-height: 1.2;
@@ -124,12 +119,8 @@ a:link {
 }
 
 span {
-  font-family: Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
-    sans-serif;
-
-  & a {
-    font-family: Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
-      "Helvetica Neue", sans-serif;
+  font-family: typography.$sourceSans & a {
+    font-family: typography.$sourceSans;
   }
 }
 
@@ -141,9 +132,15 @@ section {
   align-items: center;
   padding: 0 variables.$mobile-lateral-padding;
 
+  @media (min-width: breakpoint.$breakpoint-lg) {
+    width: 100%;
+    max-width: variables.$main-column-max-width-md;
+  }
+
   content {
     display: flex;
     flex-direction: column;
+    align-items: center;
     width: 100%;
     gap: 1.5em;
 
@@ -153,75 +150,28 @@ section {
       font-style: italic;
       margin: 1.5em;
     }
+
+    .quotation + .quotation {
+      margin-top: 0;
+    }
   }
 }
 
-.services {
-  display: flex;
-  flex-direction: column;
-  padding: 4em 0;
-  max-width: 100%;
-  gap: 3em;
+.picture {
+  width: 100%;
+  max-width: 400px;
+  overflow: hidden;
+  position: relative;
+  margin: 0;
+  height: auto;
+  border-radius: 10px;
+  max-height: 500px;
 
-  .service {
-    display: flex;
-    flex-direction: column;
-    max-width: variables.$main-column-max-width;
-    padding: 0 variables.$mobile-lateral-padding;
-    gap: 1em;
-
-    .service-type {
-      // display: grid;
-      // grid-template-columns: 1fr auto;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 8px;
-
-      .service-name {
-        display: flex;
-        justify-content: space-between;
-        width: 100%;
-        align-items: center;
-        cursor: pointer;
-      }
-
-      .service-box {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-
-        .service-description {
-          font-size: 16px;
-          line-height: 30px;
-          letter-spacing: normal;
-        }
-
-        .service-actions {
-          display: flex;
-          width: 100%;
-          justify-content: right;
-          padding: 20px;
-          gap: 16px;
-        }
-      }
-    }
-  }
-
-  @media (min-width: breakpoint.$breakpoint-md) {
+  img {
     width: 100%;
-    padding: 6em 0;
-    // max-width: 800px;
-    .services {
-      gap: 3em;
-      padding: 6em 2em;
-
-      .service {
-        p {
-          font-size: 18px;
-        }
-      }
-    }
+    height: auto;
+    object-fit: cover;
+    object-position: 50% 20%;
   }
 }
 
@@ -229,13 +179,18 @@ section {
   display: flex;
   flex-direction: column;
   gap: 1.5em;
-}
 
-.centered-list-item {
-  display: block;
-  width: 100%;
-  text-align: center;
-  line-height: normal;
+  li {
+    display: block;
+    width: 100%;
+    text-align: center;
+    line-height: normal;
+
+    span {
+      font-style: italic;
+      font-size: 21px;
+    }
+  }
 }
 
 .invert {
@@ -264,216 +219,25 @@ section {
 .fade-in-up {
   opacity: 1;
   transform: translateY(0);
-  transition: opacity 1.4s ease, transform 1.4s ease;
+  transition:
+    opacity 1.4s ease,
+    transform 1.4s ease;
 }
 
 .fade-in-left {
   opacity: 1;
   transform: translateX(0);
-  transition: opacity 0.6s ease, transform 0.6s ease;
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s ease;
 }
 
 .fade-in-right {
   opacity: 1;
   transform: translateX(0);
-  transition: opacity 0.6s ease, transform 0.6s ease;
-}
-//
-
-@font-face {
-  font-family: "SegoeUI";
-  src: url("/assets/font/SegoeUI.ttf") format("truetype");
-  font-weight: 400; /* Normal weight */
-  font-style: normal; /* Regular style */
-}
-
-@font-face {
-  font-family: "SegoeUI";
-  src: url("/assets/font/SegoeUIBold.ttf") format("truetype");
-  font-weight: 700; /* Normal weight */
-  font-style: normal; /* Regular style */
-}
-
-@font-face {
-  font-family: "SegoeUI";
-  src: url("/assets/font/SegoeUIItalic.ttf") format("truetype");
-  font-weight: 400; /* Normal weight */
-  font-style: italic; /* Regular style */
-}
-
-@font-face {
-  font-family: "SegoeUI";
-  src: url("/assets/font/SegoeUIBoldItalic.ttf") format("truetype");
-  font-weight: 700; /* Normal weight */
-  font-style: italic; /* Regular style */
-}
-
-@font-face {
-  font-family: "Inter";
-  src: url("/assets/font/Inter_18pt-Thin.ttf") format("truetype");
-  font-weight: 100;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Inter";
-  src: url("/assets/font/Inter_18pt-ThinItalic.ttf") format("truetype");
-  font-weight: 100;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: "Inter";
-  src: url("/assets/font/Inter_18pt-ExtraLight.ttf") format("truetype");
-  font-weight: 200;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Inter";
-  src: url("/assets/font/Inter_18pt-ExtraLightItalic.ttf") format("truetype");
-  font-weight: 200;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: "Inter";
-  src: url("/assets/font/Inter_18pt-Light.ttf") format("truetype");
-  font-weight: 300;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Inter";
-  src: url("/assets/font/Inter_18pt-LightItalic.ttf") format("truetype");
-  font-weight: 300;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: "Inter";
-  src: url("/assets/font/Inter_18pt-Regular.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Inter";
-  src: url("/assets/font/Inter_18pt-Italic.ttf") format("truetype");
-  font-weight: 400;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: "Inter";
-  src: url("/assets/font/Inter_18pt-Medium.ttf") format("truetype");
-  font-weight: 500;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Inter";
-  src: url("/assets/font/Inter_18pt-MediumItalic.ttf") format("truetype");
-  font-weight: 500;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: "Inter";
-  src: url("/assets/font/Inter_18pt-SemiBold.ttf") format("truetype");
-  font-weight: 600;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Inter";
-  src: url("/assets/font/Inter_18pt-SemiBoldItalic.ttf") format("truetype");
-  font-weight: 600;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: "Inter";
-  src: url("/assets/font/Inter_18pt-Bold.ttf") format("truetype");
-  font-weight: 700;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Inter";
-  src: url("/assets/font/Inter_18pt-BoldItalic.ttf") format("truetype");
-  font-weight: 700;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: "Inter";
-  src: url("/assets/font/Inter_18pt-ExtraBold.ttf") format("truetype");
-  font-weight: 800;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Inter";
-  src: url("/assets/font/Inter_18pt-ExtraBoldItalic.ttf") format("truetype");
-  font-weight: 800;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: "Inter";
-  src: url("/assets/font/Inter_18pt-Black.ttf") format("truetype");
-  font-weight: 900;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Inter";
-  src: url("/assets/font/Inter_18pt-BlackItalic.ttf") format("truetype");
-  font-weight: 900;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: "Anastasia";
-  src: url("/assets/font/Anastasia.otf") format("opentype");
-  font-weight: 600;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Apercu";
-  src: url("/assets/font/Apercu Bold.otf") format("opentype");
-  font-weight: 400;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Acumin";
-  src: url("/assets/font/Acumin-RPro.otf") format("opentype");
-  font-weight: 400;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Acumin";
-  src: url("/assets/font/Acumin-BdPro.otf") format("opentype");
-  font-weight: 700;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Acumin";
-  src: url("/assets/font/Acumin-ItPro.otf") format("opentype");
-  font-weight: 400;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: "Acumin";
-  src: url("/assets/font/Acumin-BdItPro.otf") format("opentype");
-  font-weight: 700;
-  font-style: italic;
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s ease;
 }
 
 // html, body { height: 100%; }
@@ -586,6 +350,18 @@ section {
   height: 66px;
 }
 
+.fullscreenMenuOpen {
+  color: white;
+}
+
 mat-divider {
   margin: 8px 0 16px 0 !important;
+}
+
+mat-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 2000;
 }
