@@ -29,15 +29,14 @@
       flex-direction: column;
       max-width: variables.$main-column-max-width;
       gap: 3em;
-
+      h2 {
+        margin-bottom: 1em;
+      }
       ul {
         display: flex;
         flex-direction: column;
         margin: 0 !important;
         gap: 1em;
-
-        @media (min-width: breakpoint.$breakpoint-md) {
-        }
       }
     }
     @media (min-width: breakpoint.$breakpoint-md) {
@@ -50,7 +49,6 @@
     font-size: 18px;
     letter-spacing: 1.1px;
     font-style: italic;
-    margin-bottom: 1.5em;
   }
 
   @media (min-width: breakpoint.$breakpoint-sm) {
@@ -101,6 +99,19 @@
     h2 {
       font-size: 24px;
       text-align: center;
+    }
+  }
+
+  @media (min-width: breakpoint.$breakpoint-lg) {
+    .bio {
+      max-width: variables.$main-column-max-width-lg !important;
+      h1 {
+        font-size: 56px;
+      }
+
+      h2 {
+        font-weight: 500;
+      }
     }
   }
 }

@@ -12,6 +12,36 @@
 
   .introduction {
     margin: 3em 0;
+
+    .care-introduction {
+      .pillars {
+        margin: 2em 0;
+        .pillars-title {
+          text-align: center;
+          margin-bottom: 2em;
+          text-align: center;
+          font-size: 32px;
+          margin-bottom: 1em;
+        }
+        .pillars-list {
+          display: flex;
+          flex-direction: column;
+          gap: 1.5em;
+
+          li {
+            display: block;
+            width: 100%;
+            text-align: center;
+            line-height: normal;
+
+            span {
+              font-family: Inter;
+              font-size: 24px;
+            }
+          }
+        }
+      }
+    }
   }
 
   .services {
@@ -31,7 +61,7 @@
       display: flex;
       flex-direction: column;
       align-items: start;
-      max-width: variables.$main-column-max-width;
+      max-width: variables.$main-column-max-width-md;
       padding: 0 variables.$mobile-lateral-padding;
       gap: 1em;
 
@@ -79,41 +109,28 @@
         }
       }
     }
+  }
 
-    @media (min-width: breakpoint.$breakpoint-md) {
-      width: 100%;
-      padding: 6em 0;
-      .services {
-        gap: 3em;
-        padding: 6em 2em;
-
-        .service {
-          p {
-            font-size: 18px;
-          }
+  @media (min-width: breakpoint.$breakpoint-lg) {
+    .introduction {
+      .care-introduction {
+        .pillars {
+          margin: 4em 0;
         }
       }
     }
-  }
 
-  @media (min-width: breakpoint.$breakpoint-md) {
-    width: 100%;
-
-    .introduction {
-      margin: 6em 0;
-    }
-
-    content {
-      width: 100%;
+    .services {
+      .service {
+        max-width: variables.$main-column-max-width-md;
+      }
     }
   }
 }
 
-.pillar-title {
-  text-align: center;
-}
-
-svg {
+.expand-icon {
   cursor: pointer;
   height: 40px;
+  transform-origin: center;
+  transition: transform 0.3s ease;
 }

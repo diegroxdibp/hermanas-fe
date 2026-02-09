@@ -59,8 +59,11 @@ h1 {
   // margin: 20px 0 0.2em 0;
   margin: 0;
   @media (min-width: breakpoint.$breakpoint-md) {
-    // font-size: 42px;
     font-size: 48px;
+  }
+
+  @media (min-width: breakpoint.$breakpoint-lg) {
+    font-size: 56px;
   }
 }
 
@@ -96,11 +99,8 @@ p {
   text-align: justify;
   margin: 0;
 
-  @media (min-width: breakpoint.$breakpoint-md) {
-    // font-size: 18px;
-    // font-size: 20px;
-    // line-height: 36px;
-    // letter-spacing: 1.3px;
+  @media (min-width: breakpoint.$breakpoint-lg) {
+    font-size: 21px;
   }
 }
 
@@ -119,22 +119,20 @@ a:link {
 }
 
 span {
-  font-family: typography.$sourceSans & a {
-    font-family: typography.$sourceSans;
-  }
+  font-family: typography.$sourceSans;
 }
 
 section {
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: variables.$main-column-max-width;
+  max-width: variables.$main-column-max-width-md;
   align-items: center;
   padding: 0 variables.$mobile-lateral-padding;
 
   @media (min-width: breakpoint.$breakpoint-lg) {
     width: 100%;
-    max-width: variables.$main-column-max-width-md;
+    max-width: variables.$main-column-max-width-lg;
   }
 
   content {
@@ -149,6 +147,12 @@ section {
       font-weight: 500;
       font-style: italic;
       margin: 1.5em;
+
+      @media (min-width: breakpoint.$breakpoint-md) {
+        line-height: 1.2;
+        font-size: 32px;
+        word-spacing: 1.2px;
+      }
     }
 
     .quotation + .quotation {
@@ -172,24 +176,6 @@ section {
     height: auto;
     object-fit: cover;
     object-position: 50% 20%;
-  }
-}
-
-.list {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5em;
-
-  li {
-    display: block;
-    width: 100%;
-    text-align: center;
-    line-height: normal;
-
-    span {
-      font-style: italic;
-      font-size: 21px;
-    }
   }
 }
 
