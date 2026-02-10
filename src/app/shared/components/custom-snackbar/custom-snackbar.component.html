@@ -1,0 +1,16 @@
+<div class="snackbar-container">
+  <div class="snackbar-content">
+    <span class="snackbar-text">{{ data.message }}</span>
+    @if (data.action) {
+      <button (click)="snackBarRef.dismissWithAction()">
+        <mat-icon>close</mat-icon>
+      </button>
+    }
+  </div>
+  <div class="progress-bar-wrapper">
+    <div
+      class="progress-bar"
+      [style.animation-duration.ms]="data.duration"
+    ></div>
+  </div>
+</div>
