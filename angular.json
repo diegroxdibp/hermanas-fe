@@ -26,8 +26,11 @@
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
-              "src/favicon",
-              "src/assets"
+              {
+                  "glob": "**/*",
+                  "input": "src/assets",
+                  "output": "/assets"
+                }
             ],
             "styles": [
               "@angular/material/prebuilt-themes/azure-blue.css",

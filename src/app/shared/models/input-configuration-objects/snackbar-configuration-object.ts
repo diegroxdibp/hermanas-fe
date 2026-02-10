@@ -3,7 +3,7 @@ import { SnackbarVerticalPosition } from '../../enums/snackbar-vertical-position
 
 export interface SnackbarConfigurationObject {
   message: string;
-  closeButtonMessage?: string;
+  action?: boolean;
   horizontalPosition?: SnackbarHorizontalPosition;
   verticalPosition?: SnackbarVerticalPosition;
   duration?: number;
@@ -11,7 +11,7 @@ export interface SnackbarConfigurationObject {
 
 export const dafultSnackbarConfiguration: SnackbarConfigurationObject = {
   message: 'Snackbar message!',
-  closeButtonMessage: 'Close',
+  action: true,
   horizontalPosition: SnackbarHorizontalPosition.END,
   verticalPosition: SnackbarVerticalPosition.TOP,
   duration: 3,

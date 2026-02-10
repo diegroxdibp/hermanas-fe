@@ -13,14 +13,16 @@ export class AccessGuard {
     const user: User | null = this.sessionService.user();
     if (!user) {
       this.snackbarService.openSnackBar({
-        message: 'Para acessar essa area é preciso fazer Sign In primeiro!',
+        message: 'Faça login para acessar esta área',
+        action: true,
       });
       return this.router.createUrlTree(['/auth/signin']);
     }
 
     if (user && !user.profileCompleted) {
       this.snackbarService.openSnackBar({
-        message: 'Para acessar essa area é preciso fazer completar o On Boarding primeiro!',
+        message: 'Complete o cadastro para acessar esta área',
+        action: true,
       });
       return this.router.createUrlTree(['/onboarding']);
     }

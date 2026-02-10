@@ -333,7 +333,7 @@ section {
 }
 
 .dashboard-header {
-  height: 66px;
+  height: 62px;
 }
 
 .fullscreenMenuOpen {
@@ -350,4 +350,34 @@ mat-progress-bar {
   left: 0;
   width: 100%;
   z-index: 2000;
+}
+
+
+// Target the flex container wrapper
+.cdk-global-overlay-wrapper {
+  pointer-events: none !important;
+  
+  // Add top padding to push snackbar down
+  &:has(.custom-snackbar) {
+    padding-top: 65px !important;
+  }
+}
+
+// Re-enable pointer events on the actual snackbar
+.mat-mdc-snack-bar-container {
+  pointer-events: auto !important;
+  margin: 0 1.5em !important;
+  
+  
+  &.custom-snackbar {
+    .mdc-snackbar__surface {
+      padding: 15px !important;
+      background-color: palette.$primaryColorBlue !important;
+      color: white;
+    }
+    
+    .mat-mdc-snack-bar-label {
+      padding: 0 !important;
+    }
+  }
 }
