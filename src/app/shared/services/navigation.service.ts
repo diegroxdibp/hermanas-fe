@@ -1,21 +1,22 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { Pages } from '../enums/pages.enum';
 import { NavigationItem } from '../models/navigation-item.model';
 import { ViewportScroller } from '@angular/common';
 import { BehaviorSubject, filter } from 'rxjs';
+import { SnackbarService } from './snackbar.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class NavigationService {
+  snackbarService = inject(SnackbarService);
   Pages = Pages;
   navigationItems: NavigationItem[] = [
     { name: 'Home', destination: Pages.HOME },
     { name: 'Sobre', destination: Pages.ABOUT },
     { name: 'Contato', destination: Pages.CONTACT },
     { name: 'Agendar', destination: Pages.SCHEDULING },
-    // { name: 'AR', destination: Pages.ANALISE_REICHANA },
   ];
   private routesWithAnchor = [`/${Pages.ATENDIMENTO}`, '/', '/contact'];
   readonly currentUrl: BehaviorSubject<string> = new BehaviorSubject('/');
@@ -46,7 +47,7 @@ export class NavigationService {
   }
 
   navigateTo(page: Pages): void {
-    console.log('Navigating to: ', page)
+    this.snackbarService.closeSnackbar();
     this.router.navigate([page]);
   }
 }

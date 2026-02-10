@@ -10,7 +10,7 @@ import { CustomSnackbarComponent } from '../components/custom-snackbar/custom-sn
   providedIn: 'root',
 })
 export class SnackbarService {
-    private _snackBar = inject(MatSnackBar);
+  private _snackBar = inject(MatSnackBar);
   snackbarConfigurationObject: SnackbarConfigurationObject =
     dafultSnackbarConfiguration;
 
@@ -33,5 +33,9 @@ export class SnackbarService {
       duration: duration,
       panelClass: ['custom-snackbar'],
     });
+  }
+
+  closeSnackbar() {
+    this._snackBar.dismiss();
   }
 }
