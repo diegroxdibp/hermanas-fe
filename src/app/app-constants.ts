@@ -65,7 +65,7 @@ export const AppConstants = {
         {
           name: 'Somatic Experience®',
           description:
-            'Whaterevers revsdervs nervs rergvs drevs nergrsvs deris guervs.',
+            'A Somatic Experiencing (SE) é um método psicoterapêutico centrado na regulação do sistema nervoso e na elaboração de experiências traumáticas por meio do corpo. Por meio de intervenções seguras e graduais, a SE possibilita a renegociação das respostas traumáticas, reduzindo sintomas de diversas naturezas e fortalecendo a capacidade natural de autorregulação do organismo.',
           knowMorePage: Pages.SOMATIC_EXPERIENCE,
         },
       ],
@@ -94,7 +94,7 @@ export const AppConstants = {
         {
           name: 'Supervisão',
           description:
-            'Supervisão supervisiona da Luane pra você ficar 100% na terapeutica #CONFIA.',
+            'A supervisão na abordagem da Análise Corporal Reichiana ocorre individual e em grupos pequenos, com ênfase no atendimento individual de adultos. São encontros semanais, quinzenais ou mensais no formato presencial (em Lisboa) ou remoto.',
           knowMorePage: Pages.SUPERVISION,
         },
       ],

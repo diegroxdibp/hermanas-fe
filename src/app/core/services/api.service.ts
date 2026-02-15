@@ -1,3 +1,4 @@
+import { SessionService } from './../../shared/services/session.service';
 import { SchedulingService } from './../../shared/services/scheduling.service';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
@@ -9,6 +10,9 @@ import { AppConstants } from '../../app-constants';
 import { HttpClient } from '@angular/common/http';
 import { ProfessionalModel } from '../../shared/models/professional.model';
 import { environment } from '../../../environments/environment';
+import { ProfessionalService } from '../../shared/models/professional-service.model';
+import { ProfessionalSessionService } from '../../shared/enums/professional-session-service.enum';
+import { Professional } from '../../shared/models/get-professional-by-service-response.model';
 
 @Injectable({
   providedIn: 'root',
@@ -40,6 +44,29 @@ export class ApiService {
   ): Observable<AvailabilityModel[]> {
     return this.http.get<AvailabilityModel[]>(
       environment.apiUrl + `/api/availability/professional/${professionalId}`,
+      { withCredentials: true },
+    );
+  }
+
+  getAvailabilititesByService(
+    sessionService: ProfessionalSessionService,
+  ): Observable<ProfessionalService[]> {
+    return this.http.get<ProfessionalService[]>(
+      environment.apiUrl + `/api/availability/service/${sessionService}`,
+      { withCredentials: true },
+    );
+  }
+
+  getServices(): Observable<ProfessionalService[]> {
+    return this.http.get<ProfessionalService[]>(
+      environment.apiUrl + `/api/services/getAll`,
+      { withCredentials: true },
+    );
+  }
+
+  getProfessionalbyService(serviceId: number): Observable<Professional[]> {
+    return this.http.get<Professional[]>(
+      environment.apiUrl + `/api/services/${serviceId}/professionals`,
       { withCredentials: true },
     );
   }

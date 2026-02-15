@@ -1,13 +1,27 @@
 <div class="therapist-section">
+  @if (schedulingService.services.length) {
+    <mat-form-field class="therapist-selection">
+      <mat-label>Escolha um serviço</mat-label>
+      <mat-select required>
+        <mat-option (click)="selectService(null)" value="">--</mat-option>
+        <ng-container *ngFor="let service of schedulingService.services">
+          <mat-option (click)="selectService(service)" [value]="service.id">{{
+            service.name
+          }}</mat-option>
+        </ng-container>
+      </mat-select>
+    </mat-form-field>
+  }
+
   @if (schedulingService.professionals.length) {
     <mat-form-field class="therapist-selection">
-      <mat-label>Choose a therapist</mat-label>
+      <mat-label>Escolha um profissional</mat-label>
       <mat-select required>
         <mat-option (click)="selectTherapist(null)" value="">--</mat-option>
         <ng-container
           *ngFor="
             let therapist of schedulingService.professionals;
-            trackBy: trackById
+            trackBy: trackByName
           "
         >
           <mat-option
@@ -97,6 +111,6 @@
     }
   }
   @if (!loader.isHttpLoading() && !schedulingService.professionals.length) {
-    <h1>Serviço temporariamente fora do ar.</h1>
+    <!-- <h1>Serviço temporariamente fora do ar.</h1> -->
   }
 </div>

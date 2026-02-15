@@ -1,19 +1,13 @@
 import { ProfessionalServiceFormat } from '../enums/professional-service-format.enum';
 import { ProfessionalServiceModality } from '../enums/professional-service-modality.enum';
+import { ProfessionalSessionService } from '../enums/professional-session-service.enum';
+
 export interface ProfessionalService {
   id: number;
-  name: string;
+  active: boolean;
   format: ProfessionalServiceFormat;
+  name: string;
   modality: ProfessionalServiceModality;
   price: string;
-  active: boolean;
+  sessionService: ProfessionalSessionService[];
 }
-
-export const emptyProfessionalService: ProfessionalService = {
-  id: 0,
-  name: '',
-  format: ProfessionalServiceFormat.INDIVIDUAL,
-  modality: ProfessionalServiceModality.LOCAL,
-  price: '',
-  active: false,
-};

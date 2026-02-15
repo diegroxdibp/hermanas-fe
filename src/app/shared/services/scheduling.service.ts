@@ -12,6 +12,9 @@ import {
   sameDay,
 } from '../utils/date-helper.util';
 import { ProfessionalModel } from '../models/professional.model';
+import { emptyProfessionalService, ProfessionalService } from '../models/professional-service.model';
+import { ProfessionalSessionService } from '../enums/professional-session-service.enum';
+import { Professional } from '../models/get-professional-by-service-response.model';
 
 @Injectable({
   providedIn: 'root',
@@ -20,11 +23,16 @@ export class SchedulingService {
   schedulingForm: FormGroup;
   availability = signal<AvailabilityModel[]>([]);
   timeSlots = new Map<string, string[]>();
-  professionals: ProfessionalModel[] = [];
+  services: ProfessionalService[] = [];
+  professionals: Professional[] = [];
+  ProfessionalSessionService = ProfessionalSessionService;
 
   constructor(private readonly fb: FormBuilder) {
     this.schedulingForm = this.fb.group({
-      [SchedulingFormControls.CLIENT_ID]: this.fb.control(0, [
+      [SchedulingFormControls.CLIENT_ID]: this.fb.control(null, [
+        Validators.required,
+      ]),
+      [SchedulingFormControls.SELECTED_SERVICE]: this.fb.control<ProfessionalService>(emptyProfessionalService, [
         Validators.required,
       ]),
       [SchedulingFormControls.SELECTED_DAY]: this.fb.control('', [
@@ -38,7 +46,7 @@ export class SchedulingService {
 
       [SchedulingFormControls.SELECTED_TYPE]: this.fb.control<AppointmentType>(
         AppointmentType.ANY,
-        [Validators.required]
+        [Validators.required],
       ),
     });
   }
@@ -48,10 +56,10 @@ export class SchedulingService {
       clientId: this.schedulingForm.get(SchedulingFormControls.CLIENT_ID)
         ?.value,
       therapistId: this.schedulingForm.get(
-        SchedulingFormControls.PROFESSIONAL_ID
+        SchedulingFormControls.PROFESSIONAL_ID,
       )?.value,
       appointmentDate: this.schedulingForm.get(
-        SchedulingFormControls.SELECTED_DAY
+        SchedulingFormControls.SELECTED_DAY,
       )?.value,
       startTime: '',
       endTime: '',
@@ -73,7 +81,7 @@ export class SchedulingService {
 
       if (availability.isRecurring) {
         let current = new Date(
-          Math.max(new Date(availability.startDate).getTime(), now.getTime())
+          Math.max(new Date(availability.startDate).getTime(), now.getTime()),
         );
 
         const recurringEnd = new Date(availability.endDate);
@@ -101,7 +109,6 @@ export class SchedulingService {
         }
       }
     }
-    console.log('TIMESLOTS -> ', this.timeSlots);
   }
 
   private formatDateKey(date: Date): string {
@@ -110,7 +117,7 @@ export class SchedulingService {
 
   filterAvailabilityForDay(
     allAvailabilities: AvailabilityModel[],
-    selectedDate: Date
+    selectedDate: Date,
   ): AvailabilityModel[] {
     const selectedDayName = dayName(selectedDate);
 

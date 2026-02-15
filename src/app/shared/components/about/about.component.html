@@ -4,33 +4,84 @@
   <a (click)="navigationService.navigateTo(Pages.LUANE)">Rayssa</a>
   <a (click)="navigationService.navigateTo(Pages.LUANE)">Yara</a>
 </div> -->
-<section class="bio" appScrollAnimate="fade-in-up">
-  <content>
-    <h1>Luane Bastos</h1>
 
-    <p>
+<section>
+  <content>
+    <picture class="picture bio-pic" appScrollAnimate="fade-in-up">
+      <img src="assets/images/Logo_PNG (1).png" alt="Foto de pilares" />
+    </picture>
+
+    <p appScrollAnimate="fade-in-up">
       A <strong>CARE</strong> nasceu do encontro entre a visão da fundadora,
-      Luane Bastos, e sua sólida formação universitária em saúde pela
-      Universidade Federal de São Paulo (UNIFESP).
+      <strong>Luane Bastos</strong>, sua sólida formação acadêmica e clínica e o
+      conceito de clínica ampliada, consolidando uma proposta de plataforma
+      digital que fomenta cuidados em saúde mental e relacional pautados na
+      abordagem integral, na humanização no atendimento, no modelo
+      biopsicossocial e na perspectiva transdisciplinar.
     </p>
 
-    <h2>Pioneirismo na formação: Integralidade e Ética na prática em saúde</h2>
+    <p appScrollAnimate="fade-in-up">
+      Após a pandemia de Covid-19 e a consequente expansão do uso dos meios
+      virtuais, ampliaram-se significativamente as possibilidades de acesso aos
+      cuidados em saúde mental e relacional, fortalecendo o compromisso da CARE
+      com a democratização do cuidado.
+    </p>
+
+    <p appScrollAnimate="fade-in-up">
+      Nesse contexto, a missão da CARE é impulsionar e garantir a acessibilidade
+      a cuidados de saúde mental e relacional, bem como fomentar espaços de
+      estudo continuado destinados a profissionais que buscam práticas ampliadas
+      e fundamentadas em uma abordagem integrativa.
+    </p>
+  </content>
+</section>
+<section class="bio" appScrollAnimate="fade-in-up">
+  <content>
+    <h2>Sobre a fundadora</h2>
 
     <p>
-      Luane S. Bastos formou-se em uma universidade pioneira no Brasil,
-      reconhecida por adotar um projeto político-pedagógico inovador, que
-      valorizava o trabalho em equipe interprofissional e a integralidade no
-      cuidado em saúde. Sua formação integrou dimensões éticas, políticas,
+      Luane Bastos formou-se em uma universidade pioneira no Brasil, reconhecida
+      por adotar um projeto político-pedagógico inovador, que valorizava o
+      trabalho em equipe transprofissional e a integralidade no cuidado em
+      saúde. Sua formação integrou dimensões éticas, políticas,
       técnico-científicas e humanas, bases que orientam sua prática clínica e
       profissional até hoje.
     </p>
   </content>
-  <picture class="picture">
-    <img [src]="bio.image" [alt]="'Foto de ' + bio.name" />
+  <picture class="picture bio-pic">
+    <img appScrollAnimate="fade-in-up" [src]="bio.image" [alt]="'Foto de ' + bio.name" />
   </picture>
 </section>
 
-<section class="bio reversed" appScrollAnimate="fade-in-right">
+<section>
+  <content>
+    <h2 appScrollAnimate="fade-in-up">Do corpo organicamente sensível à Clínica Intercultural</h2>
+
+    <p appScrollAnimate="fade-in-up">
+      A perspectiva de Luane Bastos sobre a complexidade do corpo humano teve
+      suas raízes na infância, despertada pelo amor inato à dança. Contudo, foi
+      durante sua formação universitária que essa compreensão se aprofundou, ao
+      se deparar com o trabalho seminal de Wilhelm Reich e, em particular, com
+      as abordagens terapêuticas que transcendem a linguagem verbal. Inspirada
+      pelos princípios reichianos, Luane Bastos trilhou uma jornada profissional
+      multifacetada.
+    </p>
+
+    <p appScrollAnimate="fade-in-up">
+      Dedicou-se a formações contínuas, ao atendimento clínico individual e
+      grupal, à condução de workshops e supervisões, e ao desenvolvimento de
+      grupos de movimento, atuando no Rio de Janeiro e São Paulo.
+    </p>
+
+    <p appScrollAnimate="fade-in-up">
+      Adicionalmente, seu próprio processo migratório para a Europa
+      impulsionou-a a aprofundar estudos na clínica intercultural, expandindo
+      seu atendimento a migrantes em diversas partes do mundo.
+    </p>
+  </content>
+</section>
+
+<!-- <section class="bio reversed" appScrollAnimate="fade-in-right">
   <picture class="picture books">
     <img src="assets/images/books1.jpg" alt="Imagem de livros." />
   </picture>
@@ -58,11 +109,11 @@
       seu atendimento a migrantes em diversas partes do mundo.
     </p>
   </content>
-</section>
+</section> -->
 
 <section>
-  <content class="lists" appScrollAnimate="fade-in-up">
-    <div class="academic">
+  <content class="lists">
+    <div class="academic" appScrollAnimate="fade-in-up">
       <h2>Formação Acadêmica e Especializações</h2>
       <ul>
         <title>Formação Acadêmica e Especializações</title>
@@ -75,7 +126,7 @@
           Federal do Rio de Janeiro (UFRJ)
         </li>
         <li>
-          2017: Estudos em Psicoterapia Reichiana no Instituto de Formação e
+          2018: Estudos em Psicoterapia Reichiana no Instituto de Formação e
           Pesquisa Wilhelm Reich (IFP), Rio de Janeiro.
         </li>
         <li>
@@ -87,33 +138,42 @@
           Reichianos (CPER), Lisboa.
         </li>
         <li>
-          Atualmente: Em formação em Trauma, utilizando o método Somatic
-          Experiencing de Peter Levine, pela Associação Brasileira de Trauma
-          (ABT).
+          2021: Especialização em Somatic Experiencing pela Associação
+          Brasileira do Trauma (ABT) e reconhecida pela European Association for
+          Somatic Experiencing (EASE)
         </li>
       </ul>
     </div>
 
-    <div class="academic">
+    <div class="academic" appScrollAnimate="fade-in-up">
       <h2>Experiência Profissional e Contribuições</h2>
       <ul>
         <title>Experiência Profissional e Contribuições</title>
         <li>
-          Atuação no Sistema Único de Saúde (SUS): Experiência em serviços
-          públicos de saúde no Brasil.
+          Atuação no Sistema Único de Saúde (SUS) - Experiência consolidada em
+          serviços públicos de saúde no Brasil, com prática alinhada aos
+          princípios de integralidade, equidade e compromisso social.
         </li>
         <li>
-          Centro de Cidadania para Mulheres: Trabalho desenvolvido em apoio e
-          empoderamento de pessoas que se identificam como mulheres.
-        </li>
-        <li>Clínica Privada e Social: Atendimento individual e em grupo.</li>
-        <li>
-          Projetos Coletivos em Portugal: Foco em iniciativas voltadas para a
-          migração.
+          Implementação do Setor de Psicologia | Centro de Cidadania para
+          Mulheres Dinah Coutinho (RJ) - Estruturação e consolidação do setor,
+          com atuação articulada em equipe multidisciplinar e em rede, voltada
+          ao acolhimento e fortalecimento de pessoas que se identificam como
+          mulheres.
         </li>
         <li>
-          Produção Acadêmica: Autoria de dois capítulos em livros
-          especializados.
+          Clínica Privada e Comunitária - Condução de atendimentos individuais e
+          grupais com abordagem de Wilhelm Reich e Carl Rogers.
+        </li>
+        <li>
+          Projetos Coletivos em Portugal - Desenvolvimento e participação em
+          iniciativas direcionadas à população migrante, com foco em saúde
+          mental, integração e construção de redes de apoio.
+        </li>
+        <li>
+          Produção Acadêmica - Autoria de dois capítulos de livros nas áreas de
+          migração e formação em saúde, contribuindo para o aprimoramento
+          técnico e científico da prática profissional.
         </li>
       </ul>
     </div>

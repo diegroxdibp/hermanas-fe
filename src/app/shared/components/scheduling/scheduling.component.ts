@@ -1,3 +1,4 @@
+import { ProfessionalSessionService } from './../../enums/professional-session-service.enum';
 import { AvailabilityModel } from './../../models/availability.model';
 import { SchedulingService } from './../../services/scheduling.service';
 import { ApiService } from './../../../core/services/api.service';
@@ -39,6 +40,9 @@ import { MatIcon } from '@angular/material/icon';
 import { AvailabilityType } from '../../enums/availability-type.enum';
 import { ProfessionalModel } from '../../models/professional.model';
 import { LoadingService } from '../../../core/services/loading.service';
+import { ProfessionalService } from '../../models/professional-service.model';
+import { EnumValuePipe } from '../../pipes/enum-value.pipe';
+import { Professional } from '../../models/get-professional-by-service-response.model';
 
 @Component({
   selector: 'app-scheduling',
@@ -81,26 +85,43 @@ export class SchedulingComponent implements OnInit {
     public schedulingService: SchedulingService,
   ) {
     this.apiService
-      .getTherapists()
+      .getServices()
       .pipe(take(1))
-      .subscribe((professionals: ProfessionalModel[]) => {
-        console.log(professionals);
-        this.schedulingService.professionals = professionals;
+      .subscribe((services: ProfessionalService[]) => {
+        this.schedulingService.services = services;
       });
+
+    this.schedulingService.schedulingForm
+      .get(SchedulingFormControls.SELECTED_SERVICE)
+      ?.valueChanges.subscribe((selectedService: ProfessionalService) => {
+        console.log('Selected Professional:', selectedService);
+        this.apiService
+          .getProfessionalbyService(selectedService.id)
+          .pipe(take(1))
+          .subscribe((professional: Professional[]) => {
+            console.log('Selected Professional:', professional);
+            this.schedulingService.professionals = professional;
+          });
+      });
+
+    // this.schedulingService.schedulingForm
+    //   .get(SchedulingFormControls.SELECTED_PROFESSIONAL)
+    //   ?.valueChanges.subscribe((selectedService: ProfessionalService) => {
+    //     this.apiService
+    //       .getProfessionalbyService(selectedService)
+    //       .pipe(take(1))
+    //       .subscribe((professional: Professional[]) => {
+    //         this.schedulingService.professionals = professional;
+    //       });
+    //   });
 
     this.schedulingService.schedulingForm
       .get(SchedulingFormControls.SELECTED_PROFESSIONAL)
       ?.valueChanges.subscribe((selectedProfessional: ProfessionalModel) => {
-        console.log(selectedProfessional);
         this.apiService
           .getAvailabilititesByProfessionalId(selectedProfessional.id)
           .pipe(take(1))
           .subscribe((availabilities: AvailabilityModel[]) => {
-            console.log(
-              'availabilities of ->',
-              selectedProfessional,
-              availabilities,
-            );
             this.schedulingService.setAvailabilitites(availabilities);
           });
       });
@@ -167,7 +188,19 @@ export class SchedulingComponent implements OnInit {
     };
   }
 
-  selectTherapist(professional: ProfessionalModel | null): void {
+  selectService(service: ProfessionalService | null): void {
+    if (service) {
+      this.schedulingService.schedulingForm
+        .get(SchedulingFormControls.SELECTED_SERVICE)
+        ?.setValue(service);
+    } else {
+      this.schedulingService.schedulingForm
+        .get(SchedulingFormControls.SELECTED_SERVICE)
+        ?.setValue(null);
+    }
+  }
+
+  selectTherapist(professional: Professional | null): void {
     if (professional) {
       this.schedulingService.schedulingForm
         .get(SchedulingFormControls.SELECTED_PROFESSIONAL)
@@ -207,7 +240,7 @@ export class SchedulingComponent implements OnInit {
     );
   };
 
-  trackById = (index: number, item: ProfessionalModel) => item.id;
+  trackByName = (index: number, item: any) => item.name;
 
   restrictInput(event: Event) {
     const input = event.target as HTMLInputElement;

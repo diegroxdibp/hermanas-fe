@@ -2,10 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { NavigationService } from '../../services/navigation.service';
 import { Pages } from '../../enums/pages.enum';
 import { Bio } from '../../models/bio.model';
+import { ScrollAnimateDirective } from '../../directives/scroll-animate.directive';
 
 @Component({
   selector: 'app-about',
-  imports: [],
+  imports: [ScrollAnimateDirective],
   templateUrl: './about.component.html',
   styleUrl: './about.component.scss',
 })
