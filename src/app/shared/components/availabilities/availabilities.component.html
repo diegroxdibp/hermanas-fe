@@ -14,7 +14,7 @@
     </mat-expansion-panel-header>
     <div class="availability-content">
       <mat-button-toggle-group
-        [(ngModel)]="typeSelection"
+        [(ngModel)]="modalitySelection"
         name="fontStyle"
         aria-label="Font Style"
       >
@@ -34,7 +34,7 @@
           >Qualquer</mat-button-toggle
         >
       </mat-button-toggle-group>
-      <button mat-raised-button (click)="scheduleAppointment()">Agendar</button>
+      <button mat-raised-button (click)="scheduleAppointment(availability)">Agendar</button>
     </div>
   </mat-expansion-panel>
   } @empty {

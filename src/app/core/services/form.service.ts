@@ -7,7 +7,6 @@ import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SchedulingFormControls } from '../../shared/enums/scheduling-form-controls.enum';
 import { AvailabilityModel } from '../../shared/models/availability.model';
-import { AppointmentType } from '../../shared/enums/appointment-type.enum';
 import { FormControlsNames } from '../../shared/enums/form-controls-names.enum';
 import { SignInPayload } from '../../shared/models/sign-in-payload';
 import { SignUpPayload } from '../../shared/models/sign-up-payload';
@@ -17,6 +16,7 @@ import { OnboardingPayload } from '../../shared/models/onboarding-payload.model'
 import { ProfileView } from '../../shared/models/profile-view.model';
 import { User } from '../../auth/user.model';
 import { ProfessionalModel } from '../../shared/models/professional.model';
+import { Modality } from '../../shared/enums/modality.enum';
 
 @Injectable({
   providedIn: 'root',
@@ -25,7 +25,6 @@ export class FormService {
   authForm: FormGroup;
   onboardingForm: FormGroup;
   profileForm: FormGroup;
-  schedulingForm: FormGroup;
   availability: AvailabilityModel[] = [];
   timeSlots = new Map<string, string[]>();
   professionals: ProfessionalModel[] = [];
@@ -90,23 +89,6 @@ export class FormService {
       [FormControlsNames.GENDER_PROFILE]: this.fb.control(''),
       [FormControlsNames.BIO_PROFILE]: this.fb.control(''),
     });
-
-    this.schedulingForm = this.fb.group({
-      [SchedulingFormControls.CLIENT_ID]: this.fb.control(0, [
-        Validators.required,
-      ]),
-      [SchedulingFormControls.SELECTED_DAY]: this.fb.control('', [
-        Validators.required,
-      ]),
-      [SchedulingFormControls.SELECTED_TIME_SLOT]: this.fb.control('', [
-        Validators.required,
-      ]),
-      [SchedulingFormControls.SELECTED_PROFESSIONAL]:
-        this.fb.control<ProfessionalModel | null>(null, [Validators.required]),
-      selectedType: this.fb.control<AppointmentType>(AppointmentType.ANY, [
-        Validators.required,
-      ]),
-    });
   }
 
   signUp() {}
@@ -132,9 +114,11 @@ export class FormService {
 
     const gender = getEnumKeyByValue(
       Genders,
-      this.onboardingForm.get(FormControlsNames.GENDER)?.value
+      this.onboardingForm.get(FormControlsNames.GENDER)?.value,
     );
-    const birthDate = this.onboardingForm.get(FormControlsNames.BIRTHDATE)?.value;
+    const birthDate = this.onboardingForm.get(
+      FormControlsNames.BIRTHDATE,
+    )?.value;
     const phone = this.buildPhoneNumber();
 
     if (!name) {
@@ -163,7 +147,7 @@ export class FormService {
 
   buildPhoneNumber(): string {
     const country: CountryModel = this.onboardingForm.get(
-      FormControlsNames.PHONE_PREFIX
+      FormControlsNames.PHONE_PREFIX,
     )?.value;
     let phoneNumber = this.onboardingForm.get(FormControlsNames.PHONE)?.value;
 

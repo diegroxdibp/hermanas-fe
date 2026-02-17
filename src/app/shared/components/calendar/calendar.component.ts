@@ -50,7 +50,6 @@ export class CalendarComponent implements OnInit {
   constructor(private datePipe: DatePipe) {}
 
   ngOnInit() {
-    console.log('init', this.availability);
     for (const availability of this.availability) {
       if (availability.isRecurring && availability.recurringDay) {
         const dayOfWeek = this.getDayNumber(availability.recurringDay);
@@ -85,7 +84,7 @@ export class CalendarComponent implements OnInit {
         (allowed) =>
           allowed.getFullYear() === date.getFullYear() &&
           allowed.getMonth() === date.getMonth() &&
-          allowed.getDate() === date.getDate()
+          allowed.getDate() === date.getDate(),
       );
     }
 

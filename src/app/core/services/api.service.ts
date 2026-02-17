@@ -72,15 +72,13 @@ export class ApiService {
   }
 
   setAppointment(payload: AppointmentPayload) {
-    //     {
-    //     "clientId": 1,
-    //     "therapistId": 1,
-    //     "appointmentDate": "2025-07-15",
-    //     "startTime": "11:00:00",
-    //     "endTime": "12:00:00",
-    //     "isRecurring": true,
-    //     "type":"REMOTE"
-    // }
+    this.http
+      .post(`${environment.apiUrl}/api/appointments/create`, payload, {
+        withCredentials: true,
+      })
+      .subscribe((response) => {
+        console.log(response);
+      });
   }
 
   sendEmail(subject: string, body: string) {

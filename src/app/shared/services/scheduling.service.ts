@@ -1,9 +1,8 @@
+import { SchedulingFormControls } from './../enums/scheduling-form-controls.enum';
 import { Injectable, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AppointmentType } from '../enums/appointment-type.enum';
 import { AvailabilityModel } from '../models/availability.model';
 import { AppointmentPayload } from '../models/appointment-payload.model';
-import { SchedulingFormControls } from '../enums/scheduling-form-controls.enum';
 import { dayNumberToEnum } from '../enums/day-to-number-enum.util';
 import {
   dayName,
@@ -11,16 +10,20 @@ import {
   parseDate,
   sameDay,
 } from '../utils/date-helper.util';
-import { ProfessionalModel } from '../models/professional.model';
-import { emptyProfessionalService, ProfessionalService } from '../models/professional-service.model';
+import {
+  emptyProfessionalService,
+  ProfessionalService,
+} from '../models/professional-service.model';
 import { ProfessionalSessionService } from '../enums/professional-session-service.enum';
 import { Professional } from '../models/get-professional-by-service-response.model';
+import { SchedulingFormModel } from '../models/input-configuration-objects/scheduling-form-controls.model';
+import { ProfessionalModel } from '../models/professional.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SchedulingService {
-  schedulingForm: FormGroup;
+  schedulingForm: FormGroup<SchedulingFormModel>;
   availability = signal<AvailabilityModel[]>([]);
   timeSlots = new Map<string, string[]>();
   services: ProfessionalService[] = [];
@@ -28,44 +31,70 @@ export class SchedulingService {
   ProfessionalSessionService = ProfessionalSessionService;
 
   constructor(private readonly fb: FormBuilder) {
-    this.schedulingForm = this.fb.group({
-      [SchedulingFormControls.CLIENT_ID]: this.fb.control(null, [
+    this.schedulingForm = this.fb.group<SchedulingFormModel>({
+      [SchedulingFormControls.CLIENT_ID]: this.fb.control(
+        null,
         Validators.required,
-      ]),
-      [SchedulingFormControls.SELECTED_SERVICE]: this.fb.control<ProfessionalService>(emptyProfessionalService, [
-        Validators.required,
-      ]),
-      [SchedulingFormControls.SELECTED_DAY]: this.fb.control('', [
-        Validators.required,
-      ]),
-      [SchedulingFormControls.SELECTED_TIME_SLOT]: this.fb.control('', [
-        Validators.required,
-      ]),
-      [SchedulingFormControls.SELECTED_PROFESSIONAL]:
-        this.fb.control<ProfessionalModel | null>(null, [Validators.required]),
+      ),
 
-      [SchedulingFormControls.SELECTED_TYPE]: this.fb.control<AppointmentType>(
-        AppointmentType.ANY,
-        [Validators.required],
+      [SchedulingFormControls.SELECTED_SERVICE]: this.fb.control(
+        emptyProfessionalService,
+        Validators.required,
+      ),
+
+      [SchedulingFormControls.SELECTED_DAY]: this.fb.control(
+        null,
+        Validators.required,
+      ),
+
+      [SchedulingFormControls.SELECTED_TIME_SLOT]: this.fb.control(
+        null,
+        Validators.required,
+      ),
+
+      [SchedulingFormControls.SELECTED_PROFESSIONAL]: this.fb.control(
+        null,
+        Validators.required,
+      ),
+
+      [SchedulingFormControls.SELECTED_MODALITY]: this.fb.control(
+        null,
+        Validators.required,
+      ),
+
+      [SchedulingFormControls.SELECTED_AVAILABILITY]: this.fb.control(
+        null,
+        Validators.required,
       ),
     });
   }
 
   getAppointmentPayload(): AppointmentPayload {
     const payload = {
-      clientId: this.schedulingForm.get(SchedulingFormControls.CLIENT_ID)
-        ?.value,
-      therapistId: this.schedulingForm.get(
-        SchedulingFormControls.PROFESSIONAL_ID,
-      )?.value,
-      appointmentDate: this.schedulingForm.get(
-        SchedulingFormControls.SELECTED_DAY,
-      )?.value,
-      startTime: '',
-      endTime: '',
-      isRecurring: true,
-      type: this.schedulingForm.get(SchedulingFormControls.SELECTED_TYPE)
-        ?.value,
+      availabilityId:
+        this.schedulingForm.controls[
+          SchedulingFormControls.SELECTED_AVAILABILITY
+        ].value?.id,
+      professionalServiceId:
+        this.schedulingForm.controls[SchedulingFormControls.SELECTED_SERVICE]
+          .value?.id,
+      appointmentDate:
+        this.schedulingForm.controls[SchedulingFormControls.SELECTED_DAY].value,
+      startTime:
+        this.schedulingForm.controls[
+          SchedulingFormControls.SELECTED_AVAILABILITY
+        ].value?.startTime,
+      endTime:
+        this.schedulingForm.controls[
+          SchedulingFormControls.SELECTED_AVAILABILITY
+        ].value?.endTime,
+      isRecurring:
+        this.schedulingForm.controls[
+          SchedulingFormControls.SELECTED_AVAILABILITY
+        ].value?.isRecurring,
+      modality:
+        this.schedulingForm.controls[SchedulingFormControls.SELECTED_MODALITY]
+          .value,
     } as AppointmentPayload;
     return payload;
   }

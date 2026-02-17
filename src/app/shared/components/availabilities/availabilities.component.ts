@@ -9,10 +9,13 @@ import {
 import { MatDividerModule } from '@angular/material/divider';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { formatTime } from '../../utils/date-helper.util';
-import { AvailabilityType } from '../../enums/availability-type.enum';
 import { FormsModule } from '@angular/forms';
 import { ProfessionalServiceModality } from '../../enums/professional-service-modality.enum';
 import { SnackbarService } from '../../services/snackbar.service';
+import { AvailabilityModel } from '../../models/availability.model';
+import { AvailabilitySelectionOutputObject } from '../../models/input-configuration-objects/availability-selection-output-object';
+import { Modality } from '../../enums/modality.enum';
+import { getEnumKeyByValue } from '../../utils/getEnumKeyByValue';
 
 @Component({
   selector: 'app-availabilities',
@@ -32,13 +35,18 @@ export class AvailabilitiesComponent {
   @Input({ required: true })
   availabilityConfiguration: AvailabilityConfigurationObject =
     emptyAvailabilityConfiguration;
-  @Output('isSubmitted') isSubmitted = new EventEmitter<AvailabilityType>();
-  typeSelection = AvailabilityType.ANY;
+  @Output('isSubmitted') isSubmitted =
+    new EventEmitter<AvailabilitySelectionOutputObject>();
+  modalitySelection = Modality.ANY;
   formatTime = formatTime;
   ProfessionalServiceModality = ProfessionalServiceModality;
 
-  scheduleAppointment(): void {
-    this.isSubmitted.emit(this.typeSelection);
+  scheduleAppointment(availability: AvailabilityModel): void {
+    const availabilityOutputObject = {
+      availability: availability,
+      modality: getEnumKeyByValue(Modality, this.modalitySelection) as Modality,
+    };
+    this.isSubmitted.emit(availabilityOutputObject);
     this.snackbarService.openSnackBar({
       message: 'Serviço de agendamento em construção!',
     });

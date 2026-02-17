@@ -37,23 +37,23 @@
     </mat-form-field>
 
     @if (
-      schedulingService.schedulingForm.get(
+      schedulingService.schedulingForm.controls[
         SchedulingFormControls.SELECTED_PROFESSIONAL
-      )?.value
+      ].value
     ) {
       <mat-card class="therapist-card" appearance="outlined">
         <mat-card-header class="therapist-card--header">
           <mat-card-title-group class="title-group">
             <mat-card-title class="title">{{
-              schedulingService.schedulingForm.get(
+              schedulingService.schedulingForm.controls[
                 SchedulingFormControls.SELECTED_PROFESSIONAL
-              )?.value.name
+              ].value?.name
             }}</mat-card-title>
-            <mat-card-subtitle class="subtitle">{{
-              schedulingService.schedulingForm.get(
+            <!-- <mat-card-subtitle class="subtitle">{{
+              schedulingService.schedulingForm.controls[
                 SchedulingFormControls.SELECTED_PROFESSIONAL
-              )?.value.title
-            }}</mat-card-subtitle>
+              ].value?.title
+            }}</mat-card-subtitle> -->
           </mat-card-title-group>
           <ng-container
             *ngIf="getProfessionalPicture() as picture; else defaultIcon"
@@ -76,18 +76,18 @@
           ><div class="text">
             <p>
               {{
-                schedulingService.schedulingForm.get(
+                schedulingService.schedulingForm.controls[
                   SchedulingFormControls.SELECTED_PROFESSIONAL
-                )?.value.bio
+                ].value?.bio
               }}
             </p>
           </div>
         </mat-card-content>
       </mat-card>
       @if (
-        schedulingService.schedulingForm.get(
+        schedulingService.schedulingForm.controls[
           SchedulingFormControls.SELECTED_PROFESSIONAL
-        )?.value
+        ].value
       ) {
         <app-calendar
           *ngIf="schedulingService.availability().length"
@@ -96,12 +96,9 @@
         ></app-calendar>
       }
       @if (
-        schedulingService.schedulingForm.get(
+        schedulingService.schedulingForm.controls[
           SchedulingFormControls.SELECTED_PROFESSIONAL
-        )?.value &&
-        schedulingService.schedulingForm.get(
-          SchedulingFormControls.SELECTED_DAY
-        )?.value
+        ].value
       ) {
         <app-availabilities
           [availabilityConfiguration]="availabilityConfigurationObject"

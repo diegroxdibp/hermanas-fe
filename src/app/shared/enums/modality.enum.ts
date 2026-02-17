@@ -1,5 +1,5 @@
-export enum ProfessionalServiceModality  {
-    USER = 'USER',
-    THERAPIST = 'THERAPIST',
-    ADMIN = 'ADMIN'
+export enum Modality {
+  ANY = 'Qualquer',
+  LOCAL = 'Presencial',
+  REMOTE = 'Remoto',
 }
