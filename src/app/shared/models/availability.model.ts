@@ -12,7 +12,8 @@ export interface AvailabilityModel {
   startTime: string;
   endTime: string;
   isRecurring: boolean;
-  recurringDay: DayOfWeek;
+  dayOfWeek: DayOfWeek;
+  isBooked: boolean;
   services: ProfessionalService[];
 }
 
@@ -25,6 +26,7 @@ export const emptyAvailability: AvailabilityModel = {
   startTime: '',
   endTime: '',
   isRecurring: false,
-  recurringDay: DayOfWeek.MONDAY,
+  dayOfWeek: DayOfWeek.MONDAY,
+  isBooked: false,
   services: [emptyProfessionalService],
 };

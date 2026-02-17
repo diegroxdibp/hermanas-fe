@@ -117,7 +117,7 @@ export class SchedulingService {
         const end = recurringEnd < maxDate ? recurringEnd : maxDate;
 
         while (current <= end) {
-          if (dayNumberToEnum[current.getDay()] === availability.recurringDay) {
+          if (dayNumberToEnum[current.getDay()] === availability.dayOfWeek) {
             const key = this.formatDateKey(current);
             if (!this.timeSlots.has(key)) {
               this.timeSlots.set(key, []);
@@ -155,9 +155,9 @@ export class SchedulingService {
       const end = parseDate(av.endDate);
 
       // 🔁 Recurring availability
-      if (av.isRecurring && av.recurringDay) {
+      if (av.isRecurring && av.dayOfWeek) {
         return (
-          av.recurringDay === selectedDayName &&
+          av.dayOfWeek === selectedDayName &&
           isBetween(selectedDate, start, end)
         );
       }

@@ -19,6 +19,7 @@ import {
   emptyCalendarConfiguration,
 } from '../../models/input-configuration-objects/calendar-configuration-object';
 import { CalendarType } from '../../enums/calendar-type.enum';
+import { DayOfWeek } from '../../enums/day-of-week.enum';
 
 @Component({
   selector: 'app-calendar',
@@ -51,8 +52,13 @@ export class CalendarComponent implements OnInit {
 
   ngOnInit() {
     for (const availability of this.availability) {
-      if (availability.isRecurring && availability.recurringDay) {
-        const dayOfWeek = this.getDayNumber(availability.recurringDay);
+      if (availability.isBooked) {
+        // Skip booked slots
+        continue;
+      }
+
+      if (availability.isRecurring && availability.dayOfWeek) {
+        const dayOfWeek = this.getDayNumber(availability.dayOfWeek);
         this.allowedRecurringDays.add(dayOfWeek);
       } else if (!availability.isRecurring) {
         this.allowedSpecificDates.push(new Date(availability.startDate));
@@ -64,12 +70,6 @@ export class CalendarComponent implements OnInit {
     const formattedDate = this.datePipe.transform(event.value, 'yyyy-MM-dd');
     this.calendarConfiguration.control.setValue(formattedDate);
   }
-
-  // onDateChange(event: MatDatepickerInputEvent<Date>): void {
-  //   console.log('Date selected from calendar:', event.value);
-  //   const formattedDate = this.datePipe.transform(event.value, 'yyyy-MM-dd');
-  //   console.log('Formated date:', formattedDate);
-  // }
 
   isDateAllowed = (date: Date | null): boolean => {
     if (!date) return false;
@@ -91,17 +91,28 @@ export class CalendarComponent implements OnInit {
     return true;
   };
 
-  getDayNumber(dayName: string): number {
-    const days = [
-      'SUNDAY',
-      'MONDAY',
-      'TUESDAY',
-      'WEDNESDAY',
-      'THURSDAY',
-      'FRIDAY',
-      'SATURDAY',
-    ];
-    return days.indexOf(dayName.toUpperCase());
+  getDayNumber(day: DayOfWeek | string): number {
+    // Ensure enum value
+    const dow = day as DayOfWeek;
+
+    switch (dow) {
+      case DayOfWeek.SUNDAY:
+        return 0;
+      case DayOfWeek.MONDAY:
+        return 1;
+      case DayOfWeek.TUESDAY:
+        return 2;
+      case DayOfWeek.WEDNESDAY:
+        return 3;
+      case DayOfWeek.THURSDAY:
+        return 4;
+      case DayOfWeek.FRIDAY:
+        return 5;
+      case DayOfWeek.SATURDAY:
+        return 6;
+      default:
+        return -1;
+    }
   }
 
   get minDate() {

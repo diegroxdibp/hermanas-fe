@@ -6,7 +6,7 @@
         <mat-option (click)="selectService(null)" value="">--</mat-option>
         <ng-container *ngFor="let service of schedulingService.services">
           <mat-option (click)="selectService(service)" [value]="service.id">{{
-            service.name
+            service.name | enumValue: ProfessionalSessionService
           }}</mat-option>
         </ng-container>
       </mat-select>

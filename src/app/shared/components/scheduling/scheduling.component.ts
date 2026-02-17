@@ -40,6 +40,8 @@ import { Professional } from '../../models/get-professional-by-service-response.
 import { AvailabilitySelectionOutputObject } from '../../models/input-configuration-objects/availability-selection-output-object';
 import { SchedulingFormControls } from '../../enums/scheduling-form-controls.enum';
 import { Modality } from '../../enums/modality.enum';
+import { ProfessionalSessionService } from '../../enums/professional-session-service.enum';
+import { EnumValuePipe } from '../../pipes/enum-value.pipe';
 
 @Component({
   selector: 'app-scheduling',
@@ -57,6 +59,7 @@ import { Modality } from '../../enums/modality.enum';
     AvailabilitiesComponent,
     MatButtonModule,
     MatIcon,
+    EnumValuePipe,
   ],
   templateUrl: './scheduling.component.html',
   providers: [provideNativeDateAdapter()],
@@ -76,6 +79,7 @@ export class SchedulingComponent implements OnInit {
   allowedSpecificDates: Date[] = [];
   availability: AvailabilityModel[] = [];
   SchedulingFormControls = SchedulingFormControls;
+  ProfessionalSessionService = ProfessionalSessionService;
 
   constructor(
     private apiService: ApiService,
