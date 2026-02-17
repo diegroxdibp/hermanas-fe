@@ -7,9 +7,8 @@
       [min]="minDate"
       [max]="maxDate"
       [matDatepickerFilter]="isDateAllowed"
-      (dateInput)="onDateInput($event)"
+      [formControl]="dateControl"
       placeholder="DD/MM/YYYY"
-      [maskito]="options"
     />
     <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
     <mat-datepicker #picker [touchUi]="true"></mat-datepicker>
