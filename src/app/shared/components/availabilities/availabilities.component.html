@@ -1,43 +1,54 @@
 <mat-accordion class="availability-headers-align">
-  @for (availability of availabilityConfiguration.availability; track
-  availability.id) {
-  <mat-expansion-panel>
-    <mat-expansion-panel-header>
-      <mat-panel-title>
-        {{ formatTime(availability.startTime) }} -
-        {{ formatTime(availability.endTime) }}</mat-panel-title
-      >
-      <mat-panel-description>
-        {{ availabilityConfiguration.selectedDate }}
-        <mat-icon>account_circle</mat-icon>
-      </mat-panel-description>
-    </mat-expansion-panel-header>
-    <div class="availability-content">
-      <mat-button-toggle-group
-        [(ngModel)]="modalitySelection"
-        name="fontStyle"
-        aria-label="Font Style"
-      >
-        <mat-button-toggle
-          [value]="ProfessionalServiceModality.LOCAL"
-          [disabled]="availability.services[0].modality ===  ProfessionalServiceModality.REMOTE"
-          >Presencial</mat-button-toggle
+  @for (
+    availability of availabilityConfiguration.availability;
+    track availability.id
+  ) {
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          {{ formatTime(availability.startTime) }} -
+          {{ formatTime(availability.endTime) }}</mat-panel-title
         >
-        <mat-button-toggle
-          [value]="ProfessionalServiceModality.REMOTE"
-          [disabled]="availability.services[0].modality === ProfessionalServiceModality.LOCAL"
-          >Remoto</mat-button-toggle
+        <mat-panel-description>
+          {{ availabilityConfiguration.selectedDate }}
+          <mat-icon>account_circle</mat-icon>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <div class="availability-content">
+        <mat-button-toggle-group
+          [(ngModel)]="modalitySelection"
+          name="fontStyle"
+          aria-label="Font Style"
         >
-        <mat-button-toggle
-          [value]="ProfessionalServiceModality.ANY"
-          [disabled]="availability.services[0].modality === ProfessionalServiceModality.ANY"
-          >Qualquer</mat-button-toggle
-        >
-      </mat-button-toggle-group>
-      <button mat-raised-button (click)="scheduleAppointment(availability)">Agendar</button>
-    </div>
-  </mat-expansion-panel>
-  } @empty {
-  <h3>Sem disponibilidade para esse dia.</h3>
+          <mat-button-toggle
+            [value]="ProfessionalServiceModality.LOCAL"
+            [disabled]="
+              availability.services[0].modality ===
+              ProfessionalServiceModality.REMOTE
+            "
+            >Presencial</mat-button-toggle
+          >
+          <mat-button-toggle
+            [value]="ProfessionalServiceModality.REMOTE"
+            [disabled]="
+              availability.services[0].modality ===
+              ProfessionalServiceModality.LOCAL
+            "
+            >Remoto</mat-button-toggle
+          >
+          <mat-button-toggle
+            [value]="ProfessionalServiceModality.ANY"
+            [disabled]="
+              availability.services[0].modality ===
+              ProfessionalServiceModality.ANY
+            "
+            >Qualquer</mat-button-toggle
+          >
+        </mat-button-toggle-group>
+        <button mat-raised-button (click)="scheduleAppointment(availability)">
+          Agendar
+        </button>
+      </div>
+    </mat-expansion-panel>
   }
 </mat-accordion>

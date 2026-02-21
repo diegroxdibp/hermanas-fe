@@ -3,7 +3,6 @@ import { Injectable, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AvailabilityModel } from '../models/availability.model';
 import { AppointmentPayload } from '../models/appointment-payload.model';
-import { dayNumberToEnum } from '../enums/day-to-number-enum.util';
 import {
   dayName,
   isBetween,
@@ -17,8 +16,21 @@ import {
 import { ProfessionalSessionService } from '../enums/professional-session-service.enum';
 import { Professional } from '../models/get-professional-by-service-response.model';
 import { SchedulingFormModel } from '../models/input-configuration-objects/scheduling-form-controls.model';
-import { ProfessionalModel } from '../models/professional.model';
+import { SchedulingSteps } from '../enums/scheduling-steps.enum';
+import {
+  AvailabilityConfigurationObject,
+  emptyAvailabilityConfiguration,
+} from '../models/input-configuration-objects/availability-configuration-object';
 
+const dayNumberToEnum: { [key: number]: string } = {
+  0: 'SUNDAY',
+  1: 'MONDAY',
+  2: 'TUESDAY',
+  3: 'WEDNESDAY',
+  4: 'THURSDAY',
+  5: 'FRIDAY',
+  6: 'SATURDAY',
+};
 @Injectable({
   providedIn: 'root',
 })
@@ -28,6 +40,9 @@ export class SchedulingService {
   timeSlots = new Map<string, string[]>();
   services: ProfessionalService[] = [];
   professionals: Professional[] = [];
+  availabilityConfiguration = signal<AvailabilityConfigurationObject>(
+    emptyAvailabilityConfiguration,
+  );
   ProfessionalSessionService = ProfessionalSessionService;
 
   constructor(private readonly fb: FormBuilder) {
@@ -101,36 +116,52 @@ export class SchedulingService {
 
   setAvailabilitites(availabilities: AvailabilityModel[]): void {
     this.availability.set(availabilities);
+    this.timeSlots.clear(); // Clear existing timeSlots
 
     const now = new Date();
+    now.setHours(0, 0, 0, 0);
     const maxDate = new Date(new Date().setMonth(new Date().getMonth() + 2)); // Calendar limit
+    maxDate.setHours(23, 59, 59, 999);
 
     for (const availability of availabilities) {
       const timeSlot = `${availability.startTime} - ${availability.endTime}`;
 
-      if (availability.isRecurring) {
-        let current = new Date(
-          Math.max(new Date(availability.startDate).getTime(), now.getTime()),
-        );
+      if (availability.isRecurring && availability.dayOfWeek) {
+        let current = new Date(availability.startDate);
+        current.setHours(0, 0, 0, 0);
+
+        // Start from today or availability start date, whichever is later
+        if (current < now) {
+          current = new Date(now);
+        }
 
         const recurringEnd = new Date(availability.endDate);
+        recurringEnd.setHours(23, 59, 59, 999);
         const end = recurringEnd < maxDate ? recurringEnd : maxDate;
 
+        let datesAdded = 0;
         while (current <= end) {
-          if (dayNumberToEnum[current.getDay()] === availability.dayOfWeek) {
+          const currentDayName = dayNumberToEnum[current.getDay()];
+
+          if (currentDayName === availability.dayOfWeek) {
             const key = this.formatDateKey(current);
+
             if (!this.timeSlots.has(key)) {
               this.timeSlots.set(key, []);
             }
             this.timeSlots.get(key)!.push(timeSlot);
+            datesAdded++;
           }
           current.setDate(current.getDate() + 1);
         }
-      } else {
-        // One-time availability (only add if inside calendar range)
+      } else if (!availability.isRecurring) {
         const start = new Date(availability.startDate);
-        if (start <= maxDate) {
+        start.setHours(0, 0, 0, 0);
+
+        if (start >= now && start <= maxDate) {
           const key = this.formatDateKey(start);
+          console.log('Adding one-time timeSlot for', key, ':', timeSlot);
+
           if (!this.timeSlots.has(key)) {
             this.timeSlots.set(key, []);
           }
@@ -141,7 +172,10 @@ export class SchedulingService {
   }
 
   private formatDateKey(date: Date): string {
-    return date.toISOString().split('T')[0]; // yyyy-mm-dd
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`; // yyyy-mm-dd
   }
 
   filterAvailabilityForDay(
@@ -169,5 +203,54 @@ export class SchedulingService {
 
       return false;
     });
+  }
+
+  clearChainedRelatedFields(step: SchedulingSteps): void {
+    const controls = this.schedulingForm.controls;
+
+    switch (step) {
+      case SchedulingSteps.SERVICE_SELECTION:
+        controls[SchedulingFormControls.SELECTED_PROFESSIONAL].setValue(null);
+        controls[SchedulingFormControls.SELECTED_DAY].setValue(null);
+        controls[SchedulingFormControls.SELECTED_AVAILABILITY].setValue(null);
+        controls[SchedulingFormControls.SELECTED_MODALITY].setValue(null);
+        this.professionals = [];
+        this.availability.set([]);
+        this.timeSlots.clear();
+        break;
+
+      case SchedulingSteps.PROFESSIONAL_SELECTION:
+        controls[SchedulingFormControls.SELECTED_DAY].setValue(null);
+        controls[SchedulingFormControls.SELECTED_AVAILABILITY].setValue(null);
+        controls[SchedulingFormControls.SELECTED_MODALITY].setValue(null);
+        this.availability.set([]);
+        this.timeSlots.clear();
+        break;
+
+      case SchedulingSteps.DATE_SELECTION:
+        controls[SchedulingFormControls.SELECTED_AVAILABILITY].setValue(null);
+        controls[SchedulingFormControls.SELECTED_MODALITY].setValue(null);
+        break;
+
+      case SchedulingSteps.AVAILABILITY_SELECTION:
+        controls[SchedulingFormControls.SELECTED_MODALITY].setValue(null);
+        break;
+    }
+  }
+
+  clearAvailabilities() {
+    this.availability.set([]);
+  }
+
+  clearTimeSlots() {
+    this.timeSlots = new Map<string, string[]>();
+  }
+
+  clearServcies() {
+    this.services = [];
+  }
+
+  clearProfessionals() {
+    this.professionals = [];
   }
 }

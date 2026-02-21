@@ -2,13 +2,21 @@
   @if (schedulingService.services.length) {
     <mat-form-field class="therapist-selection">
       <mat-label>Escolha um serviço</mat-label>
-      <mat-select required>
-        <mat-option (click)="selectService(null)" value="">--</mat-option>
-        <ng-container *ngFor="let service of schedulingService.services">
-          <mat-option (click)="selectService(service)" [value]="service.id">{{
-            service.name | enumValue: ProfessionalSessionService
-          }}</mat-option>
-        </ng-container>
+      <mat-select
+        [formControl]="
+          schedulingService.schedulingForm.controls[
+            SchedulingFormControls.SELECTED_SERVICE
+          ]
+        "
+      >
+        <mat-option [value]="null">--</mat-option>
+
+        <mat-option
+          *ngFor="let service of schedulingService.services"
+          [value]="service"
+        >
+          {{ service.name | enumValue: ProfessionalSessionService }}
+        </mat-option>
       </mat-select>
     </mat-form-field>
   }
@@ -16,38 +24,34 @@
   @if (schedulingService.professionals.length) {
     <mat-form-field class="therapist-selection">
       <mat-label>Escolha um profissional</mat-label>
-      <mat-select required>
-        <mat-option (click)="selectTherapist(null)" value="">--</mat-option>
-        <ng-container
+
+      <mat-select
+        [formControl]="
+          schedulingService.schedulingForm.controls[
+            SchedulingFormControls.SELECTED_PROFESSIONAL
+          ]
+        "
+        [compareWith]="compareProfessionals"
+      >
+        <mat-option [value]="null">--</mat-option>
+
+        <mat-option
           *ngFor="
             let therapist of schedulingService.professionals;
             trackBy: trackByName
           "
+          [value]="therapist"
         >
-          <mat-option
-            (click)="selectTherapist(therapist)"
-            [value]="therapist.id"
-            >{{ therapist.name }}</mat-option
-          >
-        </ng-container>
+          {{ therapist.name }}
+        </mat-option>
       </mat-select>
-      <!-- <mat-error *ngIf="therapistControl.hasError('required')">
-      Please choose a therapist.
-    </mat-error> -->
     </mat-form-field>
-
-    @if (
-      schedulingService.schedulingForm.controls[
-        SchedulingFormControls.SELECTED_PROFESSIONAL
-      ].value
-    ) {
+    @if (selectedProfessional) {
       <mat-card class="therapist-card" appearance="outlined">
         <mat-card-header class="therapist-card--header">
           <mat-card-title-group class="title-group">
             <mat-card-title class="title">{{
-              schedulingService.schedulingForm.controls[
-                SchedulingFormControls.SELECTED_PROFESSIONAL
-              ].value?.name
+              selectedProfessional.name
             }}</mat-card-title>
             <!-- <mat-card-subtitle class="subtitle">{{
               schedulingService.schedulingForm.controls[
@@ -75,11 +79,7 @@
         <mat-card-content class="therapist-card--content-area"
           ><div class="text">
             <p>
-              {{
-                schedulingService.schedulingForm.controls[
-                  SchedulingFormControls.SELECTED_PROFESSIONAL
-                ].value?.bio
-              }}
+              {{ selectedProfessional.bio }}
             </p>
           </div>
         </mat-card-content>
@@ -95,13 +95,12 @@
           [calendarConfiguration]="calendarConfigurationObject"
         ></app-calendar>
       }
-      @if (
-        schedulingService.schedulingForm.controls[
-          SchedulingFormControls.SELECTED_PROFESSIONAL
-        ].value
-      ) {
+      @if (schedulingService.availability().length) {
         <app-availabilities
-          [availabilityConfiguration]="availabilityConfigurationObject"
+          [availabilityConfiguration]="
+            schedulingService.availabilityConfiguration()
+          "
+          [attr.data-key]="renderKey"
           (isSubmitted)="bookAppointment($event)"
         ></app-availabilities>
       }

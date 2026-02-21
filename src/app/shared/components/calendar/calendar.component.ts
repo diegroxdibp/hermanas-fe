@@ -1,10 +1,13 @@
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule, DatePipe, registerLocaleData } from '@angular/common';
 import { Component, Injectable, Input, OnInit } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE, NativeDateAdapter } from '@angular/material/core';
 import {
-  MatDatepickerModule,
-} from '@angular/material/datepicker';
+  DateAdapter,
+  MAT_DATE_FORMATS,
+  MAT_DATE_LOCALE,
+  NativeDateAdapter,
+} from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MaskitoDirective } from '@maskito/angular';
@@ -19,6 +22,9 @@ import {
 } from '../../models/input-configuration-objects/calendar-configuration-object';
 import { CalendarType } from '../../enums/calendar-type.enum';
 import { DayOfWeek } from '../../enums/day-of-week.enum';
+
+import localePt from '@angular/common/locales/pt-PT';
+registerLocaleData(localePt);
 
 export const DD_MM_YYYY_FORMAT = {
   parse: {
@@ -88,24 +94,44 @@ export class CalendarComponent implements OnInit {
 
   readonly options: MaskitoOptions = pastDateMask;
   allowedRecurringDays: Set<number> = new Set();
-  allowedSpecificDates: Date[] = [];
+  allowedSpecificDates: Set<string> = new Set(); // Changed to Set<string> for better comparison
   dateControl = new FormControl<Date | null>(null);
 
   constructor(private datePipe: DatePipe) {}
 
   ngOnInit() {
+    console.log('=== AVAILABILITIES ===');
+    console.log(JSON.stringify(this.availability, null, 2));
+
     for (const availability of this.availability) {
-      if (availability.isBooked) continue;
+      if (availability.isBooked) {
+        console.log('Skipping booked availability:', availability.id);
+        continue;
+      }
 
       if (availability.isRecurring && availability.dayOfWeek) {
         const dayOfWeek = this.getDayNumber(availability.dayOfWeek);
+        console.log(
+          `Adding recurring day: ${availability.dayOfWeek} (${dayOfWeek})`,
+        );
         this.allowedRecurringDays.add(dayOfWeek);
-      } else if (!availability.isRecurring) {
-        this.allowedSpecificDates.push(new Date(availability.startDate));
+      } else if (!availability.isRecurring && availability.startDate) {
+        // Store as YYYY-MM-DD string for easier comparison
+        console.log(`Adding specific date: ${availability.startDate}`);
+        this.allowedSpecificDates.add(availability.startDate);
       }
     }
 
-    this.dateControl.valueChanges.subscribe(value => {
+    console.log(
+      'Allowed recurring days:',
+      Array.from(this.allowedRecurringDays),
+    );
+    console.log(
+      'Allowed specific dates:',
+      Array.from(this.allowedSpecificDates),
+    );
+
+    this.dateControl.valueChanges.subscribe((value) => {
       if (value) {
         const isoDate = this.datePipe.transform(value, 'yyyy-MM-dd');
         this.calendarConfiguration.control.setValue(isoDate);
@@ -114,33 +140,47 @@ export class CalendarComponent implements OnInit {
   }
 
   isDateAllowed = (date: Date | null): boolean => {
-    if (!date) return false;
-
-    if (this.calendarConfiguration.calendarType === CalendarType.SCHEDULING) {
-      if (this.allowedRecurringDays.has(date.getDay())) return true;
-
-      return this.allowedSpecificDates.some(
-        (allowed) =>
-          allowed.getFullYear() === date.getFullYear() &&
-          allowed.getMonth() === date.getMonth() &&
-          allowed.getDate() === date.getDate(),
-      );
+    if (!date) {
+      console.log('Date is null');
+      return false;
     }
 
-    return true;
+    // For non-scheduling calendars, allow all dates
+    if (this.calendarConfiguration.calendarType !== CalendarType.SCHEDULING) {
+      return true;
+    }
+
+    const dayOfWeek = date.getDay();
+    const dateString = this.datePipe.transform(date, 'yyyy-MM-dd');
+
+    // Check recurring days
+    if (this.allowedRecurringDays.has(dayOfWeek)) {
+      console.log(`Date ${dateString} allowed (recurring ${dayOfWeek})`);
+      return true;
+    }
+
+    // Check specific dates
+    if (dateString && this.allowedSpecificDates.has(dateString)) {
+      console.log(`Date ${dateString} allowed (specific date)`);
+      return true;
+    }
+
+    return false;
   };
 
   getDayNumber(day: DayOfWeek | string): number {
-    const days: DayOfWeek[] = [
-      DayOfWeek.SUNDAY,
-      DayOfWeek.MONDAY,
-      DayOfWeek.TUESDAY,
-      DayOfWeek.WEDNESDAY,
-      DayOfWeek.THURSDAY,
-      DayOfWeek.FRIDAY,
-      DayOfWeek.SATURDAY,
-    ];
-    return days.indexOf(day as DayOfWeek);
+    // Map string keys to day numbers
+    const dayMap: { [key: string]: number } = {
+      SUNDAY: 0,
+      MONDAY: 1,
+      TUESDAY: 2,
+      WEDNESDAY: 3,
+      THURSDAY: 4,
+      FRIDAY: 5,
+      SATURDAY: 6,
+    };
+
+    return dayMap[day] ?? -1;
   }
 
   get minDate(): Date {

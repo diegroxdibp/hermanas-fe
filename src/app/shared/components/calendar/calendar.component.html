@@ -1,6 +1,6 @@
 <div class="calendar">
   <mat-form-field class="example-full-width">
-    <mat-label>Choose a date</mat-label>
+    <mat-label>Escolha uma data</mat-label>
     <input
       matInput
       [matDatepicker]="picker"
@@ -9,6 +9,7 @@
       [matDatepickerFilter]="isDateAllowed"
       [formControl]="dateControl"
       placeholder="DD/MM/YYYY"
+      [maskito]="options"
     />
     <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
     <mat-datepicker #picker [touchUi]="true"></mat-datepicker>

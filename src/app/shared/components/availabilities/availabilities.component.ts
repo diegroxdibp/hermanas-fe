@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,7 +11,6 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { formatTime } from '../../utils/date-helper.util';
 import { FormsModule } from '@angular/forms';
 import { ProfessionalServiceModality } from '../../enums/professional-service-modality.enum';
-import { SnackbarService } from '../../services/snackbar.service';
 import { AvailabilityModel } from '../../models/availability.model';
 import { AvailabilitySelectionOutputObject } from '../../models/input-configuration-objects/availability-selection-output-object';
 import { Modality } from '../../enums/modality.enum';
@@ -31,7 +30,6 @@ import { getEnumKeyByValue } from '../../utils/getEnumKeyByValue';
   styleUrl: './availabilities.component.scss',
 })
 export class AvailabilitiesComponent {
-  snackbarService = inject(SnackbarService);
   @Input({ required: true })
   availabilityConfiguration: AvailabilityConfigurationObject =
     emptyAvailabilityConfiguration;
@@ -47,8 +45,5 @@ export class AvailabilitiesComponent {
       modality: getEnumKeyByValue(Modality, this.modalitySelection) as Modality,
     };
     this.isSubmitted.emit(availabilityOutputObject);
-    this.snackbarService.openSnackBar({
-      message: 'Serviço de agendamento em construção!',
-    });
   }
 }

@@ -13,6 +13,7 @@ import { environment } from '../../../environments/environment';
 import { ProfessionalService } from '../../shared/models/professional-service.model';
 import { ProfessionalSessionService } from '../../shared/enums/professional-session-service.enum';
 import { Professional } from '../../shared/models/get-professional-by-service-response.model';
+import { Appointment } from '../../shared/models/appointment.model';
 
 @Injectable({
   providedIn: 'root',
@@ -71,14 +72,23 @@ export class ApiService {
     );
   }
 
-  setAppointment(payload: AppointmentPayload) {
-    this.http
-      .post(`${environment.apiUrl}/api/appointments/create`, payload, {
+  setAppointment(payload: AppointmentPayload): Observable<any> {
+    return this.http.post(
+      `${environment.apiUrl}/api/appointments/create`,
+      payload,
+      {
         withCredentials: true,
-      })
-      .subscribe((response) => {
-        console.log(response);
-      });
+      },
+    );
+  }
+
+  getUserAppointments(userId: number): Observable<Appointment[]> {
+    return this.http.get<Appointment[]>(
+      `${environment.apiUrl}/api/appointments/client/${userId}`,
+      {
+        withCredentials: true,
+      },
+    );
   }
 
   sendEmail(subject: string, body: string) {

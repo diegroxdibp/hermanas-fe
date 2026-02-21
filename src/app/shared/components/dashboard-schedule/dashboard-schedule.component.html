@@ -1,1 +1,53 @@
-<p>Em construção!</p>
+<div class="appointments-container">
+  @for (appointment of appointments; track appointment.id) {
+    <mat-card class="dashboard-menu" appearance="outlined">
+      <mat-card-header class="dashboard-header">
+        <mat-card-title>Agendamento</mat-card-title>
+      </mat-card-header>
+      <mat-divider></mat-divider>
+      <mat-card-content>
+        @if (appointment.isRecurring) {
+          <p>
+            Próximo atendimento: 
+            {{ appointment.dayOfWeek | nextAppointmentDate : appointment.startDate | date: 'dd/MM/yyyy' }}
+            ({{ appointment.dayOfWeek | enumValue: DayOfWeek }})
+          </p>
+        } @else {
+          <p>Data: {{ appointment.startDate | date: 'dd/MM/yyyy' }}</p>
+        }
+        <p>Horário: {{ appointment.startTime }} - {{ appointment.endTime }}</p>
+        <p>Modalidade: {{ appointment.modality | enumValue: Modality }}</p>
+        <p>Profissional: {{ appointment.professionalName }}</p>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- Calendar view with visual date picker -->
+  <mat-card class="calendar-view" appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>Próximas Consultas</mat-card-title>
+    </mat-card-header>
+    <mat-divider></mat-divider>
+    <mat-card-content>
+      @if (calendarDates.length > 0) {
+        <!-- Visual Calendar -->
+        <mat-calendar 
+          [dateClass]="dateClass"
+          [selected]="calendarDates[0]">
+        </mat-calendar>
+        
+        <!-- List of upcoming dates -->
+        <!-- <div class="upcoming-dates">
+          <h3>Datas agendadas:</h3>
+          <ul class="appointment-dates">
+            @for (date of calendarDates.slice(0, 10); track date.getTime()) {
+              <li>{{ date | date: 'EEEE, dd/MM/yyyy' : '' : 'pt-PT' }}</li>
+            }
+          </ul>
+        </div> -->
+      } @else {
+        <p class="no-appointments">Nenhum agendamento encontrado</p>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

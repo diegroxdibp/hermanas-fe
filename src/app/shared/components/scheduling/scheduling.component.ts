@@ -8,8 +8,9 @@ import {
   inject,
   OnInit,
   ViewChild,
+  OnDestroy,
 } from '@angular/core';
-import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { provideNativeDateAdapter, MatOption } from '@angular/material/core';
 import { CalendarComponent } from '../calendar/calendar.component';
@@ -29,7 +30,7 @@ import {
   AvailabilityConfigurationObject,
   emptyAvailabilityConfiguration,
 } from '../../models/input-configuration-objects/availability-configuration-object';
-import { take } from 'rxjs';
+import { take, Subscription } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { CalendarType } from '../../enums/calendar-type.enum';
 import { parseDate } from '../../utils/date-helper.util';
@@ -42,6 +43,10 @@ import { SchedulingFormControls } from '../../enums/scheduling-form-controls.enu
 import { Modality } from '../../enums/modality.enum';
 import { ProfessionalSessionService } from '../../enums/professional-session-service.enum';
 import { EnumValuePipe } from '../../pipes/enum-value.pipe';
+import { NavigationService } from '../../services/navigation.service';
+import { Pages } from '../../enums/pages.enum';
+import { SnackbarService } from '../../services/snackbar.service';
+import { SchedulingSteps } from '../../enums/scheduling-steps.enum';
 
 @Component({
   selector: 'app-scheduling',
@@ -65,21 +70,25 @@ import { EnumValuePipe } from '../../pipes/enum-value.pipe';
   providers: [provideNativeDateAdapter()],
   styleUrl: './scheduling.component.scss',
 })
-export class SchedulingComponent implements OnInit {
-  loader = inject(LoadingService);
+export class SchedulingComponent implements OnInit, OnDestroy {
+  readonly navigationService = inject(NavigationService);
+  readonly snackbarService = inject(SnackbarService);
+  readonly loader = inject(LoadingService);
+
   @ViewChild('body') body: ElementRef | undefined;
   @ViewChild('subject') subject: ElementRef | undefined;
+
   calendarConfigurationObject: CalendarConfigurationObject =
     emptyCalendarConfiguration;
-  availabilityConfigurationObject: AvailabilityConfigurationObject =
-    emptyAvailabilityConfiguration;
   appointmentTypeConfiguration: RadioInputConfigurationObject =
     emptyRadioInputConfiguration;
-  allowedRecurringDays: Set<number> = new Set(); // e.g., 1 for Monday
+  allowedRecurringDays: Set<number> = new Set();
   allowedSpecificDates: Date[] = [];
   availability: AvailabilityModel[] = [];
   SchedulingFormControls = SchedulingFormControls;
   ProfessionalSessionService = ProfessionalSessionService;
+  renderKey = 0;
+  private subscriptions: Subscription[] = [];
 
   constructor(
     private apiService: ApiService,
@@ -89,51 +98,129 @@ export class SchedulingComponent implements OnInit {
       .getServices()
       .pipe(take(1))
       .subscribe((services: ProfessionalService[]) => {
-        console.log('Services:', services);
         this.schedulingService.services = services;
-      });
+      }); // Load services
 
-    this.schedulingService.schedulingForm.controls[
-      SchedulingFormControls.SELECTED_SERVICE
-    ].valueChanges.subscribe((selectedService: ProfessionalService | null) => {
-      if (selectedService) {
-        this.apiService
-          .getProfessionalbyService(selectedService.id)
-          .pipe(take(1))
-          .subscribe((professionals: Professional[]) => {
-            this.schedulingService.professionals = professionals;
-          });
-      }
-    });
+    const serviceControl =
+      this.schedulingService.schedulingForm.controls[
+        SchedulingFormControls.SELECTED_SERVICE
+      ];
 
-    this.schedulingService.schedulingForm.controls[
-      SchedulingFormControls.SELECTED_PROFESSIONAL
-    ]?.valueChanges.subscribe((selectedProfessional: Professional | null) => {
-      if (selectedProfessional) {
-        this.apiService
-          .getAvailabilititesByProfessionalId(selectedProfessional.id)
-          .pipe(take(1))
-          .subscribe((availabilities: AvailabilityModel[]) => {
-            this.schedulingService.setAvailabilitites(availabilities);
-          });
-      }
-    });
-
-    this.schedulingService.schedulingForm.controls[
-      SchedulingFormControls.SELECTED_DAY
-    ]?.valueChanges.subscribe((date: string | null) => {
-      if (date && this.schedulingService.timeSlots.get(date)) {
-        this.setAvailabilityConfiguration(
-          this.schedulingService.availability(),
-          parseDate(date),
+    const serviceSub = serviceControl.valueChanges.subscribe(
+      (selectedService: ProfessionalService | null) => {
+        this.schedulingService.clearChainedRelatedFields(
+          SchedulingSteps.SERVICE_SELECTION,
         );
-      }
+
+        this.renderKey++;
+
+        if (selectedService) {
+          this.apiService
+            .getProfessionalbyService(selectedService.id)
+            .pipe(take(1))
+            .subscribe((professionals: Professional[]) => {
+              this.schedulingService.professionals = professionals;
+            });
+        }
+      },
+    );
+    this.subscriptions.push(serviceSub);
+
+    const professionalControl =
+      this.schedulingService.schedulingForm.controls[
+        SchedulingFormControls.SELECTED_PROFESSIONAL
+      ];
+
+    const professionalSub = professionalControl.valueChanges.subscribe(
+      (selectedProfessional: Professional | null) => {
+        this.schedulingService.clearChainedRelatedFields(
+          SchedulingSteps.PROFESSIONAL_SELECTION,
+        );
+
+        this.renderKey++;
+
+        this.schedulingService.availabilityConfiguration.set(
+          emptyAvailabilityConfiguration,
+        );
+
+        if (selectedProfessional) {
+          this.apiService
+            .getAvailabilititesByProfessionalId(selectedProfessional.id)
+            .pipe(take(1))
+            .subscribe((availabilities: AvailabilityModel[]) => {
+              this.schedulingService.setAvailabilitites(availabilities);
+            });
+        }
+      },
+    );
+    this.subscriptions.push(professionalSub);
+
+    // When date is selected, filter availabilities for that day
+    const dateControl =
+      this.schedulingService.schedulingForm.controls[
+        SchedulingFormControls.SELECTED_DAY
+      ];
+
+    const dateSub = dateControl.valueChanges.subscribe(
+      (date: string | null) => {
+        this.schedulingService.clearChainedRelatedFields(
+          SchedulingSteps.DATE_SELECTION,
+        );
+
+        this.renderKey++;
+
+        this.schedulingService.availabilityConfiguration.set(
+          emptyAvailabilityConfiguration,
+        );
+
+        if (date) {
+          const slots = this.schedulingService.timeSlots.get(date);
+
+          if (slots && slots.length > 0) {
+            this.setAvailabilityConfiguration(
+              this.schedulingService.availability(),
+              parseDate(date),
+            );
+          } else {
+            this.schedulingService.availabilityConfiguration.set({
+              ...emptyAvailabilityConfiguration,
+              title: 'Nenhuma disponibilidade encontrada para esta data',
+              selectedDate: parseDate(date).toLocaleDateString('pt-PT'),
+            });
+          }
+        }
+      },
+    );
+    this.subscriptions.push(dateSub);
+
+    const availabilityControl =
+      this.schedulingService.schedulingForm.controls[
+        SchedulingFormControls.SELECTED_AVAILABILITY
+      ];
+
+    const availabilitySub = availabilityControl.valueChanges.subscribe(() => {
+      this.schedulingService.clearChainedRelatedFields(
+        SchedulingSteps.AVAILABILITY_SELECTION,
+      );
+      this.renderKey++;
     });
+    this.subscriptions.push(availabilitySub);
   }
 
   ngOnInit() {
     this.setCalendarConfiguration();
     this.setAppointmentTypeConfiguration();
+  }
+
+  ngOnDestroy() {
+    // Clean up subscriptions
+    this.subscriptions.forEach((sub) => sub.unsubscribe());
+  }
+
+  get selectedProfessional(): Professional | null {
+    return this.schedulingService.schedulingForm.controls[
+      SchedulingFormControls.SELECTED_PROFESSIONAL
+    ].value;
   }
 
   setCalendarConfiguration() {
@@ -157,7 +244,7 @@ export class SchedulingComponent implements OnInit {
         selectedDate,
       );
 
-    this.availabilityConfigurationObject = {
+    const availabilityConfigurationObject = {
       title: 'Escolha uma disponibilidade:',
       selectedDate: parseDate(
         this.schedulingService.schedulingForm.controls[
@@ -170,54 +257,21 @@ export class SchedulingComponent implements OnInit {
         ],
       availability: filteredAvailability,
     };
+
+    this.schedulingService.availabilityConfiguration.set(
+      availabilityConfigurationObject,
+    );
   }
 
   setAppointmentTypeConfiguration() {
     this.appointmentTypeConfiguration = {
-      title: 'Escolha uma tipe de atendimento:',
+      title: 'Escolha um tipo de atendimento:',
       control:
         this.schedulingService.schedulingForm.controls[
           SchedulingFormControls.SELECTED_MODALITY
         ],
       listOfOptions: Object.values(Modality),
     };
-  }
-
-  selectService(service: ProfessionalService | null): void {
-    if (service) {
-      this.schedulingService.schedulingForm.controls[
-        SchedulingFormControls.SELECTED_SERVICE
-      ]?.setValue(service);
-    } else {
-      this.schedulingService.schedulingForm.controls[
-        SchedulingFormControls.SELECTED_SERVICE
-      ]?.setValue(null);
-    }
-  }
-
-  selectTherapist(professional: Professional | null): void {
-    if (professional) {
-      this.schedulingService.schedulingForm.controls[
-        SchedulingFormControls.SELECTED_PROFESSIONAL
-      ]?.setValue(professional);
-    } else {
-      this.schedulingService.schedulingForm.controls[
-        SchedulingFormControls.SELECTED_PROFESSIONAL
-      ]?.setValue(null);
-    }
-  }
-
-  getDayNumber(dayName: string): number {
-    const days = [
-      'SUNDAY',
-      'MONDAY',
-      'TUESDAY',
-      'WEDNESDAY',
-      'THURSDAY',
-      'FRIDAY',
-      'SATURDAY',
-    ];
-    return days.indexOf(dayName.toUpperCase());
   }
 
   isDateAllowed = (date: Date | null): boolean => {
@@ -239,19 +293,17 @@ export class SchedulingComponent implements OnInit {
 
   restrictInput(event: Event) {
     const input = event.target as HTMLInputElement;
-    let value = input.value.replace(/[^0-9]/g, ''); // Remove non-numeric characters immediately
+    let value = input.value.replace(/[^0-9]/g, '');
 
-    // Add ":" after the second digit
     if (value.length > 2) {
       value = value.slice(0, 2) + ':' + value.slice(2, 4);
     }
 
-    // Prevent further input if max length (5 characters) is reached
     if (value.length > 5) {
-      value = value.slice(0, 5); // Truncate excess characters
+      value = value.slice(0, 5);
     }
 
-    input.value = value; // Update the input value in real-time
+    input.value = value;
   }
 
   bookAppointment(availabilityOutputObject: AvailabilitySelectionOutputObject) {
@@ -263,10 +315,19 @@ export class SchedulingComponent implements OnInit {
     ]?.setValue(availabilityOutputObject.availability);
     const payload = this.schedulingService.getAppointmentPayload();
     console.log(payload);
-    this.apiService.setAppointment(payload);
+    this.apiService.setAppointment(payload).subscribe((response) => {
+      this.navigationService.navigateTo(Pages.DASHBOARD_SCHEDULE);
+      this.snackbarService.openSnackBar({
+        message: 'Agendamento realizado com sucesso!',
+      });
+    });
   }
 
   getProfessionalPicture(): string {
     return '';
+  }
+
+  compareProfessionals(a: Professional, b: Professional): boolean {
+    return a?.id === b?.id;
   }
 }

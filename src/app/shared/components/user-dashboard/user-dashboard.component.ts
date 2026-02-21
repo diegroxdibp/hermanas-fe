@@ -65,7 +65,7 @@ export class UserDashboardComponent implements OnInit {
 
     const data = route.snapshot.data;
 
-    this.title = data['title'] ?? '';
+    this.title = data['title'] === 'Schedule' ? 'Agendamentos' : '';
     this.subtitle = data['subtitle'] ?? '';
   }
 }
