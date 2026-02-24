@@ -1,6 +1,6 @@
 <div class="therapist-section">
   @if (schedulingService.services.length) {
-    <mat-form-field class="therapist-selection">
+    <mat-form-field class="therapist-selection" appScrollAnimate="fade-in-up">
       <mat-label>Escolha um serviço</mat-label>
       <mat-select
         [formControl]="
@@ -22,7 +22,7 @@
   }
 
   @if (schedulingService.professionals.length) {
-    <mat-form-field class="therapist-selection">
+    <mat-form-field class="therapist-selection" appScrollAnimate="fade-in-up">
       <mat-label>Escolha um profissional</mat-label>
 
       <mat-select
@@ -47,7 +47,11 @@
       </mat-select>
     </mat-form-field>
     @if (selectedProfessional) {
-      <mat-card class="therapist-card" appearance="outlined">
+      <mat-card
+        class="therapist-card"
+        appearance="outlined"
+        appScrollAnimate="fade-in-up"
+      >
         <mat-card-header class="therapist-card--header">
           <mat-card-title-group class="title-group">
             <mat-card-title class="title">{{
@@ -93,6 +97,7 @@
           *ngIf="schedulingService.availability().length"
           [availability]="schedulingService.availability()"
           [calendarConfiguration]="calendarConfigurationObject"
+          appScrollAnimate="fade-in-up"
         ></app-calendar>
       }
       @if (schedulingService.availability().length) {
@@ -102,6 +107,7 @@
           "
           [attr.data-key]="renderKey"
           (isSubmitted)="bookAppointment($event)"
+          appScrollAnimate="fade-in-up"
         ></app-availabilities>
       }
     }

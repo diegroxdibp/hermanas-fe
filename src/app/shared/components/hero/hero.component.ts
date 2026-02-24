@@ -24,6 +24,7 @@ export class HeroComponent {
     return this.getHeroHeight();
   }
   @ViewChild('heroImage') heroImage: ElementRef | undefined;
+
   // Keep track of scroll position
   scrollPosition = 0;
   private lastScrollPosition = 0;
@@ -38,11 +39,57 @@ export class HeroComponent {
       });
     }
   }
+  @ViewChild('typedText') typedText: ElementRef | undefined;
 
-  constructor(private router: Router, private navService: NavigationService) {}
+  phrases = [
+    'Ressignificação',
+    'Saúde',
+    'Cuidado',
+    'Transformação',
+  ];
+
+  phraseIndex = 0;
+  charIndex = 0;
+  isDeleting = false;
+
+  // 🔧 FIX: Use arrow function to preserve 'this' context
+  type = () => {
+    const currentPhrase = this.phrases[this.phraseIndex];
+    const currentText = currentPhrase.substring(0, this.charIndex);
+
+    if (this.typedText) {
+      this.typedText.nativeElement.textContent = currentText;
+
+      if (!this.isDeleting && this.charIndex < currentPhrase.length) {
+        // Typing forward
+        this.charIndex++;
+        setTimeout(this.type, 100);
+      } else if (this.isDeleting && this.charIndex > 0) {
+        // Deleting backward
+        this.charIndex--;
+        setTimeout(this.type, 60);
+      } else {
+        // Switching between typing and deleting
+        this.isDeleting = !this.isDeleting;
+        if (!this.isDeleting) {
+          // Move to next phrase
+          this.phraseIndex = (this.phraseIndex + 1) % this.phrases.length;
+        }
+        // Pause before next action
+        setTimeout(this.type, this.isDeleting ? 500 : 2000);
+      }
+    }
+  };
+  constructor(
+    private router: Router,
+    private navService: NavigationService,
+  ) {}
 
   ngOnInit() {
     this.updateParallax();
+    setTimeout(() => {
+      this.type();
+    }, 500);
   }
 
   imageLoaded() {

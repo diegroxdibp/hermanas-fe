@@ -115,6 +115,7 @@
 
   @media (min-width: breakpoint.$breakpoint-lg) {
     .introduction {
+      margin: 5em 0;
       .care-introduction {
         .pillars {
           margin: 4em 0;
@@ -135,4 +136,35 @@
   height: 40px;
   transform-origin: center;
   transition: transform 0.3s ease;
+}
+
+.hands {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 100px;
+  margin: 200px 0;
+  overflow: hidden;
+
+  .hand {
+    width: 300px;
+    animation: slideInCartoon 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)
+      forwards;
+  }
+
+  @keyframes slideInCartoon {
+    0% {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    70% {
+      transform: translateX(15%); /* Overshoots past center */
+      opacity: 1;
+    }
+    100% {
+      transform: translateX(0); /* Settles back */
+      opacity: 1;
+    }
+  }
 }

@@ -5,6 +5,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDivider } from '@angular/material/divider';
+import { ScrollAnimateDirective } from '../../directives/scroll-animate.directive';
 
 @Component({
   selector: 'app-contact',
@@ -14,6 +15,7 @@ import { MatDivider } from '@angular/material/divider';
     MatInputModule,
     MatButtonModule,
     MatDivider,
+    ScrollAnimateDirective
   ],
   templateUrl: './contact.component.html',
   styleUrl: './contact.component.scss',

@@ -14,20 +14,11 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    align-items: center;
     color: white;
-    margin-top: 8em;
+    // margin-top: 8em;
+    margin-top: 10em;
     gap: 2em;
     z-index: 5;
-
-    h1 {
-      font-family: Mondo;
-      font-size: 60px;
-      letter-spacing: 10px;
-      text-align: center;
-      font-style: italic;
-      margin: 0;
-    }
 
     h2 {
       width: 100%;
@@ -83,28 +74,28 @@
     }
   }
 
-  @media (min-width: breakpoint.$breakpoint-lg) {
-    .content {
-      margin-right: 10%;
-      gap: 1em;
-      z-index: 5;
-      width: 100%;
-      align-items: end;
-      margin-right: 5%;
-      h1 {
-        font-size: 100px;
-        letter-spacing: 15px;
-      }
+  // @media (min-width: breakpoint.$breakpoint-lg) {
+  //   .content {
+  //     margin-right: 10%;
+  //     gap: 1em;
+  //     z-index: 5;
+  //     width: 100%;
+  //     align-items: end;
+  //     margin-right: 5%;
+  //     h1 {
+  //       font-size: 100px;
+  //       letter-spacing: 15px;
+  //     }
 
-      h2 {
-        font-size: 30px;
-        letter-spacing: 10px;
-        text-align: right;
-        background-color: unset;
-        padding: 0;
-      }
-    }
-  }
+  //     h2 {
+  //       font-size: 30px;
+  //       letter-spacing: 10px;
+  //       text-align: right;
+  //       background-color: unset;
+  //       padding: 0;
+  //     }
+  //   }
+  // }
 }
 
 .loaded {
@@ -123,5 +114,57 @@
 
   100% {
     background-color: rgba(255, 255, 255, 0);
+  }
+}
+
+/* ✒️ Typing container */
+.type-container {
+  font-size: 32px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  min-height: 1.2em; // Prevents layout shift
+  margin-left: 20px;
+
+  .care {
+    margin-right: 16px;
+  }
+
+  .typed-text {
+    color: palette.$primaryColorPurple;
+  }
+
+  .care,
+  .typed-text {
+    font-weight: 700;
+
+    @media (min-width: breakpoint.$breakpoint-md) {
+      font-size: 72px;
+    }
+  }
+
+  /* 🔁 Blinking cursor */
+  .cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1.5em;
+    background-color: palette.$primaryColorPurple;
+    margin-left: 5px;
+    animation: blink 0.7s infinite;
+  }
+
+  @media (min-width: breakpoint.$breakpoint-md) {
+    margin-left: 100px;
+  }
+}
+
+/* ✨ Blink animation */
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
   }
 }

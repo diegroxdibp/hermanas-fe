@@ -16,6 +16,7 @@ import { AuthService } from '../../../auth/auth.service';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
+import { LogoHorizontalComponent } from "../logo-horizontal/logo-horizontal.component";
 
 @Component({
   selector: 'app-header',
@@ -25,7 +26,8 @@ import { MatButtonModule } from '@angular/material/button';
     MatIcon,
     MatMenuModule,
     MatButtonModule,
-  ],
+    LogoHorizontalComponent
+],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
   standalone: true,

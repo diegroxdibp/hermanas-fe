@@ -33,7 +33,7 @@ export class ScrollAnimateDirective implements OnInit, OnDestroy {
       });
     },
     {
-      threshold: 0.3,          // wait until 30% visible
+      threshold: 0.2,          // wait until 30% visible
       rootMargin: '0px 0px -10% 0px' // trigger a bit later
     }
   );

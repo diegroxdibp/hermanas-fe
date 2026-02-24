@@ -26,10 +26,7 @@ import {
   emptyCalendarConfiguration,
 } from '../../models/input-configuration-objects/calendar-configuration-object';
 import { AvailabilitiesComponent } from '../availabilities/availabilities.component';
-import {
-  AvailabilityConfigurationObject,
-  emptyAvailabilityConfiguration,
-} from '../../models/input-configuration-objects/availability-configuration-object';
+import { emptyAvailabilityConfiguration } from '../../models/input-configuration-objects/availability-configuration-object';
 import { take, Subscription } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { CalendarType } from '../../enums/calendar-type.enum';
@@ -47,6 +44,7 @@ import { NavigationService } from '../../services/navigation.service';
 import { Pages } from '../../enums/pages.enum';
 import { SnackbarService } from '../../services/snackbar.service';
 import { SchedulingSteps } from '../../enums/scheduling-steps.enum';
+import { ScrollAnimateDirective } from '../../directives/scroll-animate.directive';
 
 @Component({
   selector: 'app-scheduling',
@@ -65,6 +63,7 @@ import { SchedulingSteps } from '../../enums/scheduling-steps.enum';
     MatButtonModule,
     MatIcon,
     EnumValuePipe,
+    ScrollAnimateDirective,
   ],
   templateUrl: './scheduling.component.html',
   providers: [provideNativeDateAdapter()],

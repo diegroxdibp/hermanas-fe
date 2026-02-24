@@ -5,6 +5,7 @@
   [class]="{ fixed: fixedHeader }"
   [style]="{ backgroundColor: backgroundColor }"
 >
+  <logo-horizontal [hasHomeNavigation]="true"></logo-horizontal>
   <nav id="navbar">
     @if (screenSizeService.isTablet() || screenSizeService.isDesktop()) {
       <ul>
