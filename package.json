@@ -26,7 +26,6 @@
     "@maskito/kit": "^3.2.1",
     "hermanas-fe": "file:",
     "moment": "^2.30.1",
-    "ngx-mat-select-search": "^8.0.4",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
