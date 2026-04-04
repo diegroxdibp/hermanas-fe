@@ -1,10 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { BodyComponent } from './shared/components/body/body.component';
 import { BiographyComponent } from './shared/components/biography/biography.component';
-import { AboutComponent } from './shared/components/about/about.component';
+import { AboutComponent } from './core/pages/about/about.component';
 import { Pages } from './shared/enums/pages.enum';
-import { ContactComponent } from './shared/components/contact/contact.component';
 import { MindfulnessComponent } from './shared/components/mindfulness/mindfulness.component';
 import { AnaliseCorporalReichanaComponent } from './shared/components/analise-corporal-reichana/analise-corporal-reichana.component';
 import { AccessGuard } from './auth/auth.guard';
@@ -14,12 +12,14 @@ import { DashboardScheduleComponent } from './shared/components/dashboard-schedu
 import { DashboardNotificationsComponent } from './shared/components/dashboard-notifications/dashboard-notifications.component';
 import { SomaticExperienceComponent } from './shared/components/somatic-experience/somatic-experience.component';
 import { SupervisionComponent } from './shared/components/supervision/supervision.component';
+import { HomeComponent } from './core/pages/home/home.component';
+import { ContactComponent } from './core/pages/contact/contact.component';
 
 export const routes: Routes = [
-  { path: Pages.HOME, component: BodyComponent },
-  { path: Pages.ATENDIMENTO, component: BodyComponent },
-  { path: Pages.ATENDIMENTO_INDIVIDUAL, component: BodyComponent },
-  { path: Pages.ATENDIMENTO_GRUPO, component: BodyComponent },
+  { path: Pages.HOME, component: HomeComponent },
+  { path: Pages.ATENDIMENTO, component: HomeComponent },
+  { path: Pages.ATENDIMENTO_INDIVIDUAL, component: HomeComponent },
+  { path: Pages.ATENDIMENTO_GRUPO, component: HomeComponent },
   { path: Pages.ANALISE_REICHANA, component: AnaliseCorporalReichanaComponent },
   { path: Pages.MINDFULLNESS, component: MindfulnessComponent },
   { path: Pages.SOMATIC_EXPERIENCE, component: SomaticExperienceComponent },
@@ -79,7 +79,7 @@ export const routes: Routes = [
       {
         path: Pages.SCHEDULING,
         loadComponent: () =>
-          import('./shared/components/scheduling/scheduling.component').then(
+          import('./core/pages/scheduling/scheduling.component').then(
             (m) => m.SchedulingComponent,
           ),
       },
@@ -99,4 +99,4 @@ export const routes: Routes = [
   ], // Configure the routes
   exports: [RouterModule], // Export RouterModule so it can be used in AppModule
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { NavigationService } from '../../services/navigation.service';
-import { Pages } from '../../enums/pages.enum';
-import { Bio } from '../../models/bio.model';
-import { ScrollAnimateDirective } from '../../directives/scroll-animate.directive';
+import { NavigationService } from '../../../shared/services/navigation.service';
+import { Pages } from '../../../shared/enums/pages.enum';
+import { Bio } from '../../../shared/models/bio.model';
+import { ScrollAnimateDirective } from '../../../shared/directives/scroll-animate.directive';
 
 @Component({
   selector: 'app-about',

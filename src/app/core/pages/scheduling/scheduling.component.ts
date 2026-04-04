@@ -1,5 +1,3 @@
-import { AvailabilityModel } from './../../models/availability.model';
-import { SchedulingService } from './../../services/scheduling.service';
 import { ApiService } from './../../../core/services/api.service';
 import { CommonModule } from '@angular/common';
 import {
@@ -13,38 +11,36 @@ import {
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { provideNativeDateAdapter, MatOption } from '@angular/material/core';
-import { CalendarComponent } from '../calendar/calendar.component';
-import {
-  emptyRadioInputConfiguration,
-  RadioInputConfigurationObject,
-} from '../../models/input-configuration-objects/radio-input-configuration-object';
+
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
-import {
-  CalendarConfigurationObject,
-  emptyCalendarConfiguration,
-} from '../../models/input-configuration-objects/calendar-configuration-object';
-import { AvailabilitiesComponent } from '../availabilities/availabilities.component';
-import { emptyAvailabilityConfiguration } from '../../models/input-configuration-objects/availability-configuration-object';
+
 import { take, Subscription } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
-import { CalendarType } from '../../enums/calendar-type.enum';
-import { parseDate } from '../../utils/date-helper.util';
 import { MatIcon } from '@angular/material/icon';
-import { LoadingService } from '../../../core/services/loading.service';
-import { ProfessionalService } from '../../models/professional-service.model';
-import { Professional } from '../../models/get-professional-by-service-response.model';
-import { AvailabilitySelectionOutputObject } from '../../models/input-configuration-objects/availability-selection-output-object';
-import { SchedulingFormControls } from '../../enums/scheduling-form-controls.enum';
-import { Modality } from '../../enums/modality.enum';
-import { ProfessionalSessionService } from '../../enums/professional-session-service.enum';
-import { EnumValuePipe } from '../../pipes/enum-value.pipe';
-import { NavigationService } from '../../services/navigation.service';
-import { Pages } from '../../enums/pages.enum';
-import { SnackbarService } from '../../services/snackbar.service';
-import { SchedulingSteps } from '../../enums/scheduling-steps.enum';
-import { ScrollAnimateDirective } from '../../directives/scroll-animate.directive';
+import { AvailabilitiesComponent } from '../../../shared/components/availabilities/availabilities.component';
+import { CalendarComponent } from '../../../shared/components/calendar/calendar.component';
+import { ScrollAnimateDirective } from '../../../shared/directives/scroll-animate.directive';
+import { CalendarType } from '../../../shared/enums/calendar-type.enum';
+import { Modality } from '../../../shared/enums/modality.enum';
+import { Pages } from '../../../shared/enums/pages.enum';
+import { ProfessionalSessionService } from '../../../shared/enums/professional-session-service.enum';
+import { SchedulingFormControls } from '../../../shared/enums/scheduling-form-controls.enum';
+import { SchedulingSteps } from '../../../shared/enums/scheduling-steps.enum';
+import { AvailabilityModel } from '../../../shared/models/availability.model';
+import { Professional } from '../../../shared/models/get-professional-by-service-response.model';
+import { emptyAvailabilityConfiguration } from '../../../shared/models/input-configuration-objects/availability-configuration-object';
+import { AvailabilitySelectionOutputObject } from '../../../shared/models/input-configuration-objects/availability-selection-output-object';
+import { CalendarConfigurationObject, emptyCalendarConfiguration } from '../../../shared/models/input-configuration-objects/calendar-configuration-object';
+import { RadioInputConfigurationObject, emptyRadioInputConfiguration } from '../../../shared/models/input-configuration-objects/radio-input-configuration-object';
+import { ProfessionalService } from '../../../shared/models/professional-service.model';
+import { EnumValuePipe } from '../../../shared/pipes/enum-value.pipe';
+import { NavigationService } from '../../../shared/services/navigation.service';
+import { SchedulingService } from '../../../shared/services/scheduling.service';
+import { SnackbarService } from '../../../shared/services/snackbar.service';
+import { parseDate } from '../../../shared/utils/date-helper.util';
+import { LoadingService } from '../../services/loading.service';
 
 @Component({
   selector: 'app-scheduling',
@@ -102,7 +98,7 @@ export class SchedulingComponent implements OnInit, OnDestroy {
 
     const serviceControl =
       this.schedulingService.schedulingForm.controls[
-        SchedulingFormControls.SELECTED_SERVICE
+      SchedulingFormControls.SELECTED_SERVICE
       ];
 
     const serviceSub = serviceControl.valueChanges.subscribe(
@@ -127,7 +123,7 @@ export class SchedulingComponent implements OnInit, OnDestroy {
 
     const professionalControl =
       this.schedulingService.schedulingForm.controls[
-        SchedulingFormControls.SELECTED_PROFESSIONAL
+      SchedulingFormControls.SELECTED_PROFESSIONAL
       ];
 
     const professionalSub = professionalControl.valueChanges.subscribe(
@@ -157,7 +153,7 @@ export class SchedulingComponent implements OnInit, OnDestroy {
     // When date is selected, filter availabilities for that day
     const dateControl =
       this.schedulingService.schedulingForm.controls[
-        SchedulingFormControls.SELECTED_DAY
+      SchedulingFormControls.SELECTED_DAY
       ];
 
     const dateSub = dateControl.valueChanges.subscribe(
@@ -194,7 +190,7 @@ export class SchedulingComponent implements OnInit, OnDestroy {
 
     const availabilityControl =
       this.schedulingService.schedulingForm.controls[
-        SchedulingFormControls.SELECTED_AVAILABILITY
+      SchedulingFormControls.SELECTED_AVAILABILITY
       ];
 
     const availabilitySub = availabilityControl.valueChanges.subscribe(() => {
@@ -227,7 +223,7 @@ export class SchedulingComponent implements OnInit, OnDestroy {
       title: 'Escolha uma data:',
       control:
         this.schedulingService.schedulingForm.controls[
-          SchedulingFormControls.SELECTED_DAY
+        SchedulingFormControls.SELECTED_DAY
         ],
       calendarType: CalendarType.SCHEDULING,
     };
@@ -252,7 +248,7 @@ export class SchedulingComponent implements OnInit, OnDestroy {
       ).toLocaleDateString('pt-PT'),
       control:
         this.schedulingService.schedulingForm.controls[
-          SchedulingFormControls.SELECTED_DAY
+        SchedulingFormControls.SELECTED_DAY
         ],
       availability: filteredAvailability,
     };
@@ -267,7 +263,7 @@ export class SchedulingComponent implements OnInit, OnDestroy {
       title: 'Escolha um tipo de atendimento:',
       control:
         this.schedulingService.schedulingForm.controls[
-          SchedulingFormControls.SELECTED_MODALITY
+        SchedulingFormControls.SELECTED_MODALITY
         ],
       listOfOptions: Object.values(Modality),
     };

@@ -1,30 +1,19 @@
-import { AppConstants } from './../../../app-constants';
-import {
-  AfterViewInit,
-  Component,
-  inject,
-  Inject,
-  signal,
-} from '@angular/core';
-import { HeroComponent } from '../hero/hero.component';
-import { CommonModule, NgFor } from '@angular/common';
-import { MatExpansionModule } from '@angular/material/expansion';
+import { CommonModule } from '@angular/common';
+import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { Pages } from '../../enums/pages.enum';
-import { NavigationService } from '../../services/navigation.service';
-import {
-  animate,
-  state,
-  style,
-  transition,
-  trigger,
-} from '@angular/animations';
-import { ScrollAnimateDirective } from '../../directives/scroll-animate.directive';
-import { CarouselModule, OwlOptions } from 'ngx-owl-carousel-o';
-import { Router, Routes } from '@angular/router';
-import { MarqueeTrackComponent } from '../marquee-track/marquee-track.component';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { CarouselModule } from 'ngx-owl-carousel-o';
+import { HeroComponent } from '../../../shared/components/hero/hero.component';
+import { MarqueeTrackComponent } from '../../../shared/components/marquee-track/marquee-track.component';
+import { ScrollAnimateDirective } from '../../../shared/directives/scroll-animate.directive';
+import { animate, state, style, transition, trigger } from '@angular/animations';
+import { Pages } from '../../../shared/enums/pages.enum';
+import { AppConstants } from '../../../app-constants';
+import { Router } from '@angular/router';
+import { NavigationService } from '../../../shared/services/navigation.service';
+
 @Component({
-  selector: 'app-body',
+  selector: 'app-home',
   imports: [
     HeroComponent,
     CommonModule,
@@ -32,11 +21,9 @@ import { MarqueeTrackComponent } from '../marquee-track/marquee-track.component'
     MatExpansionModule,
     ScrollAnimateDirective,
     CarouselModule,
-    MarqueeTrackComponent
-  ],
-  templateUrl: './body.component.html',
-  styleUrl: './body.component.scss',
-  standalone: true,
+    MarqueeTrackComponent],
+  templateUrl: './home.component.html',
+  styleUrl: './home.component.scss',
   animations: [
     // Expand / Collapse for service-box
     trigger('expandCollapse', [
@@ -67,7 +54,7 @@ import { MarqueeTrackComponent } from '../marquee-track/marquee-track.component'
     ]),
   ],
 })
-export class BodyComponent implements AfterViewInit {
+export class HomeComponent {
   readonly router: Router = inject(Router);
   readonly routes: Router = inject(Router);
   readonly navigationService: NavigationService = inject(NavigationService);
@@ -75,10 +62,6 @@ export class BodyComponent implements AfterViewInit {
   // Using an object instead of an array to track expanded state
   expandedItems: { [key: string]: boolean } = {};
   Pages = Pages;
-
-
-
-
 
   ngAfterViewInit() {
     const url = this.router.url;

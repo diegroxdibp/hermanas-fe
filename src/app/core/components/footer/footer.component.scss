@@ -1,0 +1,84 @@
+@use "../../../../assets/styles/palette.scss" as palette;
+@use "../src/assets/styles/typography.scss" as typography;
+@use "../../../../assets/styles/breakpoints.scss" as breakpoint;
+
+footer {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+
+  content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    color: palette.$secondaryColorPurple;
+    text-align: center;
+
+    .copyright {
+      font-weight: 800;
+    }
+  }
+
+  .social-media-group {
+    display: flex;
+    gap: 12px;
+    padding: 0;
+    list-style: none;
+
+    .social-media-item {
+      display: flex;
+    }
+
+    .social-media-item-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      width: 40px;
+      height: 40px;
+
+      border-radius: 5px;
+      background-color: palette.$secondaryColorPurple;
+
+      text-decoration: none;
+      transition: all 0.3s ease;
+
+      svg {
+        width: 20px;
+        fill: white;
+        transition: all 0.3s ease;
+
+      }
+
+      &:hover {
+        background-color: palette.$primaryColorPurple;
+
+        svg {
+          transform: scale(1.1);
+        }
+      }
+
+      // Focus (ESSENCIAL WCAG)
+      &:focus-visible {
+        outline: 2px solid white;
+        outline-offset: 2px;
+      }
+
+      // Active (click)
+      &:active {
+        transform: scale(0.95);
+      }
+    }
+  }
+
+  @media (min-width: breakpoint.$breakpoint-sm) {
+    flex-direction: row;
+
+    content {
+      text-align: left;
+    }
+  }
+}

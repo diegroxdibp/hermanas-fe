@@ -1,0 +1,141 @@
+@use "../../../../assets/styles/breakpoints.scss" as breakpoint;
+@use "../../../../assets/styles/palette.scss" as palette;
+@use "../src/assets/styles/variables.scss" as variables;
+
+:host {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: palette.$supportingColorWhite;
+    width: 100%;
+    align-items: center;
+
+    .introduction {
+        margin: 3em 0;
+
+        .care-introduction {
+            .pillars {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                margin: 1em 0;
+
+                .pillars-title {
+                    margin-bottom: 2em;
+                    margin-bottom: 1em;
+                }
+
+                .pillars-list {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 1.5em;
+
+                    li {
+                        display: block;
+                        width: 100%;
+                        text-align: center;
+                        line-height: normal;
+
+                        span {
+                            font-family: Inter;
+                            font-size: 24px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .services {
+        display: flex;
+        flex-direction: column;
+        padding: 4em 0;
+        max-width: 100%;
+        gap: 3em;
+        background: palette.$secondaryColorPurple;
+
+        ul {
+            width: 100%;
+            flex-direction: column;
+        }
+
+        .service {
+            display: flex;
+            flex-direction: column;
+            align-items: start;
+            max-width: variables.$main-column-max-width-md;
+            padding: 0 variables.$mobile-lateral-padding;
+            gap: 1em;
+
+            h2,
+            h3,
+            p,
+            svg {
+                color: palette.$supportingColorWhite;
+                fill: palette.$supportingColorWhite;
+            }
+
+            .service-type {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin-bottom: 8px;
+
+                .service-name {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    width: 100%;
+                    align-items: center;
+                    cursor: pointer;
+                }
+
+                .service-box {
+                    display: flex;
+                    flex-direction: column;
+                    width: 100%;
+
+                    .service-description {
+                        font-size: 16px;
+                        line-height: 30px;
+                        letter-spacing: normal;
+                    }
+
+                    .service-actions {
+                        display: flex;
+                        width: 100%;
+                        justify-content: right;
+                        padding: 1em;
+                        gap: 16px;
+                    }
+                }
+            }
+        }
+    }
+
+    @media (min-width: breakpoint.$breakpoint-lg) {
+        .introduction {
+            margin: 5em 0;
+
+            .care-introduction {
+                .pillars {
+                    margin: 4em 0;
+                }
+            }
+        }
+
+        .services {
+            .service {
+                max-width: variables.$main-column-max-width-md;
+            }
+        }
+    }
+}
+
+.expand-icon {
+    cursor: pointer;
+    height: 40px;
+    transform-origin: center;
+    transition: transform 0.3s ease;
+}

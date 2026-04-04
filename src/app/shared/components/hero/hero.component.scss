@@ -36,22 +36,28 @@
 
     h1,
     h2 {
-      -webkit-user-select: none; /* Safari */
-      -moz-user-select: none; /* Firefox */
-      -ms-user-select: none; /* IE10+/Edge */
-      user-select: none; /* Standard */
+      -webkit-user-select: none;
+      /* Safari */
+      -moz-user-select: none;
+      /* Firefox */
+      -ms-user-select: none;
+      /* IE10+/Edge */
+      user-select: none;
+      /* Standard */
     }
   }
 
   picture {
-    width: 100%; /* Set the desired container width */
-    overflow: hidden; /* Ensures content doesn't overflow */
+    width: 100%;
+    /* Set the desired container width */
+    overflow: hidden;
+    /* Ensures content doesn't overflow */
     position: relative;
     // -webkit-mask-image: linear-gradient(to right, rgba(0, 0, 0, 0) 20%, rgba(0, 0, 0, 0.9) 100%);
     // mask-image: linear-gradient(to right, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, 0.8) 60%);
     // -webkit-mask-repeat: no-repeat;
     mask-repeat: no-repeat;
-    background-image: url(/assets/images/hero-placeholder.jpg);
+    // background-image: url(/assets/images/hero-placeholder.jpg);
     background-size: cover;
     background-position: 50% 30%;
 
@@ -125,7 +131,8 @@
   flex-direction: column;
   align-items: center;
   min-height: 1.2em; // Prevents layout shift
-  margin-left: 20px;
+  margin-left: 24px;
+  align-items: baseline;
 
   .wrapper {
     display: flex;
@@ -158,18 +165,20 @@
     animation: blink 0.7s infinite;
   }
 
-  @media (min-width: breakpoint.$breakpoint-md) {
+  @media (min-width: breakpoint.$breakpoint-sm) {
     margin-left: 100px;
-    align-items: baseline;
+
   }
 }
 
 /* ✨ Blink animation */
 @keyframes blink {
+
   0%,
   100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0;
   }

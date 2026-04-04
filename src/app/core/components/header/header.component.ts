@@ -6,17 +6,17 @@ import {
   Renderer2,
   ViewChild,
 } from '@angular/core';
-import { NavigationBarService } from '../../services/navigation-bar.service';
-import { ScreenSizeService } from '../../services/screen-size.service';
-import { FullscreenMenuComponent } from '../fullscreen-menu/fullscreen-menu.component';
-import { NavigationService } from '../../services/navigation.service';
-import { Pages } from '../../enums/pages.enum';
+import { NavigationBarService } from '../../../shared/services/navigation-bar.service';
+import { ScreenSizeService } from '../../../shared/services/screen-size.service';
+import { FullscreenMenuComponent } from '../../../shared/components/fullscreen-menu/fullscreen-menu.component';
+import { NavigationService } from '../../../shared/services/navigation.service';
+import { Pages } from '../../../shared/enums/pages.enum';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../auth/auth.service';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
-import { LogoHorizontalComponent } from "../logo-horizontal/logo-horizontal.component";
+import { LogoHorizontalComponent } from "../../../shared/components/logo-horizontal/logo-horizontal.component";
 
 @Component({
   selector: 'app-header',

@@ -5,6 +5,7 @@
 :host {
   display: flex;
   width: 100%;
+  background-color: red;
 
   header {
     display: flex;
@@ -35,7 +36,6 @@
     ul {
       display: flex;
       gap: 1.5em;
-      // height: fit-content;
       height: 100%;
       display: flex;
       align-items: center;
@@ -47,21 +47,29 @@
         cursor: pointer;
 
         a {
-          // color: white;
-          font-family: typography.$inter;
-          font-size: 18px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+
+          font-family: typography.$sourceSans;
+          font-size: 20px;
           font-weight: 600;
           font-style: normal;
+
+          transition: transform 0.2s ease, opacity 0.2s ease;
+          transform-origin: center;
+
+          will-change: transform;
 
           user-select: none;
           -webkit-user-select: none;
           -moz-user-select: none;
           -ms-user-select: none;
 
-          transition: all 0.3s ease;
 
           &:hover {
-            transform: scale(1.15);
+            transform: scale(1.1);
+            color: palette.$primaryColorPurple;
           }
         }
       }

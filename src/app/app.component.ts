@@ -1,5 +1,4 @@
 import { Component, inject } from '@angular/core';
-import { FooterComponent } from './shared/components/footer/footer.component';
 import {
   NavigationCancel,
   NavigationEnd,
@@ -9,9 +8,10 @@ import {
   RouterOutlet,
 } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { HeaderComponent } from './shared/components/header/header.component';
+import { HeaderComponent } from './core/components/header/header.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { LoadingService } from './core/services/loading.service';
+import { FooterComponent } from './core/components/footer/footer.component';
 
 @Component({
   selector: 'app-root',
