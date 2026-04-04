@@ -1,0 +1,58 @@
+:host {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto 3em auto;
+    overflow: hidden; // ← esconde o overflow da track
+}
+
+.marquee-track {
+    display: flex;
+    width: max-content;
+    gap: 20px;
+    animation: marquee 20s linear infinite;
+    user-select: none; // ← impede seleção de texto/elementos
+}
+
+@keyframes marquee {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
+
+    // -50% porque duplicamos os itens
+}
+
+.slide {
+    flex-shrink: 0; // ← importante: impede que os slides encolham
+    width: 300px; // ← defina a largura fixa que quiser
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.slide img {
+    width: 50%;
+    object-fit: cover;
+    transition: all 0.3s ease;
+
+    &:hover {
+        transform: scale(1.15);
+    }
+}
+
+.carousel-content {
+    color: white;
+    padding: 12px 16px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+
+    &:hover {
+        transform: scale(1.15);
+    }
+}

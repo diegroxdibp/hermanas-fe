@@ -1,3 +1,28 @@
 .social-login-logo {
   height: 28px;
 }
+
+::ng-deep .owl-nav {
+  position: absolute;
+  top: 50%;
+  width: 100%;
+}
+
+::ng-deep .owl-prev,
+::ng-deep .owl-next {
+  position: absolute;
+  transform: translateY(-50%);
+  font-size: 32px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+}
+
+::ng-deep .owl-prev {
+  left: 10px;
+}
+::ng-deep .owl-next {
+  right: 10px;
+}

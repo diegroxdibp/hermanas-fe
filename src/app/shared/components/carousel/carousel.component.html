@@ -1,0 +1,14 @@
+<div class="carousel-wrapper">
+    <owl-carousel-o [options]="carouselOptions">
+        @for (slide of slidesStore(); track slide.id) {
+        <ng-template carouselSlide [id]="slide.id">
+            <div class="slide">
+                <img [src]="'assets/images/' + slide.image" alt="slide" />
+                <div class="carousel-content">
+                    <h2>{{ slide.id }}</h2>
+                </div>
+            </div>
+        </ng-template>
+        }
+    </owl-carousel-o>
+</div>

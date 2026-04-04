@@ -43,7 +43,7 @@ export class HeroComponent {
 
   phrases = [
     'Ressignificação',
-    'Saúde',
+    'Saúde Relacional',
     'Cuidado',
     'Transformação',
   ];

@@ -1,0 +1,19 @@
+<div class="marquee-track">
+    @for (slide of slidesStore(); track slide.id) {
+    <div class="slide">
+        <img [src]="'assets/images/' + slide.image" alt="slide" />
+        <div class="carousel-content">
+            <h2>{{ slide.id }}</h2>
+        </div>
+    </div>
+    }
+    <!-- Duplicata for seamless loop -->
+    @for (slide of slidesStore(); track 'dup-' + slide.id) {
+    <div class="slide" aria-hidden="true">
+        <img [src]="'assets/images/' + slide.image" alt="" />
+        <div class="carousel-content">
+            <h2>{{ slide.id }}</h2>
+        </div>
+    </div>
+    }
+</div>

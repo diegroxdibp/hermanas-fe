@@ -37,7 +37,7 @@ export const routes: Routes = [
     path: 'onboarding',
     canMatch: [AuthOnlyGuard],
     loadComponent: () =>
-      import('./shared/components//onboarding/onboarding.component').then(
+      import('./shared/components/onboarding/onboarding.component').then(
         (m) => m.OnboardingComponent,
       ),
   },
