@@ -1,0 +1,120 @@
+@use "../../../../assets/styles/breakpoints.scss" as breakpoint;
+@use "../../../../assets/styles/palette.scss" as palette;
+@use "../src/assets/styles/variables.scss" as variables;
+
+:host {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    width: 100%;
+    gap: 2em;
+    overflow-x: hidden; // ← fixes horizontal scroll
+
+    @media (min-width: breakpoint.$breakpoint-sm) {
+        flex-direction: row;
+    }
+
+    .topics {
+        flex: 1 1 100%;
+        flex-direction: column;
+        min-width: 0;
+        transition: flex-basis 400ms ease, flex-grow 400ms ease;
+
+        &.has-selection {
+            flex: 0 0 50%;
+        }
+    }
+
+    .topic-items {
+        flex: 0 0 0%;
+        overflow: hidden;
+        flex-direction: column;
+        transition: flex-basis 400ms ease;
+        background-color: coral; // ← move it here
+
+        &.visible {
+            flex: 0 0 50%;
+        }
+    }
+
+    .service {
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+        max-width: variables.$main-column-max-width-md;
+        padding: 0 variables.$mobile-lateral-padding;
+        gap: 1em;
+
+        ul {
+            flex-direction: column;
+
+            .service-type {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin-bottom: 8px;
+
+                .service-name {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    width: 100%;
+                    align-items: center;
+                    cursor: pointer;
+                    padding-left: 8px;
+                    border-radius: 10px;
+                    transition: outline 0.11s;
+
+                    &:hover {
+                        outline: 2px solid palette.$primaryColorPurple;
+                    }
+                }
+
+                .service-content {
+                    display: flex;
+                    flex-direction: column;
+                    width: 100%;
+                    padding: 0 8px;
+                    overflow: hidden;
+
+                    .service-description {
+                        font-size: 16px;
+                        line-height: 30px;
+                        letter-spacing: normal;
+                    }
+
+                    .service-actions {
+                        display: flex;
+                        width: 100%;
+                        justify-content: right;
+                        padding: 8px 0;
+                        gap: 16px;
+                    }
+                }
+            }
+        }
+
+        h2,
+        h3,
+        p,
+        svg {
+            color: palette.$supportingColorWhite;
+            fill: palette.$supportingColorWhite;
+        }
+    }
+
+    @media (min-width: breakpoint.$breakpoint-lg) {
+        .services {
+            .service {
+                max-width: variables.$main-column-max-width-md;
+            }
+        }
+    }
+}
+
+.expand-icon {
+    cursor: pointer;
+    height: 40px;
+    transform-origin: center;
+    transition: transform 0.3s ease;
+}

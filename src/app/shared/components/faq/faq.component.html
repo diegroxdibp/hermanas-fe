@@ -1,0 +1,32 @@
+<mat-selection-list #topics class="topics" [multiple]="false" hideSingleSelectionIndicator="true"
+    [class.has-selection]="selectedTopic()">
+    @for (topic of AppConstants.faq; track topic.topicName) {
+    <mat-list-option [value]="topic.topicName" (click)="selectTopicWithHeight(topic.topicName)">
+        {{ topic.topicName }}
+    </mat-list-option>
+    }
+</mat-selection-list>
+
+<div class="topic-items" #topicItemsRef [class.visible]="selectedTopic()"
+    [@heightChange]="{ value: selectedTopic()?.topicName, params: { startHeight: topicItemsHeight } }">
+    @if (selectedTopic()) {
+    <content class="service" [@topicSwap]="selectedTopic()?.topicName">
+        <h2>Perguntas</h2>
+        <ul>
+            @for (item of selectedTopic()!.items; track item.question; let i = $index) {
+            <li class="service-type">
+                <div class="service-name" (click)="toggleItem(item.question + '-' + i)">
+                    <h3>{{ item.question }}</h3>
+                    <svg [class.invert]="expandedItems[item.question + '-' + i]" class="expand-icon"></svg>
+                </div>
+                <div class="service-content" [style.height]="expandedItems[item.question + '-' + i] ? null : '0px'"
+                    [style.overflow]="'hidden'"
+                    [@expandCollapse]="expandedItems[item.question + '-' + i] ? 'expanded' : 'collapsed'">
+                    <p class="service-description">{{ item.answer }}</p>
+                </div>
+            </li>
+            }
+        </ul>
+    </content>
+    }
+</div>
