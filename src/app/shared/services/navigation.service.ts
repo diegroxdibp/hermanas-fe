@@ -10,6 +10,8 @@ import { SnackbarService } from './snackbar.service';
   providedIn: 'root',
 })
 export class NavigationService {
+  router = inject(Router);
+  viewportScroller = inject(ViewportScroller);
   snackbarService = inject(SnackbarService);
   Pages = Pages;
   navigationItems: NavigationItem[] = [
@@ -21,10 +23,7 @@ export class NavigationService {
   private routesWithAnchor = [`/${Pages.ATENDIMENTO}`, '/', '/contact'];
   readonly currentUrl: BehaviorSubject<string> = new BehaviorSubject('/');
 
-  constructor(
-    private router: Router,
-    private viewportScroller: ViewportScroller
-  ) {
+  constructor() {
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {

@@ -21,9 +21,12 @@ import { ScrollAnimateDirective } from '../../../shared/directives/scroll-animat
   styleUrl: './contact.component.scss',
 })
 export class ContactComponent {
-  @ViewChild('body') body: ElementRef | undefined;
+  @ViewChild('name') name: ElementRef | undefined;
+  @ViewChild('phone') phone: ElementRef | undefined;
   @ViewChild('subject') subject: ElementRef | undefined;
-  constructor(public apiService: ApiService) {}
+  @ViewChild('body') body: ElementRef | undefined;
+
+  constructor(public apiService: ApiService) { }
 
   handleScheduleButton() {
     this.apiService.sendEmail(
@@ -40,7 +43,9 @@ export class ContactComponent {
 
   handleEmailButton() {
     const subjectText = this.subject?.nativeElement.value;
-    const bodyText = this.body?.nativeElement.value;
+    const bodyText = `${this.body?.nativeElement.value}
+    Nome: ${this.name?.nativeElement.value}
+    Telefone: ${this.phone?.nativeElement.value}`;
 
     const mailtoLink = `mailto:luanebastos88@gmail.com?subject=${encodeURIComponent(subjectText)}&body=${encodeURIComponent(bodyText)}`;
 

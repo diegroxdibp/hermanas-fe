@@ -1,37 +1,41 @@
-<mat-card class="therapist-card" appearance="outlined" appScrollAnimate="fade-in-up">
-  <mat-card-header class="therapist-card--header">
+<mat-card class="contact-card" appearance="outlined" appScrollAnimate="fade-in-up">
+  <mat-card-header class="card-header">
     <mat-card-title-group class="title-group">
       <mat-card-title class="title">Contato</mat-card-title>
-      <mat-card-subtitle class="subtitle"
-        >Tire suas dúvidas, envie-nos uma mensagem:</mat-card-subtitle
-      >
+      <mat-card-subtitle class="subtitle">Tire suas dúvidas, envie-nos uma mensagem:</mat-card-subtitle>
     </mat-card-title-group>
   </mat-card-header>
   <mat-divider></mat-divider>
-  <mat-card-content>
-    <div class="text">
-      <form class="text-area">
-        <mat-form-field class="example-full-width">
-          <mat-label>Assunto:</mat-label>
-          <input #subject matInput placeholder="Análise Corporal Reichiana" />
-        </mat-form-field>
+  <mat-card-content class="card-content">
+    <form class="text-area">
+      <mat-form-field>
+        <mat-label>Nome:</mat-label>
+        <input #name matInput />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Telefone:</mat-label>
+        <input #phone matInput placeholder="351 910 277 826" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Assunto:</mat-label>
+        <input #subject matInput placeholder="Análise Corporal Reichiana" />
+      </mat-form-field>
 
-        <mat-form-field class="example-full-width">
-          <mat-label>Mensagem:</mat-label>
-          <textarea
-            #body
-            matInput
-            placeholder="Ex. Gostaria de marcar um agendamento para segunda-feira as 18 horas..."
-          ></textarea>
-        </mat-form-field>
-      </form>
-    </div>
-    <button
-      mat-raised-button
-      class="submit--button"
-      (click)="handleEmailButton()"
-    >
+      <mat-form-field>
+        <mat-label>Mensagem:</mat-label>
+        <textarea #body matInput
+          placeholder="Ex. Gostaria de marcar um agendamento para segunda-feira as 18 horas..."></textarea>
+      </mat-form-field>
+    </form>
+    <button mat-raised-button class="submit--button" (click)="handleEmailButton()">
       <a>ENVIAR</a>
     </button>
+    <div class="disclaimers">
+      <span>Ao enviar o email, aceito os termos de uso e política de privacidade.</span>
+
+      <span>Se quer agendar algum serviço, clique <a href="">aqui</a>.</span>
+    </div>
+    <!--  <h2>Obrigado!</h2>
+    <p>Em breve nossa equipe entrará em contato.</p> -->
   </mat-card-content>
 </mat-card>

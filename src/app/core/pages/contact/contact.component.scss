@@ -4,19 +4,24 @@
 
 :host {
   display: flex;
+  flex: 1;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
   height: 100%;
   width: 100%;
-  max-width: variables.$main-column-max-width;
-  margin: 0 auto;
   padding: 24px;
+  background-color: palette.$secondaryColorGreen;
+
 }
 
-.therapist-card {
+.contact-card {
   display: flex;
   flex-direction: column;
+  width: 100%;
+  max-width: variables.$main-column-max-width;
 
-  .therapist-card--header {
+  .card-header {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -26,20 +31,37 @@
       .title {
         color: palette.$primaryColorBlue;
       }
+
       .subtitle {
         font-weight: 400;
         color: palette.$primaryColorBlue;
       }
     }
   }
+
+  .card-content {
+
+    .text-area {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+
+    .submit--button {
+      width: 100%;
+    }
+
+    .disclaimers {
+      display: flex;
+      flex-direction: column;
+      color: palette.$primaryColorBlue;
+      font-style: italic;
+      margin-top: 16px;
+    }
+  }
 }
 
-.text-area {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-.submit--button {
-  width: 100%;
+textarea {
+  field-sizing: content;
 }

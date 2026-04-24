@@ -1,8 +1,7 @@
 :host {
     width: 100%;
-    max-width: 1200px;
     margin: 0 auto 3em auto;
-    overflow: hidden; // ← esconde o overflow da track
+    overflow: hidden;
 }
 
 .marquee-track {

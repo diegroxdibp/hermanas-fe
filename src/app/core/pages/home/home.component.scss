@@ -55,11 +55,6 @@
         gap: 3em;
         background: palette.$secondaryColorPurple;
 
-        ul {
-            width: 100%;
-            flex-direction: column;
-        }
-
         .service {
             display: flex;
             flex-direction: column;
@@ -68,48 +63,61 @@
             padding: 0 variables.$mobile-lateral-padding;
             gap: 1em;
 
+            ul {
+                width: 100%;
+                flex-direction: column;
+
+                .service-type {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    margin-bottom: 8px;
+
+                    .service-name {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        width: 100%;
+                        align-items: center;
+                        cursor: pointer;
+                        padding-left: 8px;
+                        border-radius: 10px;
+                        transition: outline 0.11s;
+
+                        &:hover {
+                            outline: 2px solid palette.$primaryColorPurple;
+                        }
+                    }
+
+                    .service-content {
+                        display: flex;
+                        flex-direction: column;
+                        width: 100%;
+                        padding: 0 8px;
+
+                        .service-description {
+                            font-size: 16px;
+                            line-height: 30px;
+                            letter-spacing: normal;
+                        }
+
+                        .service-actions {
+                            display: flex;
+                            width: 100%;
+                            justify-content: right;
+                            padding: 8px 0;
+                            gap: 16px;
+                        }
+                    }
+                }
+            }
+
             h2,
             h3,
             p,
             svg {
                 color: palette.$supportingColorWhite;
                 fill: palette.$supportingColorWhite;
-            }
-
-            .service-type {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                margin-bottom: 8px;
-
-                .service-name {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    width: 100%;
-                    align-items: center;
-                    cursor: pointer;
-                }
-
-                .service-box {
-                    display: flex;
-                    flex-direction: column;
-                    width: 100%;
-
-                    .service-description {
-                        font-size: 16px;
-                        line-height: 30px;
-                        letter-spacing: normal;
-                    }
-
-                    .service-actions {
-                        display: flex;
-                        width: 100%;
-                        justify-content: right;
-                        padding: 1em;
-                        gap: 16px;
-                    }
-                }
             }
         }
     }
@@ -133,9 +141,3 @@
     }
 }
 
-.expand-icon {
-    cursor: pointer;
-    height: 40px;
-    transform-origin: center;
-    transition: transform 0.3s ease;
-}

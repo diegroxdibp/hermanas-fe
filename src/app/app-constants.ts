@@ -1,6 +1,7 @@
 import { environment } from './../environments/environment';
 import { NavbarBackground } from './shared/enums/navbar-background.enum';
 import { Pages } from './shared/enums/pages.enum';
+import { FaqTopic, FaqTopicItem } from './shared/models/faq.model';
 import { Service } from './shared/models/service.model';
 
 export const AppConstants = {
@@ -100,4 +101,25 @@ export const AppConstants = {
       ],
     } as Service,
   ],
+
+  faq: [
+    {
+      topicName: 'Consulta',
+      items: [{ question: 'Qual a duração de uma consulta? ', answer: 'A duração é estipulada por casa pessoa profissional, contudo, no geral, varia entre 30 minutos até 2 horas. ' } as FaqTopicItem,
+      { question: 'Há consulta no formato online?', answer: 'Sim, a plataforma utilizada é de escolha de cada pessoa profissional. Ademais, em alguns serviços há o formato presencial. As opção estão visíveis no momento do agendamento.' } as FaqTopicItem,
+      { question: 'Como faço o cancelamento de uma consulta?', answer: 'Chama a puliça.' } as FaqTopicItem
+      ]
+    } as FaqTopic,
+    {
+      topicName: 'Agendamento',
+      items: [{ question: 'Como faço um (ou o?)agendamento?', answer: 'Para o agendamento é necessário primeiramente fazer Log in (terá link?). Depois poderá clicar  no botão de Agendamento (terá link?) e prosseguirá para a escolha do serviço e em seguida da pessoa profissional e assim, ter acesso a agenda com horários disponíveis.' } as FaqTopicItem]
+    } as FaqTopic,
+    {
+      topicName: 'T3',
+      items: [
+        { question: 'Q1', answer: 'A1' } as FaqTopicItem,
+        { question: 'Q2', answer: 'A2' } as FaqTopicItem,
+        { question: 'Q3', answer: 'A3' } as FaqTopicItem]
+    } as FaqTopic,
+  ]
 };

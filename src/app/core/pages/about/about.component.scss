@@ -9,61 +9,170 @@
   align-items: center;
   gap: 2em;
 
-  section {
+  .first {
+    padding: 0 !important;
+    max-width: none;
+
+    .about-intro {
+      max-width: variables.$main-column-max-width-md;
+    }
+  }
+
+  .motif {
+    height: 200px;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    mask-repeat: no-repeat;
+    background-image: url(/assets/images/gradient.png);
+    background-size: cover;
+    background-position: 50% 30%;
+
+    .custom-shape-divider-bottom-1775951696 {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      overflow: hidden;
+      line-height: 0;
+      transform: rotate(180deg);
+    }
+
+    .custom-shape-divider-bottom-1775951696 svg {
+      position: relative;
+      display: block;
+      width: calc(185% + 1.3px);
+      height: 84px;
+    }
+
+    .custom-shape-divider-bottom-1775951696 .shape-fill {
+      fill: #FFFFFF;
+    }
+  }
+
+
+
+  section,
+  .wrapper {
     display: flex;
+    flex-direction: column;
     justify-content: center;
+    align-items: center;
+
     width: 100%;
     gap: 1.5em;
 
     content {
       gap: 1.5em;
+    }
+  }
 
-      picture {
-        margin: auto;
+  .wrapper {
+    padding: 40px 0;
+    background-color: palette.$secondaryColorPink;
+    border-radius: 50px 50px 0 0;
+  }
+
+  .about-intro {
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5em;
+
+
+
+    picture {
+      max-width: 300px;
+      max-height: 500px;
+      margin: 0;
+
+      img {
+        width: 80%;
       }
     }
+  }
 
-    .lists {
+  .bio {
+    h1 {
+      text-align: center;
+    }
+  }
+
+  .curriculum {
+    display: flex;
+    flex-direction: column;
+    gap: 3em;
+    padding: 0 1.5em;
+
+    .academic {
       display: flex;
       flex-direction: column;
-      max-width: variables.$main-column-max-width;
-      gap: 3em;
-      h2 {
-        margin-bottom: 1em;
-      }
+      align-items: start;
+      max-width: variables.$main-column-max-width-md;
+      gap: 1em;
+
       ul {
-        display: flex;
+        width: 100%;
         flex-direction: column;
-        margin: 0 !important;
-        gap: 1em;
+        gap: 16px;
+
+        li {
+          justify-content: flex-start;
+          font-weight: 600;
+        }
       }
-    }
-    @media (min-width: breakpoint.$breakpoint-md) {
+
+      h1,
+      h2,
+      h3,
+      p,
+      li,
+      svg {
+        color: palette.$secondaryColorPurple;
+        fill: palette.$supportingColorWhite;
+      }
     }
   }
 
   @media (min-width: breakpoint.$breakpoint-sm) {
     max-width: unset;
-    padding: 2em 3em;
+    gap: 3em;
 
-    section {
-      // max-width: variables.$main-column-max-width;
+    .first {
+      padding: 0px;
+    }
+
+
+    .about-intro {
+      flex-direction: row;
+
+      p {
+        width: 50%;
+      }
+
+      picture {
+        image {
+          margin: 0 0 0 auto;
+
+        }
+      }
+    }
+
+    .wrapper {
+      padding: 80px 0;
+      // border-radius: 140px 140px 0 0;
     }
 
     .bio {
       gap: 64px;
+
+      h1 {
+        text-align: left;
+      }
     }
   }
 
-  @media (min-width: breakpoint.$breakpoint-sm) {
-    gap: 3em;
-  }
-
   @media (min-width: breakpoint.$breakpoint-md) {
-    padding: 3em;
-    gap: 5em;
-    padding: 1em 0;
-
     .bio {
       flex-direction: row;
       align-items: start;
@@ -72,7 +181,6 @@
       picture {
         display: flex;
         flex-direction: column;
-        // width: 50%;
       }
 
       picture {
@@ -82,6 +190,22 @@
   }
 
   @media (min-width: breakpoint.$breakpoint-lg) {
+    gap: 5em;
+
+    .first {
+      .about-intro {
+        width: 100%;
+        max-width: variables.$main-column-max-width-lg;
+      }
+    }
+
+    .curriculum {
+      .academic {
+        width: 100%;
+        max-width: variables.$main-column-max-width-lg;
+      }
+    }
+
     .bio {
       max-width: variables.$main-column-max-width-lg !important;
       gap: 64px;
@@ -89,36 +213,13 @@
   }
 }
 
-.separator {
-  display: block;
-  width: 100%; /* Full width of the container */
-  height: 1px; /* Consistent thickness */
-  margin: 2em 0; /* Ensure no default margin is added */
-  @media (min-width: breakpoint.$breakpoint-sm) {
-    margin: 1em 0;
-  }
-}
-
-.separator.vertical {
-  width: 1px;
-  height: 70%; /* Take up full height of the parent */
-  transform-origin: center;
-  margin: 4em;
-}
 
 .reversed {
   flex-direction: column-reverse;
 }
 
-.books {
-  max-height: 250px !important;
 
-  @media (min-width: breakpoint.$breakpoint-sm) {
-    max-width: 100% !important;
-  }
-
-  @media (min-width: breakpoint.$breakpoint-md) {
-    max-height: 500px !important;
-    max-width: 400px !important;
-  }
+.bio-pic {
+  max-width: 400px;
+  max-height: 500px;
 }

@@ -115,7 +115,6 @@ a:visited,
 a:link {
   color: palette.$primaryColorBlue;
   font-family: typography.$sourceSans;
-  font-size: 12px;
   font-weight: 700;
   line-height: 1.2;
   cursor: pointer;
@@ -134,6 +133,7 @@ section {
   align-items: center;
   padding: 0 variables.$mobile-lateral-padding;
 
+
   @media (min-width: breakpoint.$breakpoint-lg) {
     width: 100%;
     max-width: variables.$main-column-max-width-lg;
@@ -142,27 +142,8 @@ section {
   content {
     display: flex;
     flex-direction: column;
-    // align-items: center;
     width: 100%;
     gap: 1.5em;
-
-    .quotation {
-      text-align: center;
-      font-weight: 500;
-      font-style: italic;
-      margin: 1.5em;
-
-      @media (min-width: breakpoint.$breakpoint-md) {
-        line-height: 1.2;
-        font-size: 24px;
-        word-spacing: 1.2px;
-        margin: 3em;
-      }
-    }
-
-    .quotation+.quotation {
-      margin-top: 0;
-    }
   }
 }
 
@@ -170,21 +151,44 @@ section {
   width: 100%;
   overflow: hidden;
   position: relative;
+  justify-content: center;
   margin: 0;
   height: auto;
   border-radius: 10px;
+
 
   img {
     width: 100%;
     height: auto;
     object-fit: cover;
     object-position: 50% 20%;
+    border-radius: 10px;
   }
 }
 
-.bio-pic {
-  max-width: 400px;
-  max-height: 500px;
+.quotation {
+  font-size: 20px;
+  text-align: center;
+  font-weight: 500;
+  font-style: italic;
+
+  @media (min-width: breakpoint.$breakpoint-md) {
+    line-height: 1.2;
+    font-size: 24px;
+    word-spacing: 1.2px;
+  }
+}
+
+.quotation-margins {
+  margin: 1.5em;
+
+  @media (min-width: breakpoint.$breakpoint-md) {
+    margin: 3em;
+  }
+}
+
+.quotation+.quotation {
+  margin-top: 0;
 }
 
 .invert {
@@ -388,4 +392,12 @@ mat-progress-bar {
       padding: 0 !important;
     }
   }
+}
+
+.stretch {
+  align-self: stretch;
+}
+
+.center-vertically {
+  margin: auto 0;
 }
