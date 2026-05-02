@@ -62,6 +62,12 @@ export class FaqComponent {
         this.topicItemsHeight = this.topicItemsRef.nativeElement.offsetHeight;
       }
       this.selectedTopicName.set(topicName);
+      const elementTop = this.topicItemsRef.nativeElement.getBoundingClientRect().top + window.scrollY;
+      const offsetPosition = elementTop - AppConstants.navigation.height;
+
+      setTimeout(()=>{
+        window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+      },0)
     }, 0);
   }
 

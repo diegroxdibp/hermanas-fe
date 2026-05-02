@@ -401,3 +401,25 @@ mat-progress-bar {
 .center-vertically {
   margin: auto 0;
 }
+
+.topics .option .mdc-list-item__primary-text {
+  h2{
+    color: white !important;
+    font-size: 24px;
+    text-wrap: auto;
+  }
+}
+
+.mdc-list-item {
+  height: auto !important;
+  min-height: 56px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  align-items: center;
+}
+
+.mdc-list-item__primary-text {
+  white-space: normal !important;
+  overflow-wrap: anywhere;
+  line-height: 1.3;
+}

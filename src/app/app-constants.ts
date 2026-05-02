@@ -30,7 +30,7 @@ export const AppConstants = {
 
   navigation: {
     background: NavbarBackground.White,
-    height: 80,
+    height: 70,
   },
 
   scheduling: {
@@ -112,12 +112,24 @@ export const AppConstants = {
     } as FaqTopic,
     {
       topicName: 'Agendamento',
-      items: [{ question: 'Como faço um (ou o?)agendamento?', answer: 'Para o agendamento é necessário primeiramente fazer Log in (terá link?). Depois poderá clicar  no botão de Agendamento (terá link?) e prosseguirá para a escolha do serviço e em seguida da pessoa profissional e assim, ter acesso a agenda com horários disponíveis.' } as FaqTopicItem]
+      items: [{ question: 'Como faço um (ou o?)agendamento?', answer: 'Para o agendamento é necessário primeiramente fazer Log in (terá link?). Depois poderá clicar  no botão de Agendamento (terá link?) e prosseguirá para a escolha do serviço e em seguida da pessoa profissional e assim, ter acesso a agenda com horários disponíveis.' } as FaqTopicItem,
+        { question: 'É obrigatório fazer Log in para iniciar o agendamento?', answer: 'Sim, é obrigatório e sem custos.' } as FaqTopicItem,
+        { question: 'Como tenho acesso a agenda da pessoa profissional?', answer: 'Ao fazer o Log in e escolher o serviço e o profissional, terá acesso a agenda com datas e horários disponíveis.' } as FaqTopicItem,
+        { question: 'Como cancelo um agendamento?', answer: 'Com magia negra.' } as FaqTopicItem,
+        { question: 'Depois do primeiro agendamento e pactuação de continuidade com a pessoa profissional, terei que agendar as seguintes consultas através da CARE?', answer: 'O meio de agendamento poderá ser negociado diretamente com a pessoa profissional. ' } as FaqTopicItem,
+      ]
     } as FaqTopic,
     {
-      topicName: 'T3',
+      topicName: 'Clínica',
       items: [
-        { question: 'Q1', answer: 'A1' } as FaqTopicItem,
+        { question: 'O que é a CARE?', answer: 'Sei lá.' } as FaqTopicItem,
+        { question: 'Q2', answer: 'A2' } as FaqTopicItem,
+        { question: 'Q3', answer: 'A3' } as FaqTopicItem]
+    } as FaqTopic,
+    {
+      topicName: 'Política de privacidade e Termo de uso',
+      items: [
+        { question: 'O que é ..?', answer: 'Sei lá.' } as FaqTopicItem,
         { question: 'Q2', answer: 'A2' } as FaqTopicItem,
         { question: 'Q3', answer: 'A3' } as FaqTopicItem]
     } as FaqTopic,

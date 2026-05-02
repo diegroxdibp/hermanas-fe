@@ -8,58 +8,63 @@
     flex-direction: column;
     width: 100%;
     gap: 2em;
-    overflow-x: hidden; // ← fixes horizontal scroll
+    overflow-x: hidden;
+    justify-content: space-between;
 
     @media (min-width: breakpoint.$breakpoint-sm) {
         flex-direction: row;
     }
 
     .topics {
-        flex: 1 1 100%;
+        flex: 1 ;
         flex-direction: column;
         min-width: 0;
+        max-width: 400px;
         transition: flex-basis 400ms ease, flex-grow 400ms ease;
+        border-radius: 15px;
+        color: white;
+        background: palette.$secondaryColorPurple;
 
-        &.has-selection {
-            flex: 0 0 50%;
-        }
+      .option {
+        height: auto !important;
+      }
     }
 
     .topic-items {
-        flex: 0 0 0%;
+        flex: 1;
+        width: 100%;
         overflow: hidden;
         flex-direction: column;
         transition: flex-basis 400ms ease;
-        background-color: coral; // ← move it here
-
-        &.visible {
-            flex: 0 0 50%;
-        }
+        background: palette.$secondaryColorPurple;
+        border-radius: 15px;
     }
 
     .service {
         display: flex;
+        width: 100%;
         flex-direction: column;
         align-items: start;
         max-width: variables.$main-column-max-width-md;
-        padding: 0 variables.$mobile-lateral-padding;
+        padding: 1em variables.$mobile-lateral-padding;
         gap: 1em;
 
         ul {
+            width: 100%;
             flex-direction: column;
+            gap: 8px;
 
             .service-type {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                margin-bottom: 8px;
+                gap: 4px;
 
                 .service-name {
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
                     width: 100%;
-                    align-items: center;
                     cursor: pointer;
                     padding-left: 8px;
                     border-radius: 10px;
@@ -104,6 +109,10 @@
     }
 
     @media (min-width: breakpoint.$breakpoint-lg) {
+        .topics{
+          max-width: 400px;
+        }
+
         .services {
             .service {
                 max-width: variables.$main-column-max-width-md;

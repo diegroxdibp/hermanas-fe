@@ -1,16 +1,11 @@
 <button class="menu-button" (click)="toggleMenu()">
-  <!-- <span [class.open]="isMenuOpen">☰</span> -->
   <svg
     [class.fullscreenMenuOpen]="isMenuOpen"
     xmlns="http://www.w3.org/2000/svg"
-    xmlns:xlink="http://www.w3.org/1999/xlink"
     width="40px"
     height="40px"
     viewBox="0 0 32 32"
-    enable-background="new 0 0 32 32"
     id="Editable-line"
-    version="1.1"
-    xml:space="preserve"
   >
     <line
       class="line line-middle"
@@ -50,44 +45,46 @@
   </svg>
 </button>
 
-<div
-  class="fullscreen-menu"
-  [@menuAnimation]="isMenuOpen ? 'open' : 'closed'"
-  [class.open]="isMenuOpen"
->
-  <nav>
-    <ul>
-      <li *ngFor="let navigationItem of navigationService.navigationItems">
-        <a (click)="navigateTo(navigationItem.destination)" class="menu-item">{{
-          navigationItem.name
-        }}</a>
-      </li>
-    </ul>
-
-    @if (navbarService.showAuthLinks()) {
-      <mat-divider></mat-divider>
-
-      <ul class="auth">
-        <li>
-          <a (click)="navigateTo(navigationService.Pages.SIGN_IN)">Sign In</a>
-        </li>
-      </ul>
-    }
-    @if (navbarService.showUserMenu()) {
-      <mat-divider></mat-divider>
-
+@if (isMenuOpen) {
+  <div class="fullscreen-menu open" [class.open]="isMenuVisible">
+    <nav>
       <ul>
-        <li>
-          <a
-            (click)="navigateTo(navigationService.Pages.DASHBOARD)"
-            class="menu-item"
-            >Conta</a
-          >
-        </li>
-        <li>
-          <a (click)="logOut()" class="menu-item">Terminar Sesssão</a>
-        </li>
+        @for(navigationItem of navigationService.navigationItems; track navigationItem.destination){
+          <li>
+            <a (click)="navigateTo(navigationItem.destination)" class="menu-item">
+              {{ navigationItem.name }}
+            </a>
+          </li>
+        }
       </ul>
-    }
-  </nav>
-</div>
+
+      @if (navbarService.showAuthLinks()) {
+        <mat-divider></mat-divider>
+
+        <ul class="auth">
+          <li>
+            <a (click)="navigateTo(navigationService.Pages.SIGN_IN)">Sign In</a>
+          </li>
+        </ul>
+      }
+
+      @if (navbarService.showUserMenu()) {
+        <mat-divider></mat-divider>
+
+        <ul>
+          <li>
+            <a (click)="navigateTo(navigationService.Pages.DASHBOARD)" class="menu-item">
+              Conta
+            </a>
+          </li>
+
+          <li>
+            <a (click)="logOut()" class="menu-item">
+              Terminar Sessão
+            </a>
+          </li>
+        </ul>
+      }
+    </nav>
+  </div>
+}
