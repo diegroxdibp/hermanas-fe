@@ -1,5 +1,4 @@
 @use "../../../../assets/styles/palette.scss" as palette;
-@use "../src/assets/styles/typography.scss" as typography;
 @use "../../../../assets/styles/breakpoints.scss" as breakpoint;
 
 footer {
@@ -62,13 +61,11 @@ footer {
         }
       }
 
-      // Focus (ESSENCIAL WCAG)
       &:focus-visible {
         outline: 2px solid white;
         outline-offset: 2px;
       }
 
-      // Active (click)
       &:active {
         transform: scale(0.95);
       }

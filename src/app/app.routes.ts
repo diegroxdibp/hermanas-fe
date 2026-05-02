@@ -1,38 +1,115 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { BiographyComponent } from './shared/components/biography/biography.component';
-import { AboutComponent } from './core/pages/about/about.component';
 import { Pages } from './shared/enums/pages.enum';
-import { MindfulnessComponent } from './shared/components/mindfulness/mindfulness.component';
-import { AnaliseCorporalReichanaComponent } from './shared/components/analise-corporal-reichana/analise-corporal-reichana.component';
 import { AccessGuard } from './auth/auth.guard';
 import { AuthOnlyGuard } from './auth/authOnly.guard';
-import { DashboardProfileComponent } from './shared/components/dashboard-profile/dashboard-profile.component';
-import { DashboardScheduleComponent } from './shared/components/dashboard-schedule/dashboard-schedule.component';
-import { DashboardNotificationsComponent } from './shared/components/dashboard-notifications/dashboard-notifications.component';
-import { SomaticExperienceComponent } from './shared/components/somatic-experience/somatic-experience.component';
-import { SupervisionComponent } from './shared/components/supervision/supervision.component';
-import { HomeComponent } from './core/pages/home/home.component';
-import { ContactComponent } from './core/pages/contact/contact.component';
 
 export const routes: Routes = [
-  { path: Pages.HOME, component: HomeComponent },
-  { path: Pages.ATENDIMENTO, component: HomeComponent },
-  { path: Pages.ATENDIMENTO_INDIVIDUAL, component: HomeComponent },
-  { path: Pages.ATENDIMENTO_GRUPO, component: HomeComponent },
-  { path: Pages.ANALISE_REICHANA, component: AnaliseCorporalReichanaComponent },
-  { path: Pages.MINDFULLNESS, component: MindfulnessComponent },
-  { path: Pages.SOMATIC_EXPERIENCE, component: SomaticExperienceComponent },
-  { path: Pages.SUPERVISION, component: SupervisionComponent },
-  { path: Pages.ABOUT, component: AboutComponent },
-  { path: Pages.CONTACT, component: ContactComponent },
+  // HOME continua eager
+  {
+    path: Pages.HOME,
+    loadComponent: () =>
+      import('./core/pages/home/home.component').then(
+        (m) => m.HomeComponent,
+      ),
+  },
 
-  { path: Pages.BIO, component: BiographyComponent },
-  { path: `${Pages.BIO}/:name`, component: BiographyComponent },
+  // páginas usando HomeComponent
+  {
+    path: Pages.ATENDIMENTO,
+    loadComponent: () =>
+      import('./core/pages/home/home.component').then(
+        (m) => m.HomeComponent,
+      ),
+  },
+  {
+    path: Pages.ATENDIMENTO_INDIVIDUAL,
+    loadComponent: () =>
+      import('./core/pages/home/home.component').then(
+        (m) => m.HomeComponent,
+      ),
+  },
+  {
+    path: Pages.ATENDIMENTO_GRUPO,
+    loadComponent: () =>
+      import('./core/pages/home/home.component').then(
+        (m) => m.HomeComponent,
+      ),
+  },
+
+  // páginas isoladas
+  {
+    path: Pages.ANALISE_REICHANA,
+    loadComponent: () =>
+      import(
+        './shared/components/analise-corporal-reichana/analise-corporal-reichana.component'
+        ).then((m) => m.AnaliseCorporalReichanaComponent),
+  },
+
+  {
+    path: Pages.MINDFULLNESS,
+    loadComponent: () =>
+      import('./shared/components/mindfulness/mindfulness.component').then(
+        (m) => m.MindfulnessComponent,
+      ),
+  },
+
+  {
+    path: Pages.SOMATIC_EXPERIENCE,
+    loadComponent: () =>
+      import(
+        './shared/components/somatic-experience/somatic-experience.component'
+        ).then((m) => m.SomaticExperienceComponent),
+  },
+
+  {
+    path: Pages.SUPERVISION,
+    loadComponent: () =>
+      import('./shared/components/supervision/supervision.component').then(
+        (m) => m.SupervisionComponent,
+      ),
+  },
+
+  {
+    path: Pages.ABOUT,
+    loadComponent: () =>
+      import('./core/pages/about/about.component').then(
+        (m) => m.AboutComponent,
+      ),
+  },
+
+  {
+    path: Pages.CONTACT,
+    loadComponent: () =>
+      import('./core/pages/contact/contact.component').then(
+        (m) => m.ContactComponent,
+      ),
+  },
+
+  {
+    path: Pages.BIO,
+    loadComponent: () =>
+      import('./shared/components/biography/biography.component').then(
+        (m) => m.BiographyComponent,
+      ),
+  },
+
+  {
+    path: `${Pages.BIO}/:name`,
+    loadComponent: () =>
+      import('./shared/components/biography/biography.component').then(
+        (m) => m.BiographyComponent,
+      ),
+  },
+
+  // auth
   {
     path: 'auth',
-    loadChildren: () => import('./auth/auth.module').then((m) => m.AuthModule),
+    loadChildren: () =>
+      import('./auth/auth.module').then((m) => m.AuthModule),
   },
+
+  // onboarding
   {
     path: 'onboarding',
     canMatch: [AuthOnlyGuard],
@@ -41,6 +118,8 @@ export const routes: Routes = [
         (m) => m.OnboardingComponent,
       ),
   },
+
+  // protected area
   {
     path: '',
     canMatch: [AccessGuard],
@@ -48,34 +127,58 @@ export const routes: Routes = [
       {
         path: Pages.DASHBOARD,
         loadComponent: () =>
-          import('./shared/components/user-dashboard/user-dashboard.component').then(
-            (m) => m.UserDashboardComponent,
-          ),
+          import(
+            './shared/components/user-dashboard/user-dashboard.component'
+            ).then((m) => m.UserDashboardComponent),
+
         children: [
           {
             path: '',
             redirectTo: 'profile',
             pathMatch: 'full',
-            data: { title: 'Profile', subtitle: 'Manage your profile' },
           },
+
           {
             path: 'profile',
-            component: DashboardProfileComponent,
-            data: { title: 'Profile', subtitle: 'Manage your profile' },
+            loadComponent: () =>
+              import(
+                './shared/components/dashboard-profile/dashboard-profile.component'
+                ).then((m) => m.DashboardProfileComponent),
+
+            data: {
+              title: 'Profile',
+              subtitle: 'Manage your profile',
+            },
           },
+
           {
             path: 'schedule',
-            component: DashboardScheduleComponent,
-            data: { title: 'Schedule', subtitle: 'Manage availability' },
+            loadComponent: () =>
+              import(
+                './shared/components/dashboard-schedule/dashboard-schedule.component'
+                ).then((m) => m.DashboardScheduleComponent),
+
+            data: {
+              title: 'Schedule',
+              subtitle: 'Manage availability',
+            },
           },
+
           {
             path: 'notifications',
-            component: DashboardNotificationsComponent,
-            data: { title: 'Notifications', subtitle: 'Your notifications' },
+            loadComponent: () =>
+              import(
+                './shared/components/dashboard-notifications/dashboard-notifications.component'
+                ).then((m) => m.DashboardNotificationsComponent),
+
+            data: {
+              title: 'Notifications',
+              subtitle: 'Your notifications',
+            },
           },
-          // { path: 'mensagens', component: MensagensComponent },
         ],
       },
+
       {
         path: Pages.SCHEDULING,
         loadComponent: () =>
@@ -85,18 +188,20 @@ export const routes: Routes = [
       },
     ],
   },
-  { path: '**', redirectTo: '' },
+
+  {
+    path: '**',
+    redirectTo: '',
+  },
 ];
 
 @NgModule({
   imports: [
     RouterModule.forRoot(routes, {
-      // anchorScrolling: 'enabled', // Enables anchor scroll
-      // scrollOffset: [0, 80], // Optional: offset for fixed header
-      scrollPositionRestoration: 'enabled', // 'enabled' or 'top'
+      scrollPositionRestoration: 'enabled',
       anchorScrolling: 'disabled',
     }),
-  ], // Configure the routes
-  exports: [RouterModule], // Export RouterModule so it can be used in AppModule
+  ],
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

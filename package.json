@@ -37,6 +37,7 @@
     "@angular/compiler-cli": "^20.3.16",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
-    "typescript": "~5.9.3"
+    "typescript": "~5.9.3",
+    "webpack-bundle-analyzer": "^5.3.0"
   }
 }
