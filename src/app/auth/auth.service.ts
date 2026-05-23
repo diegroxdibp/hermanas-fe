@@ -1,4 +1,4 @@
-import { SessionService } from './../shared/services/session.service';
+import { SessionService } from '../shared/services/session.service';
 import { signal, computed, inject, Injectable } from '@angular/core';
 import {
   catchError,

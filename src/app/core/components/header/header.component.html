@@ -26,17 +26,17 @@
         </ul>
       }
       @if (navbarService.showUserMenu()) {
-        <button class="account-button" matButton [matMenuTriggerFor]="menu">
-          <mat-icon>account_circle</mat-icon>
+        <button class="user-chip" [matMenuTriggerFor]="menu">
+          <div class="avatar">{{ userInitials() }}</div>
+          <div class="who">
+            {{ firstName() }}
+            <small>Paciente</small>
+          </div>
+          <span class="material-symbols-outlined chevron">expand_more</span>
         </button>
         <mat-menu #menu="matMenu">
-          <button
-            mat-menu-item
-            (click)="navigateTo(navigationService.Pages.DASHBOARD)"
-          >
-            Conta
-          </button>
-          <button mat-menu-item (click)="logOut()">Terminar Sesssão</button>
+          <button mat-menu-item (click)="navigateTo(navigationService.Pages.DASHBOARD)">Conta</button>
+          <button mat-menu-item (click)="logOut()">Terminar Sessão</button>
         </mat-menu>
       }
     }

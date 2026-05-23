@@ -18,7 +18,7 @@ export class NavigationBarService {
 
   readonly showAuthLinks = computed(
     () =>
-      this.authService.initialized() && this.sessionService.isAuthenticated()
+      this.authService.initialized() && !this.sessionService.isAuthenticated()
   );
 
   readonly showUserMenu = computed(

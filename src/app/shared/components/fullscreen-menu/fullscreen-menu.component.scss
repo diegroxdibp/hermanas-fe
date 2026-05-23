@@ -5,20 +5,21 @@
   margin-left: auto;
 }
 
-.menu-button {
+.icon-btn {
   display: flex;
-  justify-content: center;
   align-items: center;
-  height: fit-content;
-  width: 80px;
-  padding: 0;
-  z-index: 1001;
+  justify-content: center;
   background: none;
   border: none;
-  font-size: 2rem;
   cursor: pointer;
   color: palette.$primaryColorBlue;
-  transition: transform 0.3s ease;
+  padding: 6px;
+  border-radius: 4px;
+  z-index: 1001;
+
+  span { font-size: 24px; }
+
+  &:hover { background: rgba(0, 0, 0, 0.06); }
 }
 
 .fullscreen-menu {
@@ -65,14 +66,6 @@
   transition-delay: 0.1s;
 }
 
-.menu-button:hover {
-  transform: scale(1.1);
-}
-
-.menu-button span.open {
-  transform: rotate(90deg);
-}
-
 nav {
   display: flex;
   flex-direction: column;
@@ -117,35 +110,3 @@ mat-divider {
   user-select: none; /* Standard */
 }
 
-.menu-button svg .line {
-  stroke: #0a4c6e;
-
-  transition:
-    transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 0.2s ease,
-    stroke 0.2s ease;
-
-  /* critical for proper rotation */
-  transform-box: fill-box;
-  transform-origin: center;
-}
-
-/* Change color when menu is open */
-.menu-button svg.fullscreenMenuOpen .line {
-  stroke: white;
-}
-
-/* Middle disappears */
-.menu-button svg.fullscreenMenuOpen .line-middle {
-  opacity: 0;
-}
-
-/* Top line -> diagonal */
-.menu-button svg.fullscreenMenuOpen .line-top {
-  transform: translateY(9px) rotate(45deg);
-}
-
-/* Bottom line -> diagonal */
-.menu-button svg.fullscreenMenuOpen .line-bottom {
-  transform: translateY(-9px) rotate(-45deg);
-}

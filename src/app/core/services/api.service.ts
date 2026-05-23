@@ -40,7 +40,7 @@ export class ApiService {
     );
   }
 
-  getAvailabilititesByProfessionalId(
+  getAvailabilitiesByProfessionalId(
     professionalId: number,
   ): Observable<AvailabilityModel[]> {
     return this.http.get<AvailabilityModel[]>(
@@ -65,7 +65,7 @@ export class ApiService {
     );
   }
 
-  getProfessionalbyService(serviceId: number): Observable<Professional[]> {
+  getProfessionalByService(serviceId: number): Observable<Professional[]> {
     return this.http.get<Professional[]>(
       environment.apiUrl + `/api/services/${serviceId}/professionals`,
       { withCredentials: true },
@@ -82,9 +82,9 @@ export class ApiService {
     );
   }
 
-  getUserAppointments(userId: number): Observable<Appointment[]> {
+  getUserAppointments(userEmail: string): Observable<Appointment[]> {
     return this.http.get<Appointment[]>(
-      `${environment.apiUrl}/api/appointments/client/${userId}`,
+      `${environment.apiUrl}/api/appointments/client/email/${userEmail}`,
       {
         withCredentials: true,
       },

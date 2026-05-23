@@ -1,5 +1,6 @@
 import {
   Component,
+  computed,
   ElementRef,
   HostListener,
   inject,
@@ -13,21 +14,20 @@ import { NavigationService } from '../../../shared/services/navigation.service';
 import { Pages } from '../../../shared/enums/pages.enum';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../auth/auth.service';
-import { MatIcon } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { LogoHorizontalComponent } from "../../../shared/components/logo-horizontal/logo-horizontal.component";
+import { SessionService } from '../../../shared/services/session.service';
 
 @Component({
   selector: 'app-header',
   imports: [
     FullscreenMenuComponent,
     CommonModule,
-    MatIcon,
     MatMenuModule,
     MatButtonModule,
-    LogoHorizontalComponent
-],
+    LogoHorizontalComponent,
+  ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
   standalone: true,
@@ -38,6 +38,19 @@ export class HeaderComponent {
   readonly screenSizeService = inject(ScreenSizeService);
   readonly navigationService = inject(NavigationService);
   readonly renderer = inject(Renderer2);
+  private readonly sessionService = inject(SessionService);
+
+  private readonly user = this.sessionService.user;
+
+  readonly userInitials = computed(() => {
+    const parts = (this.user()?.name ?? '').trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) return '?';
+    return parts.length === 1
+      ? parts[0][0].toUpperCase()
+      : (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  });
+
+  readonly firstName = computed(() => this.user()?.name?.split(' ')[0] ?? '');
 
   fixedHeader = true;
   heroHeight: string = '100vh';

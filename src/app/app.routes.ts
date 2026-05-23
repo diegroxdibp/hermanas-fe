@@ -127,41 +127,17 @@ export const routes: Routes = [
       {
         path: Pages.DASHBOARD,
         loadComponent: () =>
-          import(
-            './shared/components/user-dashboard/user-dashboard.component'
-            ).then((m) => m.UserDashboardComponent),
+          import('./pages/dashboard/dashboard.component').then(
+            (m) => m.DashboardPageComponent,
+          ),
 
         children: [
-          {
-            path: '',
-            redirectTo: 'profile',
-            pathMatch: 'full',
-          },
-
           {
             path: 'profile',
             loadComponent: () =>
               import(
                 './shared/components/dashboard-profile/dashboard-profile.component'
-                ).then((m) => m.DashboardProfileComponent),
-
-            data: {
-              title: 'Profile',
-              subtitle: 'Manage your profile',
-            },
-          },
-
-          {
-            path: 'schedule',
-            loadComponent: () =>
-              import(
-                './shared/components/dashboard-schedule/dashboard-schedule.component'
-                ).then((m) => m.DashboardScheduleComponent),
-
-            data: {
-              title: 'Schedule',
-              subtitle: 'Manage availability',
-            },
+              ).then((m) => m.DashboardProfileComponent),
           },
 
           {
@@ -169,12 +145,7 @@ export const routes: Routes = [
             loadComponent: () =>
               import(
                 './shared/components/dashboard-notifications/dashboard-notifications.component'
-                ).then((m) => m.DashboardNotificationsComponent),
-
-            data: {
-              title: 'Notifications',
-              subtitle: 'Your notifications',
-            },
+              ).then((m) => m.DashboardNotificationsComponent),
           },
         ],
       },

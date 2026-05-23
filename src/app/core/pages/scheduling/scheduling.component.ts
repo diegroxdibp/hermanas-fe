@@ -111,7 +111,7 @@ export class SchedulingComponent implements OnInit, OnDestroy {
 
         if (selectedService) {
           this.apiService
-            .getProfessionalbyService(selectedService.id)
+            .getProfessionalByService(selectedService.id)
             .pipe(take(1))
             .subscribe((professionals: Professional[]) => {
               this.schedulingService.professionals = professionals;
@@ -140,7 +140,7 @@ export class SchedulingComponent implements OnInit, OnDestroy {
 
         if (selectedProfessional) {
           this.apiService
-            .getAvailabilititesByProfessionalId(selectedProfessional.id)
+            .getAvailabilitiesByProfessionalId(selectedProfessional.id)
             .pipe(take(1))
             .subscribe((availabilities: AvailabilityModel[]) => {
               this.schedulingService.setAvailabilitites(availabilities);

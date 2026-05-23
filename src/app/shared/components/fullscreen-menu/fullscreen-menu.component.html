@@ -1,48 +1,5 @@
-<button class="menu-button" (click)="toggleMenu()">
-  <svg
-    [class.fullscreenMenuOpen]="isMenuOpen"
-    xmlns="http://www.w3.org/2000/svg"
-    width="40px"
-    height="40px"
-    viewBox="0 0 32 32"
-    id="Editable-line"
-  >
-    <line
-      class="line line-middle"
-      fill="none"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="2"
-      x1="7"
-      x2="25"
-      y1="16"
-      y2="16"
-    />
-
-    <line
-      class="line line-bottom"
-      fill="none"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="2"
-      x1="7"
-      x2="25"
-      y1="25"
-      y2="25"
-    />
-
-    <line
-      class="line line-top"
-      fill="none"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="2"
-      x1="7"
-      x2="25"
-      y1="7"
-      y2="7"
-    />
-  </svg>
+<button class="icon-btn" (click)="toggleMenu()" aria-label="Menu">
+  <span class="material-symbols-outlined">{{ isMenuOpen ? 'close' : 'menu' }}</span>
 </button>
 
 @if (isMenuOpen) {

@@ -4,6 +4,7 @@
 @use "../src/assets/styles/typography.scss" as typography;
 @use 'ngx-owl-carousel-o/lib/styles/scss/owl.carousel' as owlCarousel;
 @use 'ngx-owl-carousel-o/lib/styles/scss/owl.theme.default' as owlTheme;
+@import './design-system/colors_and_type.css';
 
 * {
   box-sizing: border-box;
