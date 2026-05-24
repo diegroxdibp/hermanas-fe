@@ -1,62 +1,26 @@
-import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { NavigationService } from '../../services/navigation.service';
-import { Pages } from '../../enums/pages.enum';
-import { NavigationBarService } from '../../services/navigation-bar.service';
-import { MatDividerModule } from '@angular/material/divider';
-import { AuthService } from '../../../auth/auth.service';
+import { MatBottomSheet, MatBottomSheetModule } from '@angular/material/bottom-sheet';
+import { MobileMenuSheetComponent } from '../mobile-menu-sheet/mobile-menu-sheet.component';
 
 @Component({
   selector: 'app-fullscreen-menu',
-  imports: [CommonModule, MatDividerModule],
+  imports: [MatBottomSheetModule],
   templateUrl: './fullscreen-menu.component.html',
   styleUrl: './fullscreen-menu.component.scss',
 })
 export class FullscreenMenuComponent {
-  readonly authService = inject(AuthService);
-  navbarService = inject(NavigationBarService);
-  navigationService = inject(NavigationService);
-
+  private readonly bottomSheet = inject(MatBottomSheet);
   isMenuOpen = false;
-  isMenuVisible = false;
 
-  protected readonly Pages = Pages;
-
-  toggleMenu() {
-    if (this.isMenuOpen) {
-      this.closeMenu();
-    } else {
-      this.openMenu();
-    }
-  }
-
-  openMenu() {
+  toggleMenu(): void {
+    if (this.isMenuOpen) return;
     this.isMenuOpen = true;
-
-    document.body.style.overflow = 'hidden';
-
-    setTimeout(() => {
-      this.isMenuVisible = true;
+    const ref = this.bottomSheet.open(MobileMenuSheetComponent, {
+      panelClass: 'care-menu-sheet',
+      backdropClass: 'care-menu-backdrop',
+      ariaLabel: 'Menu',
+      restoreFocus: true,
     });
-  }
-
-  closeMenu() {
-    this.isMenuVisible = false;
-
-    document.body.style.overflow = 'auto';
-
-    setTimeout(() => {
-      this.isMenuOpen = false;
-    }, 350);
-  }
-
-  navigateTo(page: Pages) {
-    this.navigationService.navigateTo(page);
-    this.closeMenu();
-  }
-
-  logOut(): void {
-    this.authService.logout();
-    this.closeMenu();
+    ref.afterDismissed().subscribe(() => { this.isMenuOpen = false; });
   }
 }

@@ -424,3 +424,25 @@ mat-progress-bar {
   overflow-wrap: anywhere;
   line-height: 1.3;
 }
+
+// ── Mobile menu bottom sheet (CDK overlay — outside component scope) ──
+// In Angular Material 20 the container element is mat-bottom-sheet-container (no mdc prefix).
+// panelClass is applied to .cdk-overlay-pane, so use a descendant selector for the container.
+.care-menu-sheet mat-bottom-sheet-container,
+.care-menu-sheet .mat-bottom-sheet-container {
+  --mat-bottom-sheet-container-shape: 24px;
+  background: #fff !important;
+  padding: 12px 0 calc(28px + env(safe-area-inset-bottom)) !important;
+  border-radius: 24px 24px 0 0 !important;
+  box-shadow: 0 -10px 30px rgba(34, 50, 110, 0.18) !important;
+  max-height: 80vh !important;
+  overflow-y: auto !important;
+}
+
+.care-menu-backdrop {
+  background: rgba(34, 50, 110, 0.55) !important;
+}
+
+.care-menu-backdrop.cdk-overlay-backdrop-showing {
+  opacity: 1 !important;
+}

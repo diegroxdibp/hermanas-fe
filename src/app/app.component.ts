@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import {
   NavigationCancel,
   NavigationEnd,
@@ -12,6 +12,8 @@ import { HeaderComponent } from './core/components/header/header.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { LoadingService } from './core/services/loading.service';
 import { FooterComponent } from './core/components/footer/footer.component';
+import { NotificationService } from './core/services/notification.service';
+import { SessionService } from './shared/services/session.service';
 
 @Component({
   selector: 'app-root',
@@ -30,6 +32,8 @@ export class AppComponent {
   title = 'CARE - Clínica Ampliada Resignificações';
   loader = inject(LoadingService);
   router = inject(Router);
+  private readonly notificationService = inject(NotificationService);
+  private readonly sessionService = inject(SessionService);
 
   constructor() {
     this.router.events.subscribe((event) => {
@@ -43,6 +47,14 @@ export class AppComponent {
         event instanceof NavigationError
       ) {
         this.loader.setRouteLoading(false);
+      }
+    });
+
+    effect(() => {
+      if (this.sessionService.isAuthenticated()) {
+        this.notificationService.connect();
+      } else {
+        this.notificationService.disconnect();
       }
     });
   }

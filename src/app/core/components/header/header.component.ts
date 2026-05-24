@@ -7,6 +7,7 @@ import {
   Renderer2,
   ViewChild,
 } from '@angular/core';
+import { Router } from '@angular/router';
 import { NavigationBarService } from '../../../shared/services/navigation-bar.service';
 import { ScreenSizeService } from '../../../shared/services/screen-size.service';
 import { FullscreenMenuComponent } from '../../../shared/components/fullscreen-menu/fullscreen-menu.component';
@@ -16,8 +17,11 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../auth/auth.service';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { LogoHorizontalComponent } from "../../../shared/components/logo-horizontal/logo-horizontal.component";
 import { SessionService } from '../../../shared/services/session.service';
+import { NotificationService } from '../../services/notification.service';
+import { NotificationResponse } from '../../../shared/models/notification.types';
 
 @Component({
   selector: 'app-header',
@@ -26,6 +30,7 @@ import { SessionService } from '../../../shared/services/session.service';
     CommonModule,
     MatMenuModule,
     MatButtonModule,
+    MatIconModule,
     LogoHorizontalComponent,
   ],
   templateUrl: './header.component.html',
@@ -37,8 +42,10 @@ export class HeaderComponent {
   readonly navbarService = inject(NavigationBarService);
   readonly screenSizeService = inject(ScreenSizeService);
   readonly navigationService = inject(NavigationService);
+  readonly notificationsService = inject(NotificationService);
   readonly renderer = inject(Renderer2);
   private readonly sessionService = inject(SessionService);
+  private readonly router = inject(Router);
 
   private readonly user = this.sessionService.user;
 
@@ -51,6 +58,7 @@ export class HeaderComponent {
   });
 
   readonly firstName = computed(() => this.user()?.name?.split(' ')[0] ?? '');
+  readonly userEmail = computed(() => this.user()?.email ?? '');
 
   fixedHeader = true;
   heroHeight: string = '100vh';
@@ -81,6 +89,32 @@ export class HeaderComponent {
 
   logOut(): void {
     this.authService.logout();
+  }
+
+  onNotifClick(n: NotificationResponse): void {
+    if (!n.read) {
+      this.notificationsService.markAsRead(n.id).subscribe();
+    }
+    this.router.navigate(['/dashboard', 'notifications']);
+  }
+
+  markAllRead(): void {
+    this.notificationsService.markAllAsRead().subscribe();
+  }
+
+  goToNotifications(): void {
+    this.router.navigate(['/dashboard', 'notifications']);
+  }
+
+  relativeTime(iso: string): string {
+    const diffMs = Date.now() - new Date(iso).getTime();
+    const diffMin = Math.floor(diffMs / 60_000);
+    if (diffMin < 1) return 'agora mesmo';
+    if (diffMin < 60) return `há ${diffMin} min`;
+    const diffH = Math.floor(diffMin / 60);
+    if (diffH < 24) return `há ${diffH}h`;
+    const diffD = Math.floor(diffH / 24);
+    return `há ${diffD} dia${diffD !== 1 ? 's' : ''}`;
   }
 
   private checkScroll() {
