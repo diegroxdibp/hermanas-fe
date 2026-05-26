@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>CARE — Bottom sheet menu (Variant D)</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  html, body { margin: 0; padding: 0; background: #f6f7fb; }
+  body {
+    font-family: var(--font-sans);
+    min-height: 100vh;
+  }
+
+  /* Fullscreen demo — no phone frame, fills the viewport. Plug the markup
+     into a real phone (or iOS device frame) to see it in context. */
+  .phone {
+    position: relative;
+    width: 100vw; height: 100vh;
+    max-width: 480px; margin: 0 auto;
+    background: #fff;
+    overflow: hidden;
+    color: var(--color-primary-blue);
+  }
+
+  /* ── Fake page behind the sheet (just to give the scrim context) ── */
+  .page {
+    position: absolute; inset: 0;
+    background: #fff;
+    padding: 100px 24px 24px;
+  }
+  .page-header {
+    position: absolute; top: 44px; left: 16px; right: 16px; height: 56px;
+    display: flex; align-items: center;
+    font-family: var(--font-serif); font-weight: 700; font-size: 24px;
+    color: var(--color-primary-blue);
+  }
+  .page-skel { height: 30px; background: rgba(34,50,110,0.06); border-radius: 6px; margin-bottom: 14px; width: 80%; }
+  .page-skel-sm { height: 14px; background: rgba(34,50,110,0.06); border-radius: 4px; margin-bottom: 8px; }
+
+  /* ── Scrim ── */
+  .scrim {
+    position: absolute; inset: 0;
+    background: rgba(34,50,110,0.55);
+  }
+
+  /* ── Sheet ── */
+  .sheet {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    max-height: 80%;
+    background: #fff;
+    border-radius: 24px 24px 0 0;
+    padding: 12px 0 calc(28px + env(safe-area-inset-bottom));
+    box-shadow: 0 -10px 30px rgba(34,50,110,0.18);
+    overflow: hidden;
+  }
+
+  .grab {
+    width: 40px; height: 4px; margin: 0 auto 8px;
+    background: rgba(34,50,110,0.20); border-radius: 999px;
+  }
+
+  /* ── User strip at top of sheet ── */
+  .user-strip {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 24px 18px;
+  }
+  .avatar {
+    width: 44px; height: 44px; border-radius: 999px;
+    background: var(--color-primary-blue); color: #fff;
+    display: inline-flex; align-items: center; justify-content: center;
+    font: 700 14px var(--font-sans);
+  }
+  .user-name { font-weight: 700; font-size: 16px; line-height: 1.2; color: var(--color-primary-blue); }
+  .user-email { font-size: 12px; color: var(--color-muted); margin-top: 2px; }
+  .close-btn {
+    width: 36px; height: 36px; border-radius: 999px;
+    background: var(--color-surface-tint); border: none; cursor: pointer;
+    color: var(--color-primary-blue);
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: background 0.2s var(--ease-care);
+  }
+  .close-btn:hover { background: #e8ebf5; }
+
+  /* ── Rows ── */
+  .row {
+    display: flex; align-items: center; gap: 16px;
+    padding: 14px 24px;
+    color: var(--color-primary-blue);
+    font-family: var(--font-sans); font-size: 17px; font-weight: 500;
+    border-top: 1px solid rgba(34,50,110,0.06);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s var(--ease-care);
+  }
+  .row:hover { background: rgba(142,127,174,0.08); }
+  .row:active { background: rgba(142,127,174,0.14); }
+  .row svg.icon { color: var(--color-primary-blue); opacity: 0.95; flex: 0 0 auto; }
+  .row .label { flex: 1; }
+  .row .chev { opacity: 0.45; flex: 0 0 auto; }
+
+  .badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 22px; height: 20px; padding: 0 6px;
+    background: var(--color-primary-purple); color: #fff;
+    font-size: 11px; font-weight: 700;
+    border-radius: 999px;
+  }
+
+  .row-danger { color: #B33049; font-weight: 600; }
+  .row-danger svg.icon { color: #B33049; }
+
+  /* ── Status bar + home indicator (cosmetic only — real device draws these) ── */
+  .status-bar {
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 44px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 28px;
+    font-weight: 600; font-size: 14px; color: var(--color-primary-blue);
+    z-index: 5;
+  }
+  .home-bar {
+    position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%);
+    width: 134px; height: 5px; border-radius: 3px;
+    background: rgba(34,50,110,0.35); z-index: 6;
+  }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <!-- Page behind (any view will do; this is purely for the scrim's context) -->
+  <div class="page">
+    <div class="status-bar">
+      <span>9:41</span>
+    </div>
+    <div class="page-header"><span>Care</span></div>
+    <div class="page-skel"></div>
+    <div class="page-skel-sm"></div>
+    <div class="page-skel-sm" style="width: 90%"></div>
+    <div class="page-skel-sm" style="width: 70%"></div>
+  </div>
+
+  <!-- Scrim -->
+  <div class="scrim"></div>
+
+  <!-- Sheet -->
+  <div class="sheet" role="dialog" aria-modal="true" aria-label="Menu">
+    <div class="grab" aria-hidden="true"></div>
+
+    <div class="user-strip">
+      <span class="avatar">MX</span>
+      <div style="flex:1">
+        <div class="user-name">Mestre</div>
+        <div class="user-email">mestre@care.pt</div>
+      </div>
+      <button class="close-btn" aria-label="Fechar menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M18 6 6 18M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <a class="row" data-i="0">
+      <svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>
+      <span class="label">Home</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+    </a>
+
+    <a class="row" data-i="1">
+      <svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+      <span class="label">Sobre</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+    </a>
+
+    <a class="row" data-i="2">
+      <svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+      <span class="label">Contato</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+    </a>
+
+    <a class="row" data-i="3">
+      <svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      <span class="label">Agendar</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+    </a>
+
+    <a class="row" data-i="4">
+      <svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+      <span class="label">Notificações</span>
+      <span class="badge">3</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+    </a>
+
+    <a class="row" data-i="5">
+      <svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span class="label">Conta</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+    </a>
+
+    <a class="row row-danger" data-i="6">
+      <svg class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg>
+      <span class="label">Terminar sessão</span>
+    </a>
+  </div>
+
+  <div class="home-bar"></div>
+</div>
+
+</body>
+</html>

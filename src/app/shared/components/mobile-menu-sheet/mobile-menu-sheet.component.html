@@ -1,0 +1,61 @@
+<div class="grab" aria-hidden="true"></div>
+
+@if (navbarService.showUserMenu()) {
+  <div class="user-strip">
+    <span class="avatar">{{ userInitials() }}</span>
+    <div class="user-meta">
+      <div class="user-name">{{ userName() }}</div>
+      <div class="user-email">{{ userEmail() }}</div>
+    </div>
+    <button class="close-btn" (click)="close()" aria-label="Fechar menu">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+}
+
+@if (!navbarService.showUserMenu()) {
+  <div class="close-row">
+    <button class="close-btn" (click)="close()" aria-label="Fechar menu">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+}
+
+@for (row of publicRows; track row.label; let i = $index) {
+  <a class="row" [style.--row-delay.s]="0.12 + i * 0.04" (click)="go(row.page)">
+    <mat-icon class="icon">{{ row.icon }}</mat-icon>
+    <span class="label">{{ row.label }}</span>
+    <mat-icon class="chev">chevron_right</mat-icon>
+  </a>
+}
+
+@if (navbarService.showUserMenu()) {
+  @for (row of userRows; track row.label; let i = $index) {
+    <a class="row"
+       [style.--row-delay.s]="0.12 + (publicRows.length + i) * 0.04"
+       [attr.aria-label]="row.ariaLabel && notificationService.unreadCount() > 0
+         ? row.ariaLabel + ', ' + notificationService.unreadCount() + ' não lidas'
+         : null"
+       (click)="go(row.page)">
+      <mat-icon class="icon">{{ row.icon }}</mat-icon>
+      <span class="label">{{ row.label }}</span>
+      @if (row.showBadge && notificationService.unreadCount() > 0) {
+        <span class="badge">{{ notificationService.unreadCount() }}</span>
+      }
+      <mat-icon class="chev">chevron_right</mat-icon>
+    </a>
+  }
+
+  <a class="row row-danger" [style.--row-delay.s]="0.12 + (publicRows.length + userRows.length) * 0.04" (click)="logout()">
+    <mat-icon class="icon">logout</mat-icon>
+    <span class="label">Terminar sessão</span>
+  </a>
+}
+
+@if (navbarService.showAuthLinks()) {
+  <a class="row" [style.--row-delay.s]="0.12 + publicRows.length * 0.04" (click)="signIn()">
+    <mat-icon class="icon">login</mat-icon>
+    <span class="label">Entrar</span>
+    <mat-icon class="chev">chevron_right</mat-icon>
+  </a>
+}
