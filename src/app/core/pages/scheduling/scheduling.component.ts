@@ -1,328 +1,253 @@
-import { ApiService } from './../../../core/services/api.service';
-import { CommonModule } from '@angular/common';
 import {
   Component,
+  computed,
   ElementRef,
+  HostListener,
   inject,
-  OnInit,
-  ViewChild,
   OnDestroy,
+  signal,
 } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { provideNativeDateAdapter, MatOption } from '@angular/material/core';
-
-import { MatSelectModule } from '@angular/material/select';
-import { MatInputModule } from '@angular/material/input';
-import { MatCardModule } from '@angular/material/card';
-
 import { take, Subscription } from 'rxjs';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIcon } from '@angular/material/icon';
-import { AvailabilitiesComponent } from '../../../shared/components/availabilities/availabilities.component';
-import { CalendarComponent } from '../../../shared/components/calendar/calendar.component';
-import { ScrollAnimateDirective } from '../../../shared/directives/scroll-animate.directive';
-import { CalendarType } from '../../../shared/enums/calendar-type.enum';
-import { Modality } from '../../../shared/enums/modality.enum';
-import { Pages } from '../../../shared/enums/pages.enum';
-import { ProfessionalSessionService } from '../../../shared/enums/professional-session-service.enum';
+import { ApiService } from '../../services/api.service';
+import { SchedulingService } from '../../../shared/services/scheduling.service';
 import { SchedulingFormControls } from '../../../shared/enums/scheduling-form-controls.enum';
 import { SchedulingSteps } from '../../../shared/enums/scheduling-steps.enum';
+import { Modality } from '../../../shared/enums/modality.enum';
+import { ProfessionalSessionService } from '../../../shared/enums/professional-session-service.enum';
 import { AvailabilityModel } from '../../../shared/models/availability.model';
 import { Professional } from '../../../shared/models/get-professional-by-service-response.model';
-import { emptyAvailabilityConfiguration } from '../../../shared/models/input-configuration-objects/availability-configuration-object';
-import { AvailabilitySelectionOutputObject } from '../../../shared/models/input-configuration-objects/availability-selection-output-object';
-import { CalendarConfigurationObject, emptyCalendarConfiguration } from '../../../shared/models/input-configuration-objects/calendar-configuration-object';
-import { RadioInputConfigurationObject, emptyRadioInputConfiguration } from '../../../shared/models/input-configuration-objects/radio-input-configuration-object';
 import { ProfessionalService } from '../../../shared/models/professional-service.model';
-import { EnumValuePipe } from '../../../shared/pipes/enum-value.pipe';
-import { NavigationService } from '../../../shared/services/navigation.service';
-import { SchedulingService } from '../../../shared/services/scheduling.service';
-import { SnackbarService } from '../../../shared/services/snackbar.service';
-import { parseDate } from '../../../shared/utils/date-helper.util';
-import { LoadingService } from '../../services/loading.service';
+import { emptyAvailabilityConfiguration } from '../../../shared/models/input-configuration-objects/availability-configuration-object';
+import { parseDate, formatTime } from '../../../shared/utils/date-helper.util';
+
+const PT_MONTHS = [
+  'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+  'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro',
+];
 
 @Component({
   selector: 'app-scheduling',
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    CalendarComponent,
-    MatOption,
-    ReactiveFormsModule,
-    MatSelectModule,
-    FormsModule,
-    MatInputModule,
-    MatCardModule,
-    AvailabilitiesComponent,
-    MatButtonModule,
-    MatIcon,
-    EnumValuePipe,
-    ScrollAnimateDirective,
-  ],
+  imports: [],
   templateUrl: './scheduling.component.html',
-  providers: [provideNativeDateAdapter()],
   styleUrl: './scheduling.component.scss',
 })
-export class SchedulingComponent implements OnInit, OnDestroy {
-  readonly navigationService = inject(NavigationService);
-  readonly snackbarService = inject(SnackbarService);
-  readonly loader = inject(LoadingService);
+export class SchedulingComponent implements OnDestroy {
+  private readonly apiService = inject(ApiService);
+  readonly schedulingService = inject(SchedulingService);
+  private readonly elRef = inject(ElementRef);
+  private readonly subs: Subscription[] = [];
 
-  @ViewChild('body') body: ElementRef | undefined;
-  @ViewChild('subject') subject: ElementRef | undefined;
+  readonly Modality = Modality;
+  readonly modalities = Object.values(Modality);
+  readonly weekdays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 
-  calendarConfigurationObject: CalendarConfigurationObject =
-    emptyCalendarConfiguration;
-  appointmentTypeConfiguration: RadioInputConfigurationObject =
-    emptyRadioInputConfiguration;
-  allowedRecurringDays: Set<number> = new Set();
-  allowedSpecificDates: Date[] = [];
-  availability: AvailabilityModel[] = [];
-  SchedulingFormControls = SchedulingFormControls;
-  ProfessionalSessionService = ProfessionalSessionService;
-  renderKey = 0;
-  private subscriptions: Subscription[] = [];
+  readonly openDropdown = signal<'service' | 'professional' | 'date' | null>(null);
+  readonly calendarViewDate = signal<Date>(new Date());
+  readonly expandedSlotId = signal<number | null>(null);
+  readonly confirmedSlotId = signal<number | null>(null);
+  readonly slotModality = signal<Modality>(Modality.ANY);
+  readonly toast = signal<string | null>(null);
+  private toastTimer: ReturnType<typeof setTimeout> | null = null;
 
-  constructor(
-    private apiService: ApiService,
-    public schedulingService: SchedulingService,
-  ) {
-    this.apiService
-      .getServices()
-      .pipe(take(1))
-      .subscribe((services: ProfessionalService[]) => {
-        this.schedulingService.services = services;
-      }); // Load services
+  readonly calendarDays = computed(() => {
+    const view = this.calendarViewDate();
+    const year = view.getFullYear();
+    const month = view.getMonth();
+    const offset = new Date(year, month, 1).getDay();
+    const days: Array<{ date: Date; inMonth: boolean; key: string }> = [];
 
-    const serviceControl =
-      this.schedulingService.schedulingForm.controls[
-      SchedulingFormControls.SELECTED_SERVICE
-      ];
+    for (let i = offset - 1; i >= 0; i--) {
+      const d = new Date(year, month, -i);
+      days.push({ date: d, inMonth: false, key: this.toKey(d) });
+    }
 
-    const serviceSub = serviceControl.valueChanges.subscribe(
-      (selectedService: ProfessionalService | null) => {
-        this.schedulingService.clearChainedRelatedFields(
-          SchedulingSteps.SERVICE_SELECTION,
-        );
+    const total = new Date(year, month + 1, 0).getDate();
+    for (let i = 1; i <= total; i++) {
+      const d = new Date(year, month, i);
+      days.push({ date: d, inMonth: true, key: this.toKey(d) });
+    }
 
-        this.renderKey++;
+    while (days.length < 42) {
+      const prev = days[days.length - 1].date;
+      const d = new Date(prev.getFullYear(), prev.getMonth(), prev.getDate() + 1);
+      days.push({ date: d, inMonth: false, key: this.toKey(d) });
+    }
 
-        if (selectedService) {
-          this.apiService
-            .getProfessionalByService(selectedService.id)
-            .pipe(take(1))
-            .subscribe((professionals: Professional[]) => {
-              this.schedulingService.professionals = professionals;
-            });
-        }
-      },
-    );
-    this.subscriptions.push(serviceSub);
+    return days;
+  });
 
-    const professionalControl =
-      this.schedulingService.schedulingForm.controls[
-      SchedulingFormControls.SELECTED_PROFESSIONAL
-      ];
+  readonly monthLabel = computed(() => {
+    const d = this.calendarViewDate();
+    return `${PT_MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+  });
 
-    const professionalSub = professionalControl.valueChanges.subscribe(
-      (selectedProfessional: Professional | null) => {
-        this.schedulingService.clearChainedRelatedFields(
-          SchedulingSteps.PROFESSIONAL_SELECTION,
-        );
-
-        this.renderKey++;
-
-        this.schedulingService.availabilityConfiguration.set(
-          emptyAvailabilityConfiguration,
-        );
-
-        if (selectedProfessional) {
-          this.apiService
-            .getAvailabilitiesByProfessionalId(selectedProfessional.id)
-            .pipe(take(1))
-            .subscribe((availabilities: AvailabilityModel[]) => {
-              this.schedulingService.setAvailabilitites(availabilities);
-            });
-        }
-      },
-    );
-    this.subscriptions.push(professionalSub);
-
-    // When date is selected, filter availabilities for that day
-    const dateControl =
-      this.schedulingService.schedulingForm.controls[
-      SchedulingFormControls.SELECTED_DAY
-      ];
-
-    const dateSub = dateControl.valueChanges.subscribe(
-      (date: string | null) => {
-        this.schedulingService.clearChainedRelatedFields(
-          SchedulingSteps.DATE_SELECTION,
-        );
-
-        this.renderKey++;
-
-        this.schedulingService.availabilityConfiguration.set(
-          emptyAvailabilityConfiguration,
-        );
-
-        if (date) {
-          const slots = this.schedulingService.timeSlots.get(date);
-
-          if (slots && slots.length > 0) {
-            this.setAvailabilityConfiguration(
-              this.schedulingService.availability(),
-              parseDate(date),
-            );
-          } else {
-            this.schedulingService.availabilityConfiguration.set({
-              ...emptyAvailabilityConfiguration,
-              title: 'Nenhuma disponibilidade encontrada para esta data',
-              selectedDate: parseDate(date).toLocaleDateString('pt-PT'),
-            });
-          }
-        }
-      },
-    );
-    this.subscriptions.push(dateSub);
-
-    const availabilityControl =
-      this.schedulingService.schedulingForm.controls[
-      SchedulingFormControls.SELECTED_AVAILABILITY
-      ];
-
-    const availabilitySub = availabilityControl.valueChanges.subscribe(() => {
-      this.schedulingService.clearChainedRelatedFields(
-        SchedulingSteps.AVAILABILITY_SELECTION,
-      );
-      this.renderKey++;
+  constructor() {
+    this.apiService.getServices().pipe(take(1)).subscribe((services: ProfessionalService[]) => {
+      this.schedulingService.services = services;
     });
-    this.subscriptions.push(availabilitySub);
+
+    const svcCtrl = this.schedulingService.schedulingForm.controls[SchedulingFormControls.SELECTED_SERVICE];
+    this.subs.push(svcCtrl.valueChanges.subscribe((svc: ProfessionalService | null) => {
+      this.schedulingService.clearChainedRelatedFields(SchedulingSteps.SERVICE_SELECTION);
+      this.confirmedSlotId.set(null);
+      if (svc?.id) {
+        this.apiService.getProfessionalByService(svc.id).pipe(take(1)).subscribe((p: Professional[]) => {
+          this.schedulingService.professionals = p;
+        });
+      }
+    }));
+
+    const profCtrl = this.schedulingService.schedulingForm.controls[SchedulingFormControls.SELECTED_PROFESSIONAL];
+    this.subs.push(profCtrl.valueChanges.subscribe((prof: Professional | null) => {
+      this.schedulingService.clearChainedRelatedFields(SchedulingSteps.PROFESSIONAL_SELECTION);
+      this.schedulingService.availabilityConfiguration.set(emptyAvailabilityConfiguration);
+      this.confirmedSlotId.set(null);
+      if (prof) {
+        this.apiService.getAvailabilitiesByProfessionalId(prof.id).pipe(take(1)).subscribe((av: AvailabilityModel[]) => {
+          this.schedulingService.setAvailabilitites(av);
+        });
+      }
+    }));
+
+    const dayCtrl = this.schedulingService.schedulingForm.controls[SchedulingFormControls.SELECTED_DAY];
+    this.subs.push(dayCtrl.valueChanges.subscribe(() => {
+      this.schedulingService.clearChainedRelatedFields(SchedulingSteps.DATE_SELECTION);
+      this.schedulingService.availabilityConfiguration.set(emptyAvailabilityConfiguration);
+      this.expandedSlotId.set(null);
+      this.confirmedSlotId.set(null);
+      this.slotModality.set(Modality.ANY);
+    }));
   }
 
-  ngOnInit() {
-    this.setCalendarConfiguration();
-    this.setAppointmentTypeConfiguration();
+  ngOnDestroy(): void {
+    this.subs.forEach(s => s.unsubscribe());
+    if (this.toastTimer) clearTimeout(this.toastTimer);
   }
 
-  ngOnDestroy() {
-    // Clean up subscriptions
-    this.subscriptions.forEach((sub) => sub.unsubscribe());
+  @HostListener('document:mousedown')
+  onDocClick(): void {
+    this.openDropdown.set(null);
+  }
+
+  get selectedService(): ProfessionalService | null {
+    const v = this.schedulingService.schedulingForm.controls[SchedulingFormControls.SELECTED_SERVICE].value;
+    return v?.id ? v : null;
   }
 
   get selectedProfessional(): Professional | null {
-    return this.schedulingService.schedulingForm.controls[
-      SchedulingFormControls.SELECTED_PROFESSIONAL
-    ].value;
+    return this.schedulingService.schedulingForm.controls[SchedulingFormControls.SELECTED_PROFESSIONAL].value;
   }
 
-  setCalendarConfiguration() {
-    this.calendarConfigurationObject = {
-      title: 'Escolha uma data:',
-      control:
-        this.schedulingService.schedulingForm.controls[
-        SchedulingFormControls.SELECTED_DAY
-        ],
-      calendarType: CalendarType.SCHEDULING,
-    };
+  get selectedDay(): string | null {
+    return this.schedulingService.schedulingForm.controls[SchedulingFormControls.SELECTED_DAY].value;
   }
 
-  setAvailabilityConfiguration(
-    availability: AvailabilityModel[],
-    selectedDate: Date,
-  ): void {
-    const filteredAvailability =
-      this.schedulingService.filterAvailabilityForDay(
-        availability,
-        selectedDate,
-      );
-
-    const availabilityConfigurationObject = {
-      title: 'Escolha uma disponibilidade:',
-      selectedDate: parseDate(
-        this.schedulingService.schedulingForm.controls[
-          SchedulingFormControls.SELECTED_DAY
-        ].value!,
-      ).toLocaleDateString('pt-PT'),
-      control:
-        this.schedulingService.schedulingForm.controls[
-        SchedulingFormControls.SELECTED_DAY
-        ],
-      availability: filteredAvailability,
-    };
-
-    this.schedulingService.availabilityConfiguration.set(
-      availabilityConfigurationObject,
+  get filteredSlots(): AvailabilityModel[] {
+    const day = this.selectedDay;
+    if (!day) return [];
+    return this.schedulingService.filterAvailabilityForDay(
+      this.schedulingService.availability(),
+      parseDate(day),
     );
   }
 
-  setAppointmentTypeConfiguration() {
-    this.appointmentTypeConfiguration = {
-      title: 'Escolha um tipo de atendimento:',
-      control:
-        this.schedulingService.schedulingForm.controls[
-        SchedulingFormControls.SELECTED_MODALITY
-        ],
-      listOfOptions: Object.values(Modality),
-    };
+  serviceName(name: string): string {
+    return ProfessionalSessionService[name as keyof typeof ProfessionalSessionService] || name;
   }
 
-  isDateAllowed = (date: Date | null): boolean => {
-    if (!date) return false;
-
-    // Check recurring days
-    if (this.allowedRecurringDays.has(date.getDay())) return true;
-
-    // Check exact matches for specific one-time availabilities
-    return this.allowedSpecificDates.some(
-      (allowed) =>
-        allowed.getFullYear() === date.getFullYear() &&
-        allowed.getMonth() === date.getMonth() &&
-        allowed.getDate() === date.getDate(),
-    );
-  };
-
-  trackByName = (index: number, item: any) => item.name;
-
-  restrictInput(event: Event) {
-    const input = event.target as HTMLInputElement;
-    let value = input.value.replace(/[^0-9]/g, '');
-
-    if (value.length > 2) {
-      value = value.slice(0, 2) + ':' + value.slice(2, 4);
-    }
-
-    if (value.length > 5) {
-      value = value.slice(0, 5);
-    }
-
-    input.value = value;
+  fmtTime(t: string): string {
+    return formatTime(t);
   }
 
-  bookAppointment(availabilityOutputObject: AvailabilitySelectionOutputObject) {
-    this.schedulingService.schedulingForm.controls[
-      SchedulingFormControls.SELECTED_MODALITY
-    ].setValue(availabilityOutputObject.modality);
-    this.schedulingService.schedulingForm.controls[
-      SchedulingFormControls.SELECTED_AVAILABILITY
-    ]?.setValue(availabilityOutputObject.availability);
-    const payload = this.schedulingService.getAppointmentPayload();
-    console.log(payload);
-    this.apiService.setAppointment(payload).subscribe((response) => {
-      this.navigationService.navigateTo(Pages.DASHBOARD_SCHEDULE);
-      this.snackbarService.openSnackBar({
-        message: 'Agendamento realizado com sucesso!',
-      });
+  fmtDate(key: string | null): string {
+    if (!key) return '';
+    const [y, m, d] = key.split('-');
+    return `${d}/${m}/${y}`;
+  }
+
+  toggleDropdown(name: 'service' | 'professional' | 'date'): void {
+    this.openDropdown.update(v => v === name ? null : name);
+  }
+
+  selectService(svc: ProfessionalService): void {
+    this.schedulingService.schedulingForm.controls[SchedulingFormControls.SELECTED_SERVICE].setValue(svc);
+    this.openDropdown.set(null);
+  }
+
+  selectProfessional(prof: Professional): void {
+    this.schedulingService.schedulingForm.controls[SchedulingFormControls.SELECTED_PROFESSIONAL].setValue(prof);
+    this.openDropdown.set(null);
+  }
+
+  selectDate(key: string): void {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const [y, m, d] = key.split('-').map(Number);
+    if (new Date(y, m - 1, d) < today) return;
+    if (!this.schedulingService.timeSlots.has(key)) return;
+    this.schedulingService.schedulingForm.controls[SchedulingFormControls.SELECTED_DAY].setValue(key);
+    this.openDropdown.set(null);
+  }
+
+  prevMonth(): void {
+    const d = this.calendarViewDate();
+    this.calendarViewDate.set(new Date(d.getFullYear(), d.getMonth() - 1, 1));
+  }
+
+  nextMonth(): void {
+    const d = this.calendarViewDate();
+    this.calendarViewDate.set(new Date(d.getFullYear(), d.getMonth() + 1, 1));
+  }
+
+  isPast(date: Date): boolean {
+    const t = new Date();
+    t.setHours(0, 0, 0, 0);
+    return date < t;
+  }
+
+  isToday(date: Date): boolean {
+    const t = new Date();
+    return date.getFullYear() === t.getFullYear() &&
+      date.getMonth() === t.getMonth() &&
+      date.getDate() === t.getDate();
+  }
+
+  toggleSlot(id: number): void {
+    if (this.expandedSlotId() === id) {
+      this.expandedSlotId.set(null);
+    } else {
+      this.expandedSlotId.set(id);
+      this.slotModality.set(Modality.ANY);
+    }
+  }
+
+  confirmSlot(slot: AvailabilityModel): void {
+    const modality = this.slotModality();
+    const fc = this.schedulingService.schedulingForm.controls;
+    fc[SchedulingFormControls.SELECTED_MODALITY].setValue(modality);
+    fc[SchedulingFormControls.SELECTED_AVAILABILITY].setValue(slot);
+    this.apiService.setAppointment(this.schedulingService.getAppointmentPayload()).subscribe({
+      next: () => {
+        this.confirmedSlotId.set(slot.id);
+        const date = this.fmtDate(this.selectedDay);
+        this.showToast(
+          `Sessão agendada · ${slot.professionalName} · ${date} · ${this.fmtTime(slot.startTime)} · ${modality}.`
+        );
+      },
+      error: () => {},
     });
   }
 
-  getProfessionalPicture(): string {
-    return '';
+  showToast(msg: string): void {
+    this.toast.set(msg);
+    if (this.toastTimer) clearTimeout(this.toastTimer);
+    this.toastTimer = setTimeout(() => this.toast.set(null), 2800);
   }
 
-  compareProfessionals(a: Professional, b: Professional): boolean {
-    return a?.id === b?.id;
+  private toKey(date: Date): string {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
   }
 }

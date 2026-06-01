@@ -446,3 +446,11 @@ mat-progress-bar {
 .care-menu-backdrop.cdk-overlay-backdrop-showing {
   opacity: 1 !important;
 }
+
+// ── Delete confirmation dialog ───────────────────────────────
+.care-dialog .mat-mdc-dialog-container,
+.care-dialog .mdc-dialog__surface {
+  border-radius: 16px !important;
+  padding: 32px !important;
+  background: #fff !important;
+}

@@ -33,10 +33,11 @@
   flex: 1;
   overflow: hidden;
 
-  @media (max-width: 1029px) {
-    overflow: visible;
+  @media (max-width: 1029px) { overflow: visible; }
+
+  @media (max-width: 767px) {
     flex-direction: column;
-    padding-bottom: 64px; /* room for bottom nav */
+    padding-bottom: 64px;
   }
 }
 
@@ -54,7 +55,7 @@
   overflow-y: auto;
   gap: 4px;
 
-  @media (max-width: 1029px) { display: none; }
+  @media (max-width: 767px) { display: none; }
 }
 
 .group-label {
@@ -552,7 +553,7 @@
   z-index: 200;
   box-shadow: 0 -2px 12px rgba(34, 50, 110, 0.08);
 
-  @media (max-width: 1029px) { display: flex; }
+  @media (max-width: 767px) { display: flex; }
 
   a {
     flex: 1;

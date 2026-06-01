@@ -183,12 +183,7 @@
       routerLinkActive="active"
     >
       <span class="material-symbols-outlined">event_note</span>
-      <span>Sessões</span>
-    </a>
-    <a class="bottombar-link-disabled">
-      <span class="material-symbols-outlined">forum</span>
-      <span class="badge">2</span>
-      <span>Mensagens</span>
+      <span>Agendamentos</span>
     </a>
     <a
       [routerLink]="['notifications']"
@@ -198,11 +193,7 @@
       @if (notificationService.unreadCount() > 0) {
         <span class="badge">{{ notificationService.unreadCount() }}</span>
       }
-      <span>Inbox</span>
-    </a>
-    <a class="bottombar-link-disabled">
-      <span class="material-symbols-outlined">receipt_long</span>
-      <span>Faturação</span>
+      <span>Notificações</span>
     </a>
     <a
       [routerLink]="['profile']"

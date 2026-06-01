@@ -13,6 +13,7 @@ export const AppConstants = {
     getProfile: `${environment.apiUrl}/api/user/profile`,
     login: `${environment.apiUrl}/api/auth/login`,
     logout: `${environment.apiUrl}/api/auth/logout`,
+    deleteAccount: `${environment.apiUrl}/api/user`,
     loginWithGoogle: `${environment.apiUrl}/oauth2/authorization/google`,
   },
   authentication: {

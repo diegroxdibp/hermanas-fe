@@ -1,104 +1,75 @@
 import { Component, inject } from '@angular/core';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { AppConstants } from '../../app-constants';
+import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { FormService } from '../../core/services/form.service';
-import { LogoComponent } from '../../shared/components/logo/logo.component';
-import { TextInputComponent } from '../../shared/components/text-input/text-input.component';
-import { FormControlsNames } from '../../shared/enums/form-controls-names.enum';
-import { InputType } from '../../shared/enums/input-type.enum';
-import { Logo } from '../../shared/enums/logo.enum';
-import { emptyLogoConfigurationObject } from '../../shared/models/input-configuration-objects/logo-configuration-object';
-import {
-  TextInputConfigurationObject,
-  emptyTextInputConfigurationObject,
-} from '../../shared/models/input-configuration-objects/text-input-configuration-object';
 import { AuthService } from '../auth.service';
-import { finalize } from 'rxjs';
 import { Router } from '@angular/router';
 import { Pages } from '../../shared/enums/pages.enum';
 import { NavigationService } from '../../shared/services/navigation.service';
+import { FormControlsNames } from '../../shared/enums/form-controls-names.enum';
+import { AppConstants } from '../../app-constants';
 
 @Component({
   selector: 'app-register',
-  imports: [ReactiveFormsModule, TextInputComponent, LogoComponent],
+  imports: [ReactiveFormsModule],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
 })
 export class RegisterComponent {
   private readonly authService = inject(AuthService);
   private readonly formService = inject(FormService);
-  public readonly navigationService = inject(NavigationService);
-
   private readonly router = inject(Router);
+  readonly navigationService = inject(NavigationService);
 
-  emailConfigurationObject: TextInputConfigurationObject =
-    emptyTextInputConfigurationObject;
+  readonly Pages = Pages;
+  error: string | null = null;
 
-  passwordConfigurationObject: TextInputConfigurationObject =
-    emptyTextInputConfigurationObject;
+  readonly confirmPasswordCtrl = new FormControl('');
+  readonly agreeTermsCtrl = new FormControl(false);
 
-  googleButtonConfigurationObject = emptyLogoConfigurationObject;
-  error: any;
-
-  constructor() {}
-  ngOnInit(): void {
-    this.setConfiguration();
+  get emailCtrl(): FormControl {
+    return this.formService.authForm.get(FormControlsNames.EMAIL) as FormControl;
   }
 
-  setConfiguration(): void {
-    this.emailConfigurationObject = {
-      inputType: InputType.EMAIL,
-      title: AppConstants.authentication.emailInputTitle,
-      placeHolder: 'Example@email.com',
-      control: this.formService.authForm.get(
-        FormControlsNames.EMAIL,
-      ) as FormControl,
-    };
-
-    this.passwordConfigurationObject = {
-      inputType: InputType.PASSWORD,
-      title: AppConstants.authentication.passwordInputTitle,
-      control: this.formService.authForm.get(
-        FormControlsNames.PASSWORD,
-      ) as FormControl,
-      showValidationTips: true,
-    };
-
-    this.passwordConfigurationObject = {
-      inputType: InputType.PASSWORD,
-      title: AppConstants.authentication.passwordInputTitle,
-      control: this.formService.authForm.get(
-        FormControlsNames.PASSWORD,
-      ) as FormControl,
-      showValidationTips: true,
-    };
-
-    this.googleButtonConfigurationObject = {
-      name: Logo.GOOGLE,
-    };
+  get passwordCtrl(): FormControl {
+    return this.formService.authForm.get(FormControlsNames.PASSWORD) as FormControl;
   }
 
-  signUp(event: Event) {
+  get pwd(): string {
+    return this.passwordCtrl?.value ?? '';
+  }
+
+  get passwordRules() {
+    const p = this.pwd;
+    return [
+      { ok: p.length >= 8, label: 'Mínimo de 8 caracteres' },
+      { ok: /[A-Z]/.test(p), label: 'Pelo menos 1 letra maiúscula' },
+      { ok: /[0-9]/.test(p), label: 'Pelo menos 1 número' },
+    ];
+  }
+
+  get canSubmit(): boolean {
+    return (
+      this.emailCtrl?.valid &&
+      this.passwordRules.every(r => r.ok) &&
+      this.confirmPasswordCtrl.value === this.pwd &&
+      !!this.agreeTermsCtrl.value
+    );
+  }
+
+  signUp(event: Event): void {
     event.preventDefault();
-
+    if (!this.canSubmit) return;
     this.error = null;
-
     this.authService.signUp(this.formService.signUpPayload()).subscribe({
-      next: () => {
-        this.router.navigate(['/dashboard']);
-      },
+      next: () => this.router.navigate(['/onboarding']),
       error: (err) => {
-        this.error = err.error?.error ?? 'Signup failed';
+        this.error = err.error?.error ?? 'Erro ao criar conta. Tente novamente.';
       },
     });
   }
 
-  signInWithGoogle(event: Event) {
+  signUpWithGoogle(event: Event): void {
     event.preventDefault();
     window.location.href = AppConstants.apiEndpoints.loginWithGoogle;
-  }
-
-  navigateTo(page: Pages) {
-    this.navigationService.navigateTo(page);
   }
 }

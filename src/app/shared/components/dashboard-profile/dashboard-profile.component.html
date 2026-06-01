@@ -1,37 +1,118 @@
-<!-- @if (sessionService.user()?.picture ?? "") {} -->
+<div class="account-page">
 
-<ng-container
-  *ngIf="sessionService.user()?.picture as picture; else defaultIcon"
->
-  <img
-    class="therapist-card--picture"
-    mat-card-sm-image
-    [src]="picture"
-    alt="Therapist picture"
-    referrerpolicy="no-referrer"
-  />
-</ng-container>
+  <div class="page-head">
+    <h1>A sua conta</h1>
+    <p class="muted">Os dados da conta são acessados apenas pela CARE e a pessoa profissional.</p>
+  </div>
 
-<ng-template #defaultIcon>
-  <mat-icon class="therapist-card--picture therapist-card--icon">
-    account_circle
-  </mat-icon>
-</ng-template>
+  <!-- Profile picture -->
+  <div class="avatar-row">
+    <div class="avatar-circle" [attr.aria-label]="'Foto de perfil'">
+      @if (user()?.picture) {
+        <img [src]="user()!.picture" alt="Foto de perfil" class="avatar-img" referrerpolicy="no-referrer" />
+        <div class="avatar-overlay">
+          <span class="material-symbols-outlined">photo_camera</span>
+          <span class="overlay-label">Alterar</span>
+        </div>
+      } @else {
+        <span class="avatar-initials">{{ userInitials() }}</span>
+        <div class="avatar-overlay">
+          <span class="material-symbols-outlined">photo_camera</span>
+          <span class="overlay-label">Alterar</span>
+        </div>
+      }
+    </div>
+    <div class="avatar-actions">
+      <button type="button" class="btn-primary-sm">
+        <span class="material-symbols-outlined">file_upload</span>
+        Alterar foto
+      </button>
+      <button type="button" class="btn-outline-sm">Remover</button>
+      <span class="hint">JPG ou PNG, até 5 MB.</span>
+    </div>
+  </div>
 
-<app-text-input
-  [configurationObject]="nameConfigurationObject"
-></app-text-input>
+  <!-- Form grid -->
+  <div class="form-grid">
+    <div class="field span-full">
+      <label for="pf-name">Nome:</label>
+      <input id="pf-name" type="text" [formControl]="nameCtrl" />
+    </div>
 
-<app-text-input
-  [configurationObject]="emailConfigurationObject"
-></app-text-input>
+    <div class="field span-full">
+      <label for="pf-email">Email:</label>
+      <input id="pf-email" type="email" [formControl]="emailCtrl" />
+    </div>
 
-<app-text-input
-  [configurationObject]="birthDateConfigurationObject"
-></app-text-input>
+    <div class="field">
+      <label for="pf-birth">Data de nascimento:</label>
+      <input id="pf-birth" type="date" [formControl]="birthdateCtrl" [max]="maxBirthdate" [min]="minDate" />
+    </div>
 
-<app-text-input
-  [configurationObject]="genderConfigurationObject"
-></app-text-input>
+    <div class="field">
+      <label for="pf-gender">Gênero:</label>
+      <div class="select-wrap">
+        <select id="pf-gender" [formControl]="genderCtrl">
+          <option value="" disabled>Selecione</option>
+          @for (g of genders; track g) {
+            <option [value]="g">{{ g }}</option>
+          }
+        </select>
+        <span class="chev" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </span>
+      </div>
+    </div>
 
-<!-- <app-text-input [configurationObject]="bioConfigurationObject"></app-text-input> -->
+    <div class="field span-full">
+      <label>Telefone:</label>
+      <div class="phone-row">
+        <div class="select-wrap country-select">
+          <select (change)="onCountryChange($any($event.target).value)">
+            @for (c of countries; track c.code) {
+              <option [value]="c.code" [selected]="c.code === selectedCountry.code">{{ c.name }} (+{{ c.InternationalAreaCode }})</option>
+            }
+          </select>
+          <span class="chev" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </span>
+        </div>
+        <div class="phone-input-wrap">
+          <span class="dial-code">+{{ selectedCountry.InternationalAreaCode }}</span>
+          <input type="tel" [formControl]="phoneCtrl" placeholder="000 000 000" inputmode="numeric" pattern="[0-9]*" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Save bar -->
+  <div class="save-bar">
+    @if (saveSuccess()) {
+      <span class="success-msg">Alterações guardadas.</span>
+    }
+    @if (saveError) {
+      <span class="error-msg">{{ saveError }}</span>
+    }
+    <div class="save-btns">
+      <button type="button" class="btn-cancel" (click)="cancel()">Cancelar</button>
+      <button type="button" class="btn-save" (click)="save()">Salvar alterações</button>
+    </div>
+  </div>
+
+  <!-- Danger zone -->
+  <div class="danger-zone">
+    <span class="danger-label">Zona de risco</span>
+    <div class="danger-row">
+      <div>
+        <div class="danger-title">Apagar a sua conta</div>
+        <p class="muted sm">Esta ação é permanente. Não é possível recuperar os seus dados depois.</p>
+      </div>
+      <button type="button" class="btn-danger" (click)="openDeleteDialog()">Apagar conta</button>
+    </div>
+  </div>
+
+</div>

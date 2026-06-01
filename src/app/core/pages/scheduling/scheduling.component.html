@@ -1,118 +1,227 @@
-<div class="therapist-section">
-  @if (schedulingService.services.length) {
-    <mat-form-field class="therapist-selection" appScrollAnimate="fade-in-up">
-      <mat-label>Escolha um serviço</mat-label>
-      <mat-select
-        [formControl]="
-          schedulingService.schedulingForm.controls[
-            SchedulingFormControls.SELECTED_SERVICE
-          ]
-        "
-      >
-        <mat-option [value]="null">--</mat-option>
+<div class="scheduling-page">
 
-        <mat-option
-          *ngFor="let service of schedulingService.services"
-          [value]="service"
-        >
-          {{ service.name | enumValue: ProfessionalSessionService }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
+  <!-- Mobile page title -->
+  <h1 class="page-title">Agendar consulta</h1>
+
+  <!-- Mobile backdrop (click-outside for bottom sheets) -->
+  @if (openDropdown()) {
+    <div class="sheet-backdrop"></div>
   }
 
-  @if (schedulingService.professionals.length) {
-    <mat-form-field class="therapist-selection" appScrollAnimate="fade-in-up">
-      <mat-label>Escolha um profissional</mat-label>
+  <div class="scheduling-stack">
 
-      <mat-select
-        [formControl]="
-          schedulingService.schedulingForm.controls[
-            SchedulingFormControls.SELECTED_PROFESSIONAL
-          ]
-        "
-        [compareWith]="compareProfessionals"
-      >
-        <mat-option [value]="null">--</mat-option>
+    <!-- 1. Service select -->
+    <div class="field-wrap" (mousedown)="$event.stopPropagation()">
+      <button type="button"
+        class="filled-field"
+        [class.open]="openDropdown() === 'service'"
+        (mousedown)="toggleDropdown('service')">
+        <div class="field-inner">
+          <span class="field-label">Escolha um serviço <span class="req">*</span></span>
+          <span class="field-value" [class.placeholder]="!selectedService">
+            {{ selectedService ? serviceName(selectedService.name) : 'Selecione' }}
+          </span>
+        </div>
+        <span class="material-symbols-outlined field-icon">expand_more</span>
+      </button>
 
-        <mat-option
-          *ngFor="
-            let therapist of schedulingService.professionals;
-            trackBy: trackByName
-          "
-          [value]="therapist"
-        >
-          {{ therapist.name }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-    @if (selectedProfessional) {
-      <mat-card
-        class="therapist-card"
-        appearance="outlined"
-        appScrollAnimate="fade-in-up"
-      >
-        <mat-card-header class="therapist-card--header">
-          <mat-card-title-group class="title-group">
-            <mat-card-title class="title">{{
-              selectedProfessional.name
-            }}</mat-card-title>
-            <!-- <mat-card-subtitle class="subtitle">{{
-              schedulingService.schedulingForm.controls[
-                SchedulingFormControls.SELECTED_PROFESSIONAL
-              ].value?.title
-            }}</mat-card-subtitle> -->
-          </mat-card-title-group>
-          <ng-container
-            *ngIf="getProfessionalPicture() as picture; else defaultIcon"
-          >
-            <img
-              class="therapist-card--picture"
-              mat-card-sm-image
-              [src]="picture"
-              alt="Therapist picture"
-            />
-          </ng-container>
-
-          <ng-template #defaultIcon>
-            <mat-icon class="therapist-card--picture therapist-card--icon">
-              account_circle
-            </mat-icon>
-          </ng-template>
-        </mat-card-header>
-        <mat-card-content class="therapist-card--content-area"
-          ><div class="text">
-            <p>
-              {{ selectedProfessional.bio }}
-            </p>
-          </div>
-        </mat-card-content>
-      </mat-card>
-      @if (
-        schedulingService.schedulingForm.controls[
-          SchedulingFormControls.SELECTED_PROFESSIONAL
-        ].value
-      ) {
-        <app-calendar
-          *ngIf="schedulingService.availability().length"
-          [availability]="schedulingService.availability()"
-          [calendarConfiguration]="calendarConfigurationObject"
-          appScrollAnimate="fade-in-up"
-        ></app-calendar>
+      @if (openDropdown() === 'service') {
+        <div class="dropdown-popover">
+          <!-- Sheet drag handle on mobile -->
+          <div class="sheet-handle" aria-hidden="true"></div>
+          <div class="sheet-title">Escolha um serviço</div>
+          @if (schedulingService.services.length === 0) {
+            <div class="dropdown-empty">Nenhum serviço disponível.</div>
+          }
+          @for (svc of schedulingService.services; track svc.id) {
+            <button type="button"
+              class="dropdown-option"
+              [class.selected]="selectedService?.id === svc.id"
+              (click)="selectService(svc)">
+              <span class="option-name">{{ serviceName(svc.name) }}</span>
+              @if (svc.price) {
+                <span class="option-meta">{{ svc.price }}</span>
+              }
+            </button>
+          }
+        </div>
       }
-      @if (schedulingService.availability().length) {
-        <app-availabilities
-          [availabilityConfiguration]="
-            schedulingService.availabilityConfiguration()
-          "
-          [attr.data-key]="renderKey"
-          (isSubmitted)="bookAppointment($event)"
-          appScrollAnimate="fade-in-up"
-        ></app-availabilities>
+    </div>
+
+    <!-- 2. Professional select -->
+    <div class="field-wrap" (mousedown)="$event.stopPropagation()">
+      <button type="button"
+        class="filled-field"
+        [class.open]="openDropdown() === 'professional'"
+        [class.field-disabled]="!selectedService"
+        (mousedown)="selectedService && toggleDropdown('professional')">
+        <div class="field-inner">
+          <span class="field-label">Escolha um profissional <span class="req">*</span></span>
+          <span class="field-value" [class.placeholder]="!selectedProfessional">
+            @if (!selectedService) {
+              Escolha um serviço primeiro
+            } @else if (selectedProfessional) {
+              {{ selectedProfessional.name }}
+            } @else {
+              Selecione
+            }
+          </span>
+        </div>
+        <span class="material-symbols-outlined field-icon">expand_more</span>
+      </button>
+
+      @if (openDropdown() === 'professional') {
+        <div class="dropdown-popover">
+          <div class="sheet-handle" aria-hidden="true"></div>
+          <div class="sheet-title">Escolha um profissional</div>
+          @if (schedulingService.professionals.length === 0) {
+            <div class="dropdown-empty">Nenhum profissional disponível.</div>
+          }
+          @for (prof of schedulingService.professionals; track prof.id) {
+            <button type="button"
+              class="dropdown-option"
+              [class.selected]="selectedProfessional?.id === prof.id"
+              (click)="selectProfessional(prof)">
+              <span class="option-name">{{ prof.name }}</span>
+              @if (selectedProfessional?.id === prof.id) {
+                <span class="material-symbols-outlined option-check">check</span>
+              }
+            </button>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- 3. Professional card -->
+    @if (selectedProfessional) {
+      <div class="prof-card">
+        <div class="prof-avatar">
+          @if (selectedProfessional.picture) {
+            <img [src]="selectedProfessional.picture" [alt]="selectedProfessional.name" class="prof-img" referrerpolicy="no-referrer" />
+          } @else {
+            <span class="material-symbols-outlined prof-placeholder">person</span>
+          }
+        </div>
+        <div class="prof-info">
+          <h2 class="prof-name">{{ selectedProfessional.name }}</h2>
+          <p class="prof-bio">{{ selectedProfessional.bio }}</p>
+        </div>
+      </div>
+    } @else {
+      <div class="prof-card prof-card--empty">
+        <span class="prof-empty-msg">Selecione um profissional para ver o perfil.</span>
+      </div>
+    }
+
+    <!-- 4. Date field — shown after professional + availabilities loaded -->
+    @if (selectedProfessional && schedulingService.availability().length > 0) {
+      <div class="field-wrap" (mousedown)="$event.stopPropagation()">
+        <button type="button"
+          class="filled-field"
+          [class.open]="openDropdown() === 'date'"
+          (mousedown)="toggleDropdown('date')">
+          <div class="field-inner">
+            <span class="field-label">Escolha uma data</span>
+            <span class="field-value" [class.placeholder]="!selectedDay">
+              {{ selectedDay ? fmtDate(selectedDay) : 'dd/mm/aaaa' }}
+            </span>
+          </div>
+          <span class="material-symbols-outlined field-icon">calendar_today</span>
+        </button>
+
+        @if (openDropdown() === 'date') {
+          <div class="calendar-popover">
+            <div class="sheet-handle" aria-hidden="true"></div>
+            <div class="cal-header">
+              <button type="button" class="cal-nav" (click)="prevMonth()">
+                <span class="material-symbols-outlined">chevron_left</span>
+              </button>
+              <span class="cal-month-label">{{ monthLabel() }}</span>
+              <button type="button" class="cal-nav" (click)="nextMonth()">
+                <span class="material-symbols-outlined">chevron_right</span>
+              </button>
+            </div>
+
+            <div class="cal-weekdays">
+              @for (wd of weekdays; track $index) {
+                <span class="cal-wd">{{ wd }}</span>
+              }
+            </div>
+
+            <div class="cal-grid">
+              @for (cell of calendarDays(); track cell.key) {
+                <button type="button"
+                  class="cal-day"
+                  [class.other-month]="!cell.inMonth"
+                  [class.today]="isToday(cell.date)"
+                  [class.selected]="selectedDay === cell.key"
+                  [class.available]="schedulingService.timeSlots.has(cell.key)"
+                  [disabled]="isPast(cell.date) || !schedulingService.timeSlots.has(cell.key) || !cell.inMonth"
+                  (click)="selectDate(cell.key)">
+                  {{ cell.date.getDate() }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- 5. Slot cards -->
+      @if (selectedDay) {
+        @if (filteredSlots.length > 0) {
+          @for (slot of filteredSlots; track slot.id) {
+            <div class="slot-card"
+              [class.confirmed]="confirmedSlotId() === slot.id">
+
+              <button type="button" class="slot-header" (click)="toggleSlot(slot.id)">
+                <span class="slot-time">{{ fmtTime(slot.startTime) }} – {{ fmtTime(slot.endTime) }}</span>
+                <span class="slot-date">{{ fmtDate(selectedDay) }}</span>
+                <span class="material-symbols-outlined slot-chev"
+                  [class.rotated]="expandedSlotId() === slot.id">expand_more</span>
+              </button>
+
+              <div class="slot-body" [class.expanded]="expandedSlotId() === slot.id">
+                <div class="slot-body-inner">
+                  <!-- Modality segmented control -->
+                  <div class="modality-seg">
+                    @for (m of modalities; track m) {
+                      <button type="button"
+                        class="mod-btn"
+                        [class.selected]="slotModality() === m"
+                        [disabled]="confirmedSlotId() === slot.id"
+                        (click)="slotModality.set(m)">
+                        @if (slotModality() === m) {
+                          <span class="material-symbols-outlined mod-check">check</span>
+                        }
+                        {{ m }}
+                      </button>
+                    }
+                  </div>
+
+                  <!-- Agendar / Confirmado button -->
+                  <button type="button"
+                    class="agendar-btn"
+                    [class.is-confirmed]="confirmedSlotId() === slot.id"
+                    [disabled]="confirmedSlotId() === slot.id"
+                    (click)="confirmSlot(slot)">
+                    {{ confirmedSlotId() === slot.id ? 'Confirmado' : 'Agendar' }}
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          }
+        } @else {
+          <div class="no-slots">Sem horários disponíveis para esta data.</div>
+        }
       }
     }
+
+  </div><!-- /scheduling-stack -->
+
+  <!-- Toast notification -->
+  @if (toast()) {
+    <div class="toast" role="status">{{ toast() }}</div>
   }
-  @if (!loader.isHttpLoading() && !schedulingService.professionals.length) {
-    <!-- <h1>Serviço temporariamente fora do ar.</h1> -->
-  }
+
 </div>

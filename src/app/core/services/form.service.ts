@@ -149,9 +149,10 @@ export class FormService {
     const country: CountryModel = this.onboardingForm.get(
       FormControlsNames.PHONE_PREFIX,
     )?.value;
-    let phoneNumber = this.onboardingForm.get(FormControlsNames.PHONE)?.value;
-
-    if (country.code === 'br' && phoneNumber.length == 10)
+    const raw: string = (this.onboardingForm.get(FormControlsNames.PHONE)?.value ?? '').replace(/\D/g, '');
+    if (!raw) return '';
+    let phoneNumber = raw;
+    if (country?.code === 'br' && phoneNumber.length === 10)
       phoneNumber = phoneNumber.slice(0, 2) + '9' + phoneNumber.slice(2);
     return '+' + country.InternationalAreaCode + phoneNumber;
   }

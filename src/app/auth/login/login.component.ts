@@ -1,96 +1,52 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
-import { AppConstants } from '../../app-constants';
 import { FormService } from '../../core/services/form.service';
-import { LogoComponent } from '../../shared/components/logo/logo.component';
-import { TextInputComponent } from '../../shared/components/text-input/text-input.component';
-import { InputType } from '../../shared/enums/input-type.enum';
-import { Logo } from '../../shared/enums/logo.enum';
-import { emptyLogoConfigurationObject } from '../../shared/models/input-configuration-objects/logo-configuration-object';
-import {
-  TextInputConfigurationObject,
-  emptyTextInputConfigurationObject,
-} from '../../shared/models/input-configuration-objects/text-input-configuration-object';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
 import { Pages } from '../../shared/enums/pages.enum';
 import { NavigationService } from '../../shared/services/navigation.service';
 import { FormControlsNames } from '../../shared/enums/form-controls-names.enum';
-import { SessionService } from '../../shared/services/session.service';
+import { AppConstants } from '../../app-constants';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, TextInputComponent, LogoComponent],
+  imports: [ReactiveFormsModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent {
   private readonly authService = inject(AuthService);
   private readonly formService = inject(FormService);
   private readonly router = inject(Router);
-  public readonly navigationService = inject(NavigationService);
-  private readonly sessionService = inject(SessionService);
+  readonly navigationService = inject(NavigationService);
 
-  emailConfigurationObject: TextInputConfigurationObject =
-    emptyTextInputConfigurationObject;
+  readonly Pages = Pages;
+  error: string | null = null;
 
-  passwordConfigurationObject: TextInputConfigurationObject =
-    emptyTextInputConfigurationObject;
-
-  googleButtonConfigurationObject = emptyLogoConfigurationObject;
-  error: any;
-
-  constructor() {}
-  ngOnInit(): void {
-    this.setConfiguration();
+  get emailCtrl(): FormControl {
+    return this.formService.authForm.get(FormControlsNames.EMAIL) as FormControl;
   }
 
-  setConfiguration(): void {
-    this.emailConfigurationObject = {
-      inputType: InputType.EMAIL,
-      title: AppConstants.authentication.emailInputTitle,
-      placeHolder: 'Example@email.com',
-      control: this.formService.authForm.get(
-        FormControlsNames.EMAIL,
-      ) as FormControl,
-    };
-
-    this.passwordConfigurationObject = {
-      inputType: InputType.PASSWORD,
-      title: AppConstants.authentication.passwordInputTitle,
-      control: this.formService.authForm.get(
-        FormControlsNames.PASSWORD,
-      ) as FormControl,
-    };
-
-    this.googleButtonConfigurationObject = {
-      name: Logo.GOOGLE,
-    };
+  get passwordCtrl(): FormControl {
+    return this.formService.authForm.get(FormControlsNames.PASSWORD) as FormControl;
   }
 
-  signIn(event: Event) {
+  signIn(event: Event): void {
     event.preventDefault();
-
     this.error = null;
-
     this.authService.signIn(this.formService.signInPayload()).subscribe({
-      next: () => {
-        this.router.navigate(['/dashboard']);
-      },
+      next: () => this.router.navigate(['/dashboard']),
       error: (err) => {
-        if (err.status === 401) {
-          this.error = err.error?.error ?? 'Invalid email or password!';
-        }
+        this.error =
+          err.status === 401
+            ? (err.error?.error ?? 'Email ou password incorretos.')
+            : 'Ocorreu um erro. Tente novamente.';
       },
     });
   }
 
-  signInWithGoogle(event: Event) {
+  signInWithGoogle(event: Event): void {
     event.preventDefault();
     window.location.href = AppConstants.apiEndpoints.loginWithGoogle;
-  }
-
-  navigateTo(page: Pages) {
-    this.navigationService.navigateTo(page);
   }
 }

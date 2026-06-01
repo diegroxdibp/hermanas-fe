@@ -38,7 +38,7 @@ export class UserService {
 
   updateProfile(payload: UpdateProfilePayload): Observable<User> {
     return this.http
-      .put<User>(AppConstants.apiEndpoints.updateProfile, payload, {
+      .patch<User>(AppConstants.apiEndpoints.updateProfile, payload, {
         withCredentials: true,
       })
       .pipe(
@@ -46,5 +46,11 @@ export class UserService {
           this.sessionService.updateUser(updatedUser)
         )
       );
+  }
+
+  deleteAccount(): Observable<void> {
+    return this.http.delete<void>(AppConstants.apiEndpoints.deleteAccount, {
+      withCredentials: true,
+    });
   }
 }

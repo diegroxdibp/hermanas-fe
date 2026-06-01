@@ -1,19 +1,97 @@
-<form>
-  <app-text-input
-    [configurationObject]="nameConfigurationObject"
-  ></app-text-input>
+<div class="page">
+  <form (submit)="submit($event)" novalidate>
+    <div class="form-header">
+      <h2>Complete o seu perfil</h2>
+      <p class="form-subhead">Estes dados ajudam o seu profissional a preparar a sessão.</p>
+    </div>
 
-  <app-calendar
-    [calendarConfiguration]="birthDateConfigurationObject"
-  ></app-calendar>
+    <div class="field">
+      <label for="ob-name">Nome:</label>
+      <input
+        id="ob-name"
+        type="text"
+        [formControl]="nameCtrl"
+        placeholder="Bruxo Voador da Silva"
+        autocomplete="name"
+      />
+    </div>
 
-  <app-phone-input></app-phone-input>
+    <div class="two-col">
+      <div class="field">
+        <label for="ob-birth">Data de nascimento:</label>
+        <input
+          id="ob-birth"
+          type="date"
+          [formControl]="birthdateCtrl"
+          [max]="maxBirthdate"
+          [min]="minDate"
+        />
+      </div>
 
-  <app-drop-down
-    [dropDownConfigurationObject]="genderConfigurationObject"
-  ></app-drop-down>
+      <div class="field">
+        <label for="ob-gender">Gênero:</label>
+        <div class="select-wrap">
+          <select id="ob-gender" [formControl]="genderCtrl">
+            <option value="" disabled>Selecione</option>
+            @for (g of genders; track g) {
+              <option [value]="g">{{ g }}</option>
+            }
+          </select>
+          <span class="chev" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+    </div>
 
-  <button class="submit" (click)="submitOnboarding($event)">
-    <span>Finish Onboarding</span>
-  </button>
-</form>
+    <div class="phone-row">
+      <div class="field country-field">
+        <label for="ob-country">País:</label>
+        <div class="select-wrap">
+          <select
+            id="ob-country"
+            [value]="selectedCountry.code"
+            (change)="onCountryChange($any($event.target).value)"
+          >
+            @for (c of countries; track c.code) {
+              <option [value]="c.code">{{ c.name }} (+{{ c.InternationalAreaCode }})</option>
+            }
+          </select>
+          <span class="chev" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+
+      <div class="field phone-field">
+        <label for="ob-phone">Telefone:</label>
+        <div class="phone-input-wrap">
+          <span class="dial-code">+{{ selectedCountry.InternationalAreaCode }}</span>
+          <input
+            id="ob-phone"
+            type="tel"
+            [formControl]="phoneCtrl"
+            placeholder="000 000 000"
+            inputmode="numeric"
+            pattern="[0-9]*"
+          />
+        </div>
+      </div>
+    </div>
+
+    @if (error) {
+      <div class="error-msg">{{ error }}</div>
+    }
+
+    <div class="actions">
+      <button type="button" class="btn-outline" (click)="navigationService.navigateTo(navigationService.Pages.SIGN_UP)">
+        Voltar
+      </button>
+      <button type="submit" class="btn-primary">Continuar</button>
+    </div>
+  </form>
+</div>

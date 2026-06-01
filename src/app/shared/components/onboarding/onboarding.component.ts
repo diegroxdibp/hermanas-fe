@@ -1,120 +1,87 @@
-import { SessionService } from './../../services/session.service';
-import { UserService } from './../../services/user.service';
-import { Component, inject } from '@angular/core';
-import { Pages } from '../../enums/pages.enum';
-import { finalize } from 'rxjs';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { AppConstants } from '../../../app-constants';
-import { FormControlsNames } from '../../enums/form-controls-names.enum';
+import { Component, inject, OnInit } from '@angular/core';
+import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
-import { NavigationService } from '../../services/navigation.service';
 import { FormService } from '../../../core/services/form.service';
-import { CalendarComponent } from '../calendar/calendar.component';
-import {
-  CalendarConfigurationObject,
-  emptyCalendarConfiguration,
-} from '../../models/input-configuration-objects/calendar-configuration-object';
-import { CalendarType } from '../../enums/calendar-type.enum';
-import {
-  DropDownConfigurationObject,
-  emptyDropDownConfigurationObject,
-} from '../../models/input-configuration-objects/drop-down-configuration-object';
-import { DropDownComponent } from '../drop-down/drop-down.component';
-import { PhoneInputComponent } from '../phone-input/phone-input.component';
+import { SessionService } from '../../services/session.service';
+import { UserService } from '../../services/user.service';
+import { NavigationService } from '../../services/navigation.service';
+import { FormControlsNames } from '../../enums/form-controls-names.enum';
+import { CountryModel, defaultCountry } from '../../models/country.model';
+import { Countries } from '../../../../assets/countries';
 import { Genders } from '../../enums/genders.enum';
-import { TextInputComponent } from '../text-input/text-input.component';
-import {
-  emptyTextInputConfigurationObject,
-  TextInputConfigurationObject,
-} from '../../models/input-configuration-objects/text-input-configuration-object';
-import { InputType } from '../../enums/input-type.enum';
 import { OnboardingResponse } from '../../models/onboarding-response.model';
-import { LoadingService } from '../../../core/services/loading.service';
 
 @Component({
   selector: 'app-onboarding',
-  imports: [
-    ReactiveFormsModule,
-    CalendarComponent,
-    PhoneInputComponent,
-    DropDownComponent,
-    TextInputComponent,
-  ],
+  imports: [ReactiveFormsModule],
   templateUrl: './onboarding.component.html',
   styleUrl: './onboarding.component.scss',
 })
-export class OnboardingComponent {
+export class OnboardingComponent implements OnInit {
   private readonly formService = inject(FormService);
   private readonly sessionService = inject(SessionService);
-  readonly userService = inject(UserService);
-  private readonly loaderService = inject(LoadingService);
+  private readonly userService = inject(UserService);
   private readonly router = inject(Router);
-  public readonly navigationService = inject(NavigationService);
-  nameConfigurationObject: TextInputConfigurationObject =
-    emptyTextInputConfigurationObject;
+  readonly navigationService = inject(NavigationService);
 
-  birthDateConfigurationObject: CalendarConfigurationObject =
-    emptyCalendarConfiguration;
+  readonly countries = Countries;
+  readonly genders = Object.values(Genders);
+  readonly maxBirthdate = (() => { const d = new Date(); d.setFullYear(d.getFullYear() - 18); return d.toISOString().slice(0, 10); })();
+  readonly minDate = new Date(new Date().getFullYear() - 120, 0, 1).toISOString().slice(0, 10);
+  error: string | null = null;
 
-  genderConfigurationObject: DropDownConfigurationObject =
-    emptyDropDownConfigurationObject;
+  get nameCtrl(): FormControl {
+    return this.formService.onboardingForm.get(FormControlsNames.NAME) as FormControl;
+  }
 
-  error: any;
-  phoneControl = new FormControl('');
+  get birthdateCtrl(): FormControl {
+    return this.formService.onboardingForm.get(FormControlsNames.BIRTHDATE) as FormControl;
+  }
+
+  get genderCtrl(): FormControl {
+    return this.formService.onboardingForm.get(FormControlsNames.GENDER) as FormControl;
+  }
+
+  get phoneCtrl(): FormControl {
+    return this.formService.onboardingForm.get(FormControlsNames.PHONE) as FormControl;
+  }
+
+  get selectedCountry(): CountryModel {
+    return (
+      (this.formService.onboardingForm.get(FormControlsNames.PHONE_PREFIX)?.value as CountryModel) ??
+      defaultCountry
+    );
+  }
 
   ngOnInit(): void {
-    this.setConfiguration();
+    this.formService.onboardingForm.reset({
+      [FormControlsNames.PHONE_PREFIX]: defaultCountry,
+    });
   }
 
-  setConfiguration(): void {
-    this.nameConfigurationObject = {
-      inputType: InputType.TEXT,
-      title: AppConstants.authentication.nameInputTitle,
-      placeHolder: 'Bruxo Voador da Silva',
-      control: this.formService.onboardingForm.get(
-        FormControlsNames.NAME,
-      ) as FormControl,
-    };
-
-    this.birthDateConfigurationObject = {
-      title: AppConstants.authentication.emailInputTitle,
-      calendarType: CalendarType.BIRTHDATE,
-      control: this.formService.onboardingForm.get(
-        FormControlsNames.BIRTHDATE,
-      ) as FormControl,
-    };
-
-    this.genderConfigurationObject = {
-      label: 'Gênero',
-      control: this.formService.onboardingForm.get(
-        FormControlsNames.GENDER,
-      ) as FormControl,
-      values: Object.values(Genders),
-    };
+  onCountryChange(code: string): void {
+    const c = Countries.find(x => x.code === code);
+    if (c) {
+      this.formService.onboardingForm.get(FormControlsNames.PHONE_PREFIX)?.setValue(c);
+    }
   }
 
-  submitOnboarding(event: Event) {
+  submit(event: Event): void {
     event.preventDefault();
-
     this.error = null;
-    console.log(this.formService.onboardingPayload());
-    this.userService
-      .onboarding(this.formService.onboardingPayload())
-      .subscribe({
-        next: (userPartial: OnboardingResponse) => {
-          this.sessionService.updateUser(userPartial);
-          console.log('User', this.sessionService.user());
+    try {
+      const payload = this.formService.onboardingPayload();
+      this.userService.onboarding(payload).subscribe({
+        next: (res: OnboardingResponse) => {
+          this.sessionService.updateUser(res);
           this.router.navigate(['/dashboard']);
         },
         error: (err: any) => {
-          if (err.status === 401) {
-            this.error = err.error?.error ?? 'Error on Onboarding!';
-          }
+          this.error = err.error?.error ?? 'Erro ao guardar perfil. Tente novamente.';
         },
       });
-  }
-
-  navigateTo(page: Pages) {
-    this.navigationService.navigateTo(page);
+    } catch (e: any) {
+      this.error = e.message ?? 'Dados inválidos.';
+    }
   }
 }

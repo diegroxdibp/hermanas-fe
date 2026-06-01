@@ -51,7 +51,7 @@ export class AppComponent {
     });
 
     effect(() => {
-      if (this.sessionService.isAuthenticated()) {
+      if (this.sessionService.user()?.profileCompleted) {
         this.notificationService.connect();
       } else {
         this.notificationService.disconnect();
