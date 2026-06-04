@@ -13,6 +13,7 @@
           <a
             (click)="navigateTo(navigationItem.destination)"
             class="menu-item"
+            [class.active]="isActive(navigationItem.destination)"
             >{{ navigationItem.name }}</a
           >
         </li>

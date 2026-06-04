@@ -1,54 +1,48 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
-import { ApiService } from '../../../core/services/api.service';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDivider } from '@angular/material/divider';
-import { ScrollAnimateDirective } from '../../../shared/directives/scroll-animate.directive';
+import { Component } from '@angular/core';
+import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
+import { NavigationService } from '../../../shared/services/navigation.service';
+import { Pages } from '../../../shared/enums/pages.enum';
 
 @Component({
   selector: 'app-contact',
-  imports: [
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatDivider,
-    ScrollAnimateDirective
-  ],
+  imports: [ReactiveFormsModule],
   templateUrl: './contact.component.html',
   styleUrl: './contact.component.scss',
 })
 export class ContactComponent {
-  @ViewChild('name') name: ElementRef | undefined;
-  @ViewChild('phone') phone: ElementRef | undefined;
-  @ViewChild('subject') subject: ElementRef | undefined;
-  @ViewChild('body') body: ElementRef | undefined;
+  sent = false;
 
-  constructor(public apiService: ApiService) { }
+  form = new FormGroup({
+    nome: new FormControl('', Validators.required),
+    telefone: new FormControl('', Validators.required),
+    assunto: new FormControl('', Validators.required),
+    mensagem: new FormControl('', Validators.required),
+  });
 
-  handleScheduleButton() {
-    this.apiService.sendEmail(
-      this.subject?.nativeElement.value,
-      this.body?.nativeElement.value,
-    );
-    console.log(
-      'Subject:',
-      this.body?.nativeElement.value,
-      'Body:',
-      this.body?.nativeElement.value,
-    );
+  constructor(private navigationService: NavigationService) {}
+
+  isError(field: string): boolean {
+    const control = this.form.get(field);
+    return !!(control?.invalid && control?.touched);
   }
 
-  handleEmailButton() {
-    const subjectText = this.subject?.nativeElement.value;
-    const bodyText = `${this.body?.nativeElement.value}
-    Nome: ${this.name?.nativeElement.value}
-    Telefone: ${this.phone?.nativeElement.value}`;
+  submit(): void {
+    this.form.markAllAsTouched();
+    if (this.form.invalid) return;
 
-    const mailtoLink = `mailto:luanebastos88@gmail.com?subject=${encodeURIComponent(subjectText)}&body=${encodeURIComponent(bodyText)}`;
-
+    const { nome, telefone, assunto, mensagem } = this.form.value;
+    const bodyText = `${mensagem}\n\nNome: ${nome}\nTelefone: ${telefone}`;
+    const mailtoLink = `mailto:luanebastos88@gmail.com?subject=${encodeURIComponent(assunto ?? '')}&body=${encodeURIComponent(bodyText)}`;
     window.location.href = mailtoLink;
+
+    this.sent = true;
+    setTimeout(() => {
+      this.sent = false;
+      this.form.reset();
+    }, 3200);
+  }
+
+  goToScheduling(): void {
+    this.navigationService.navigateTo(Pages.SCHEDULING);
   }
 }

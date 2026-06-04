@@ -1,41 +1,47 @@
-<mat-card class="contact-card" appearance="outlined" appScrollAnimate="fade-in-up">
-  <mat-card-header class="card-header">
-    <mat-card-title-group class="title-group">
-      <mat-card-title class="title">Contato</mat-card-title>
-      <mat-card-subtitle class="subtitle">Tire suas dúvidas, envie-nos uma mensagem:</mat-card-subtitle>
-    </mat-card-title-group>
-  </mat-card-header>
-  <mat-divider></mat-divider>
-  <mat-card-content class="card-content">
-    <form class="text-area">
-      <mat-form-field>
-        <mat-label>Nome:</mat-label>
-        <input #name matInput />
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>Telefone:</mat-label>
-        <input #phone matInput placeholder="351 910 277 826" />
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>Assunto:</mat-label>
-        <input #subject matInput placeholder="Análise Corporal Reichiana" />
-      </mat-form-field>
-
-      <mat-form-field>
-        <mat-label>Mensagem:</mat-label>
-        <textarea #body matInput
-          placeholder="Ex. Gostaria de marcar um agendamento para segunda-feira as 18 horas..."></textarea>
-      </mat-form-field>
-    </form>
-    <button mat-raised-button class="submit-button" (click)="handleEmailButton()">
-      <a>ENVIAR</a>
-    </button>
-    <div class="disclaimers">
-      <span>Ao enviar o email, aceito os termos de uso e política de privacidade.</span>
-
-      <span>Se quer agendar algum serviço, clique <a href="">aqui</a>.</span>
+<div class="section">
+  <form class="contact-card" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="card-head">
+      <h1 class="card-title">Contato</h1>
+      <p class="card-sub">Tire suas dúvidas, envie-nos uma mensagem:</p>
     </div>
-    <!--  <h2>Obrigado!</h2>
-    <p>Em breve nossa equipe entrará em contato.</p> -->
-  </mat-card-content>
-</mat-card>
+    <div class="card-divider"></div>
+
+    <div class="card-body">
+      <div class="field" [class.is-error]="isError('nome')">
+        <label for="nome" class="field-label">Nome:</label>
+        <input id="nome" type="text" class="field-input" formControlName="nome" placeholder="O seu nome" />
+      </div>
+
+      <div class="field" [class.is-error]="isError('telefone')">
+        <label for="telefone" class="field-label">Telefone:</label>
+        <input id="telefone" type="tel" class="field-input" formControlName="telefone" placeholder="+351 915 784 896" />
+      </div>
+
+      <div class="field" [class.is-error]="isError('assunto')">
+        <label for="assunto" class="field-label">Assunto:</label>
+        <input id="assunto" type="text" class="field-input" formControlName="assunto" placeholder="Sobre o que gostaria de falar?" />
+      </div>
+
+      <div class="field" [class.is-error]="isError('mensagem')">
+        <label for="mensagem" class="field-label">Mensagem:</label>
+        <textarea id="mensagem" class="field-input" formControlName="mensagem" rows="4" placeholder="Escreva a sua mensagem"></textarea>
+      </div>
+
+      <button type="submit" class="enviar-btn" [class.is-sent]="sent">
+        @if (sent) {
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Mensagem enviada
+        } @else {
+          ENVIAR
+        }
+      </button>
+
+      <div class="card-fineprint">
+        <p>Ao enviar o email, aceito os termos de uso e política de privacidade.</p>
+        <p>Se quer agendar algum serviço, clique <a (click)="goToScheduling()"><strong>aqui</strong></a>.</p>
+      </div>
+    </div>
+  </form>
+</div>

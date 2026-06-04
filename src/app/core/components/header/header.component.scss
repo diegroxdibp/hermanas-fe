@@ -44,6 +44,7 @@
 
         a {
           display: inline-flex;
+          flex-direction: column;
           align-items: center;
           justify-content: center;
 
@@ -60,6 +61,16 @@
           &:hover {
             transform: scale(1.1);
             color: palette.$primaryColorPurple;
+          }
+
+          &.active::after {
+            content: '';
+            display: block;
+            height: 3px;
+            width: 100%;
+            border-radius: 2px;
+            background: palette.$primaryColorPurple;
+            margin-top: 5px;
           }
         }
       }

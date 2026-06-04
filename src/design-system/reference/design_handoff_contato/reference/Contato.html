@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Care · Contato</title>
+<link rel="stylesheet" href="colors_and_type.css" />
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--color-white);
+    color: var(--fg-1);
+    font-family: var(--font-sans);
+    min-height: 100vh;
+  }
+  .page { display: flex; flex-direction: column; min-height: 100vh; }
+
+  /* ---------------- Header ---------------- */
+  .app-header {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; gap: 24px;
+    height: 92px; padding: 0 40px;
+    background: var(--color-white);
+    border-bottom: 1px solid var(--color-surface-tint);
+  }
+  .brand { display: flex; align-items: center; }
+  .brand img { height: 56px; width: auto; display: block; }
+
+  .app-nav { margin-left: auto; display: flex; align-items: center; gap: 40px; }
+  .app-nav-link {
+    font-family: var(--font-sans);
+    font-size: 21px; font-weight: var(--fw-bold); font-style: normal;
+    color: var(--color-primary-blue);
+    text-decoration: none; line-height: 1;
+    transition: color var(--dur-fast) ease, transform var(--dur-fast) ease;
+  }
+  .app-nav-link:hover { color: var(--fg-accent); transform: scale(1.05); }
+  .app-nav-link.active { color: var(--color-primary-blue); }
+  .app-nav-link.active::after {
+    content: ''; display: block; height: 3px; border-radius: 2px;
+    background: var(--color-primary-purple); margin-top: 6px;
+  }
+
+  .header-tools { display: flex; align-items: center; gap: 20px; position: relative; }
+
+  .bell-btn {
+    position: relative; display: flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px; border: 0; border-radius: var(--radius-pill);
+    background: transparent; color: var(--color-primary-blue); cursor: pointer;
+    transition: background var(--dur-fast) ease;
+  }
+  .bell-btn:hover { background: var(--color-surface-tint); }
+  .bell-btn svg { display: block; }
+  .bell-dot {
+    position: absolute; top: 9px; right: 10px; width: 9px; height: 9px;
+    border-radius: 50%; background: var(--color-secondary-pink);
+    border: 2px solid var(--color-white);
+  }
+
+  .user-chip {
+    display: flex; align-items: center; gap: 12px;
+    border: 0; background: transparent; cursor: pointer;
+    padding: 6px 6px 6px 6px; border-radius: var(--radius-pill);
+    transition: background var(--dur-fast) ease;
+  }
+  .user-chip:hover { background: var(--color-surface-tint); }
+  .avatar {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: var(--color-primary-blue); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: var(--fw-bold); font-size: 17px; letter-spacing: .5px;
+  }
+  .user-meta { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.15; }
+  .user-name { font-weight: var(--fw-bold); font-size: 17px; color: var(--color-primary-blue); }
+  .user-role { font-weight: var(--fw-regular); font-size: 15px; color: var(--color-muted); }
+  .chev { color: var(--color-primary-blue); display: flex; transition: transform var(--dur-base) ease; }
+  .chev.open { transform: rotate(180deg); }
+
+  .user-menu {
+    position: absolute; top: calc(100% + 10px); right: 0; min-width: 232px;
+    background: #fff; border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-lg); padding: 8px;
+    filter: var(--shadow-floating); z-index: 120;
+    display: flex; flex-direction: column;
+  }
+  .user-menu a {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 12px; border-radius: var(--radius-sm);
+    font-size: 16px; font-weight: var(--fw-medium); font-style: normal;
+    color: var(--color-primary-blue); text-decoration: none;
+    transition: background var(--dur-fast) ease;
+  }
+  .user-menu a:hover { background: var(--color-surface-tint); }
+  .user-menu a svg { color: var(--color-secondary-indigo); flex: none; }
+  .user-menu a.signout, .user-menu a.signout svg { color: var(--color-secondary-pink); }
+  .user-menu .user-menu-divider { height: 1px; background: var(--color-border-soft); margin: 6px 4px; }
+
+  /* ---------------- Main / section ---------------- */
+  .section {
+    flex: 1; width: 100%;
+    background: var(--section-bg, var(--color-secondary-green));
+    display: flex; justify-content: center;
+    padding: 48px 24px 64px;
+    transition: background var(--dur-base) ease;
+  }
+
+  /* ---------------- Card ---------------- */
+  .contact-card {
+    width: 100%; max-width: 800px;
+    background: var(--color-white);
+    border-radius: var(--radius-xl);
+    filter: drop-shadow(0 10px 28px rgba(33, 51, 110, 0.20));
+    padding: 36px 40px 40px;
+    align-self: flex-start;
+  }
+  .card-head { padding-bottom: 18px; }
+  .card-title { font-size: 30px; font-weight: var(--fw-bold); color: var(--color-primary-blue); margin: 0 0 4px; }
+  .card-sub {
+    font-size: 18px; font-weight: var(--fw-regular); color: var(--color-primary-blue);
+    margin: 0; text-align: left; line-height: 1.4;
+  }
+  .card-divider { height: 1px; background: var(--color-border); }
+  .card-body { display: flex; flex-direction: column; gap: 18px; padding-top: 28px; }
+
+  /* ---------------- Outlined field (label above) ---------------- */
+  .field { display: flex; flex-direction: column; gap: 8px; }
+  .field-label {
+    font-size: 15px; font-weight: var(--fw-semibold); color: var(--color-primary-blue);
+    line-height: 1.2;
+  }
+  .field-input {
+    width: 100%; display: block;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-white);
+    font-family: var(--font-sans); font-size: 16px; color: var(--color-primary-blue);
+    padding: 13px 16px; outline: 0;
+    transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+  }
+  textarea.field-input { resize: vertical; min-height: 110px; line-height: 1.5; }
+  .field-input::placeholder { color: var(--color-muted); }
+  .field-input:hover { border-color: #b7bcce; }
+  .field-input:focus {
+    border-color: var(--color-primary-blue);
+    box-shadow: 0 0 0 3px rgba(34, 50, 110, 0.12);
+  }
+  .field.is-error .field-input { border-color: var(--color-secondary-pink); }
+  .field.is-error .field-input:focus { box-shadow: 0 0 0 3px rgba(204, 174, 208, 0.4); }
+
+  /* ---------------- Enviar button ---------------- */
+  .enviar-btn {
+    margin-top: 8px; width: 100%; padding: 17px;
+    border: 1px solid var(--color-border); border-radius: var(--radius-pill);
+    background: var(--color-white); color: var(--color-primary-blue);
+    font-family: var(--font-sans); font-weight: var(--fw-bold); font-size: 16px;
+    letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer;
+    filter: drop-shadow(0 2px 5px rgba(33, 51, 110, 0.14));
+    transition: transform var(--dur-fast) ease, background var(--dur-fast) ease, color var(--dur-fast) ease;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .enviar-btn:hover { transform: scale(1.01); background: var(--color-primary-blue); color: #fff; border-color: var(--color-primary-blue); }
+  .enviar-btn:active { transform: scale(0.99); }
+  .enviar-btn.is-sent { background: var(--color-secondary-green); color: #fff; border-color: var(--color-secondary-green); }
+  .enviar-btn svg { flex: none; }
+
+  .card-fineprint { margin-top: 18px; display: flex; flex-direction: column; gap: 6px; }
+  .card-fineprint p {
+    font-size: 17px; font-style: italic; font-weight: var(--fw-regular);
+    color: var(--color-primary-blue); text-align: left; line-height: 1.45; margin: 0;
+  }
+  .card-fineprint a { color: var(--color-primary-blue); font-weight: var(--fw-bold); font-style: italic; text-decoration: none; }
+  .card-fineprint a:hover { color: var(--fg-accent); }
+  .card-fineprint strong { font-weight: var(--fw-bold); }
+
+  /* ---------------- Footer ---------------- */
+  .app-footer {
+    background: var(--color-secondary-cyan);
+    padding: 22px 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap;
+  }
+  .footer-copy { color: var(--color-secondary-indigo); }
+  .footer-line1 { font-weight: var(--fw-bold); font-size: 16px; }
+  .footer-line2 { font-weight: var(--fw-regular); font-size: 15px; margin-top: 2px; }
+  .footer-socials { display: flex; gap: 12px; list-style: none; margin: 0; padding: 0; }
+  .footer-socials a {
+    display: flex; width: 42px; height: 42px; border-radius: var(--radius-sm);
+    align-items: center; justify-content: center;
+    background: var(--color-secondary-indigo);
+    transition: background var(--dur-base) ease, transform var(--dur-fast) ease;
+  }
+  .footer-socials a:hover { background: var(--color-primary-purple); }
+  .footer-socials a:hover svg { transform: scale(1.1); }
+  .footer-socials a:active { transform: scale(0.95); }
+  .footer-socials svg { transition: transform var(--dur-fast) ease; }
+
+  @media (max-width: 720px) {
+    .app-header { height: 70px; padding: 0 16px; gap: 12px; }
+    .brand img { height: 40px; }
+    .app-nav { display: none; }
+    .user-meta { display: none; }
+    .section { padding: 24px 16px 40px; }
+    .contact-card { padding: 24px 20px 28px; }
+  }
+</style>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="contact.jsx"></script>
+<script type="text/babel">
+  const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "sectionBg": "#f6f7fb"
+  }/*EDITMODE-END*/;
+
+  function App() {
+    const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+    return (
+      <div className="page" style={{ '--section-bg': t.sectionBg }}>
+        <AppHeader active="contato" />
+        <main className="section">
+          <ContactCard t={t} />
+        </main>
+        <AppFooter />
+
+        <TweaksPanel>
+          <TweakSection label="Página" />
+          <TweakColor label="Fundo da secção" value={t.sectionBg}
+                      options={['#f6f7fb', '#56b093', '#77c5d5', '#ccaed0', '#42458e']}
+                      onChange={(v) => setTweak('sectionBg', v)} />
+        </TweaksPanel>
+      </div>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

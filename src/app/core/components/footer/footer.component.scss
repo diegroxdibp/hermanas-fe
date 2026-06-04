@@ -1,82 +1,111 @@
 @use "../../../../assets/styles/palette.scss" as palette;
 @use "../../../../assets/styles/breakpoints.scss" as breakpoint;
+@use "../../../../assets/styles/typography.scss" as typography;
 
-footer {
+.footer-wrap {
+  background: var(--color-surface-tint);
+}
+
+.wave {
+  display: block;
+  width: 100%;
+  height: 46px;
+}
+
+.footer-body {
+  padding: 8px 64px 0;
+  color: var(--color-primary-blue);
+  max-width: 1280px;
+  margin: 0 auto;
+
+  @media (max-width: breakpoint.$breakpoint-md) {
+    padding: 8px 24px 0;
+  }
+}
+
+.top {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1.3fr;
+  gap: 48px;
+  padding: 24px 0 48px;
+  align-items: start;
+
+  @media (max-width: breakpoint.$breakpoint-md) {
+    grid-template-columns: 1fr 1fr;
+    gap: 36px;
+  }
+}
+
+.brand {
+  align-self: center;
+}
+
+h4 {
+  font-family: typography.$sourceSans;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--color-primary-blue);
+  margin: 0 0 18px;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  padding: 20px;
-  justify-content: space-between;
+  gap: 11px;
+  font-style: normal;
+}
+
+li {
+  display: flex;
+  justify-content: flex-start;
+}
+
+li a {
+  font-family: typography.$sourceSans;
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--color-secondary-indigo);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s var(--ease-care);
+
+  &:hover { color: var(--color-primary-purple); }
+}
+
+.contact-list li a {
+  display: flex;
   align-items: center;
+  gap: 11px;
+  color: var(--color-secondary-indigo);
+  overflow-wrap: break-word;
+  word-break: break-all;
+  min-width: 0;
+
+  svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+    flex: none;
+    display: block;
+    max-width: none;
+  }
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
   gap: 16px;
-  background-color: palette.$secondaryColorCyan;
-
-  content {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    color: palette.$secondaryColorPurple;
-    text-align: center;
-
-    .copyright {
-      font-weight: 800;
-    }
-  }
-
-  .social-media-group {
-    display: flex;
-    gap: 12px;
-    padding: 0;
-    list-style: none;
-
-    .social-media-item {
-      display: flex;
-    }
-
-    .social-media-item-link {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      width: 40px;
-      height: 40px;
-
-      border-radius: 5px;
-      background-color: palette.$secondaryColorPurple;
-
-      text-decoration: none;
-      transition: all 0.3s ease;
-
-      svg {
-        width: 20px;
-        fill: white;
-        transition: all 0.3s ease;
-
-      }
-
-      &:hover {
-        background-color: palette.$primaryColorPurple;
-
-        svg {
-          transform: scale(1.1);
-        }
-      }
-
-      &:focus-visible {
-        outline: 2px solid white;
-        outline-offset: 2px;
-      }
-
-      &:active {
-        transform: scale(0.95);
-      }
-    }
-  }
-
-  @media (min-width: breakpoint.$breakpoint-sm) {
-    flex-direction: row;
-
-    content {
-      text-align: left;
-    }
-  }
+  border-top: 1px solid var(--color-border);
+  padding: 22px 0;
+  font-family: typography.$sourceSans;
+  font-size: 13.5px;
+  font-weight: 400;
+  color: #737a8c;
 }

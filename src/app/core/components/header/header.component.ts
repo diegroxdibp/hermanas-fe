@@ -7,6 +7,7 @@ import {
   Renderer2,
   ViewChild,
 } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { NavigationBarService } from '../../../shared/services/navigation-bar.service';
 import { ScreenSizeService } from '../../../shared/services/screen-size.service';
@@ -59,6 +60,14 @@ export class HeaderComponent {
 
   readonly firstName = computed(() => this.user()?.name?.split(' ')[0] ?? '');
   readonly userEmail = computed(() => this.user()?.email ?? '');
+
+  readonly currentUrl = toSignal(this.navigationService.currentUrl, { initialValue: '/' });
+
+  isActive(destination: Pages): boolean {
+    const url = this.currentUrl();
+    if (destination === Pages.HOME) return url === '/' || url === '';
+    return url === `/${destination}` || url.startsWith(`/${destination}/`);
+  }
 
   fixedHeader = true;
   heroHeight: string = '100vh';
