@@ -1,2 +1,6 @@
 name = "care"
-pages_build_output_dir = "dist/hermanas-fe/browser"
+compatibility_date = "2026-06-12"
+
+[assets]
+directory = "dist/hermanas-fe/browser"
+not_found_handling = "single-page-application"
