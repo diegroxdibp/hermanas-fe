@@ -95,6 +95,9 @@
             "production": {
               "buildTarget": "hermanas-fe:build:production"
             },
+            "staging": {
+              "buildTarget": "hermanas-fe:build:staging"
+            },
             "development": {
               "buildTarget": "hermanas-fe:build:development"
             }

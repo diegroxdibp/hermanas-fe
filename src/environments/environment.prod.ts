@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://care.azurewebsites.net',
+  apiUrl: 'https://acurar-be.fly.dev',
 };
