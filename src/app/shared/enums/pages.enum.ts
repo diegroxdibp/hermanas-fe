@@ -19,6 +19,7 @@ export enum Pages {
   SUPERVISION = `${Pages.FOR_PROFESSIONALS}/supervision`,
   CONTACT = 'contact',
   SCHEDULING = 'scheduling',
+  ERROR = 'error',
   LUANE = `${Pages.BIO}/luane`,
   RAYSSA = `${Pages.BIO}/rayssa`,
   YARA = `${Pages.BIO}/yara`,

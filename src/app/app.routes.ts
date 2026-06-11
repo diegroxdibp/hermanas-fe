@@ -161,6 +161,14 @@ export const routes: Routes = [
   },
 
   {
+    path: 'error',
+    loadComponent: () =>
+      import('./core/pages/error/error.component').then(
+        (m) => m.ErrorPageComponent,
+      ),
+  },
+
+  {
     path: '**',
     redirectTo: '',
   },

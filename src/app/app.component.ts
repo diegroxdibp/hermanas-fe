@@ -10,6 +10,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from './core/components/header/header.component';
 import { LoadingService } from './core/services/loading.service';
+import { ErrorService } from './core/services/error.service';
 import { FooterComponent } from './core/components/footer/footer.component';
 import { NotificationService } from './core/services/notification.service';
 import { SessionService } from './shared/services/session.service';
@@ -29,6 +30,7 @@ import { SessionService } from './shared/services/session.service';
 export class AppComponent {
   title = 'CARE - Clínica Ampliada Resignificações';
   loader = inject(LoadingService);
+  readonly errorService = inject(ErrorService);
   router = inject(Router);
   private readonly notificationService = inject(NotificationService);
   private readonly sessionService = inject(SessionService);
