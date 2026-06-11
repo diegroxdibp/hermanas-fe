@@ -1,0 +1,5 @@
+name = "care"
+pages_build_output_dir = "dist/hermanas-fe/browser"
+
+[build]
+command = "npm run build"
