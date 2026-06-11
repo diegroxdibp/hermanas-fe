@@ -9,3 +9,36 @@
     height: 100%;
   }
 }
+
+.progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  z-index: 2000;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--color-primary-purple, #8e7fae);
+    opacity: 0.2;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 60%;
+    background: var(--color-primary-purple, #8e7fae);
+    animation: progress-slide 1.8s infinite cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+@keyframes progress-slide {
+  0%   { left: -60%; }
+  100% { left: 100%; }
+}

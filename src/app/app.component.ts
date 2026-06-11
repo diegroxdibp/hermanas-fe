@@ -9,7 +9,6 @@ import {
 } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from './core/components/header/header.component';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { LoadingService } from './core/services/loading.service';
 import { FooterComponent } from './core/components/footer/footer.component';
 import { NotificationService } from './core/services/notification.service';
@@ -22,7 +21,6 @@ import { SessionService } from './shared/services/session.service';
     RouterOutlet,
     FooterComponent,
     HeaderComponent,
-    MatProgressBarModule,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',

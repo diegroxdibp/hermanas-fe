@@ -16,9 +16,6 @@ import { NavigationService } from '../../../shared/services/navigation.service';
 import { Pages } from '../../../shared/enums/pages.enum';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../auth/auth.service';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { LogoHorizontalComponent } from "../../../shared/components/logo-horizontal/logo-horizontal.component";
 import { SessionService } from '../../../shared/services/session.service';
 import { NotificationService } from '../../services/notification.service';
@@ -29,9 +26,6 @@ import { NotificationResponse } from '../../../shared/models/notification.types'
   imports: [
     FullscreenMenuComponent,
     CommonModule,
-    MatMenuModule,
-    MatButtonModule,
-    MatIconModule,
     LogoHorizontalComponent,
   ],
   templateUrl: './header.component.html',
@@ -63,10 +57,35 @@ export class HeaderComponent {
 
   readonly currentUrl = toSignal(this.navigationService.currentUrl, { initialValue: '/' });
 
+  isNotifOpen = false;
+  isUserMenuOpen = false;
+
   isActive(destination: Pages): boolean {
     const url = this.currentUrl();
     if (destination === Pages.HOME) return url === '/' || url === '';
     return url === `/${destination}` || url.startsWith(`/${destination}/`);
+  }
+
+  toggleNotif(e: MouseEvent): void {
+    e.stopPropagation();
+    this.isNotifOpen = !this.isNotifOpen;
+    this.isUserMenuOpen = false;
+  }
+
+  toggleUserMenu(e: MouseEvent): void {
+    e.stopPropagation();
+    this.isUserMenuOpen = !this.isUserMenuOpen;
+    this.isNotifOpen = false;
+  }
+
+  closeMenus(): void {
+    this.isNotifOpen = false;
+    this.isUserMenuOpen = false;
+  }
+
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    this.closeMenus();
   }
 
   fixedHeader = true;
@@ -97,10 +116,12 @@ export class HeaderComponent {
   }
 
   logOut(): void {
+    this.closeMenus();
     this.authService.logout();
   }
 
   onNotifClick(n: NotificationResponse): void {
+    this.closeMenus();
     if (!n.read) {
       this.notificationsService.markAsRead(n.id).subscribe();
     }
@@ -112,6 +133,7 @@ export class HeaderComponent {
   }
 
   goToNotifications(): void {
+    this.closeMenus();
     this.router.navigate(['/dashboard', 'notifications']);
   }
 
@@ -133,7 +155,6 @@ export class HeaderComponent {
     const headerHeight = this.el.nativeElement.offsetHeight;
 
     if (isHeroPage) {
-      // For pages with hero section
       const heroHeight = this.convertVhToPx(this.heroHeight);
       const triggerPosition = heroHeight - headerHeight;
 
@@ -143,7 +164,6 @@ export class HeaderComponent {
         this.removeBackground();
       }
     } else {
-      // For pages without hero section
       if (scrollPosition > headerHeight) {
         this.addBackground();
       } else {

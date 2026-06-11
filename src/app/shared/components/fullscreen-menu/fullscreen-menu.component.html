@@ -1,3 +1,10 @@
 <button class="icon-btn" (click)="toggleMenu()" aria-label="Menu">
   <span class="material-symbols-outlined">{{ isMenuOpen ? 'close' : 'menu' }}</span>
 </button>
+
+@if (isMenuOpen) {
+  <div class="sheet-backdrop" (click)="closeMenu()"></div>
+  <div class="sheet-container">
+    <app-mobile-menu-sheet (closed)="closeMenu()"></app-mobile-menu-sheet>
+  </div>
+}

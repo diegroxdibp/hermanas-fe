@@ -26,78 +26,85 @@
           </li>
         </ul>
       }
+
       @if (navbarService.showUserMenu()) {
-        <button
-          class="bell-button"
-          [matMenuTriggerFor]="notifMenu"
-          [attr.aria-label]="'Notificações' + (notificationsService.unreadCount() > 0 ? ' (' + notificationsService.unreadCount() + ' novas)' : '')"
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-            <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-          </svg>
-          @if (notificationsService.unreadCount() > 0) {
-            <span class="bell-badge">
-              {{ notificationsService.unreadCount() > 9 ? '9+' : notificationsService.unreadCount() }}
-            </span>
-          }
-        </button>
-
-        <mat-menu #notifMenu="matMenu" class="care-menu care-menu--notif">
-          <div class="notif-header" (click)="$event.stopPropagation()">
-            <span class="notif-title">Notificações</span>
-            <button
-              type="button"
-              class="notif-markall"
-              (click)="markAllRead(); $event.stopPropagation()"
-            >
-              marcar todas como lidas
-            </button>
-          </div>
-
-          @for (n of notificationsService.notifications().slice(0, 5); track n.id) {
-            <a mat-menu-item [class.is-unread]="!n.read" (click)="onNotifClick(n)">
-              <span class="unread-dot" [class.visible]="!n.read" aria-hidden="true"></span>
-              <span class="notif-body">
-                <span class="notif-text">{{ n.message }}</span>
-                <span class="notif-when">{{ relativeTime(n.createdAt) }}</span>
+        <div class="dropdown-wrap">
+          <button
+            class="bell-button"
+            (click)="toggleNotif($event)"
+            [attr.aria-expanded]="isNotifOpen"
+            [attr.aria-label]="'Notificações' + (notificationsService.unreadCount() > 0 ? ' (' + notificationsService.unreadCount() + ' novas)' : '')"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+              <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+            </svg>
+            @if (notificationsService.unreadCount() > 0) {
+              <span class="bell-badge">
+                {{ notificationsService.unreadCount() > 9 ? '9+' : notificationsService.unreadCount() }}
               </span>
-            </a>
-          }
+            }
+          </button>
 
-          @if (notificationsService.notifications().length === 0) {
-            <div class="notif-empty" (click)="$event.stopPropagation()">
-              Sem notificações
+          @if (isNotifOpen) {
+            <div class="care-menu care-menu--notif" (click)="$event.stopPropagation()">
+              <div class="notif-header">
+                <span class="notif-title">Notificações</span>
+                <button
+                  type="button"
+                  class="notif-markall"
+                  (click)="markAllRead()"
+                >
+                  marcar todas como lidas
+                </button>
+              </div>
+
+              @for (n of notificationsService.notifications().slice(0, 5); track n.id) {
+                <a class="notif-item" [class.is-unread]="!n.read" (click)="onNotifClick(n)">
+                  <span class="unread-dot" [class.visible]="!n.read" aria-hidden="true"></span>
+                  <span class="notif-body">
+                    <span class="notif-text">{{ n.message }}</span>
+                    <span class="notif-when">{{ relativeTime(n.createdAt) }}</span>
+                  </span>
+                </a>
+              }
+
+              @if (notificationsService.notifications().length === 0) {
+                <div class="notif-empty">Sem notificações</div>
+              }
+
+              <a class="notif-item notif-seeall" (click)="goToNotifications()">Ver todas</a>
             </div>
           }
+        </div>
 
-          <a mat-menu-item class="notif-seeall" (click)="goToNotifications()">
-            Ver todas
-          </a>
-        </mat-menu>
+        <div class="dropdown-wrap">
+          <button class="user-chip" (click)="toggleUserMenu($event)">
+            <div class="avatar">{{ userInitials() }}</div>
+            <div class="who">
+              {{ firstName() }}
+              <small>Paciente</small>
+            </div>
+            <span class="material-symbols-outlined chevron">expand_more</span>
+          </button>
 
-        <button class="user-chip" [matMenuTriggerFor]="menu">
-          <div class="avatar">{{ userInitials() }}</div>
-          <div class="who">
-            {{ firstName() }}
-            <small>Paciente</small>
-          </div>
-          <span class="material-symbols-outlined chevron">expand_more</span>
-        </button>
-        <mat-menu #menu="matMenu" class="care-menu">
-          <div class="menu-user-header" (click)="$event.stopPropagation()">
-            <span class="menu-user-name">{{ firstName() }}</span>
-            <span class="menu-user-email">{{ userEmail() }}</span>
-          </div>
-          <button mat-menu-item (click)="navigateTo(navigationService.Pages.DASHBOARD)">
-            <mat-icon>person</mat-icon>
-            <span>Conta</span>
-          </button>
-          <button mat-menu-item class="menu-item-danger" (click)="logOut()">
-            <mat-icon>logout</mat-icon>
-            <span>Terminar sessão</span>
-          </button>
-        </mat-menu>
+          @if (isUserMenuOpen) {
+            <div class="care-menu" (click)="$event.stopPropagation()">
+              <div class="menu-user-header">
+                <span class="menu-user-name">{{ firstName() }}</span>
+                <span class="menu-user-email">{{ userEmail() }}</span>
+              </div>
+              <button class="dropdown-item" (click)="closeMenus(); navigateTo(navigationService.Pages.DASHBOARD)">
+                <span class="material-symbols-outlined">person</span>
+                <span>Conta</span>
+              </button>
+              <button class="dropdown-item dropdown-item--danger" (click)="logOut()">
+                <span class="material-symbols-outlined">logout</span>
+                <span>Terminar sessão</span>
+              </button>
+            </div>
+          }
+        </div>
       }
     }
     @if (!(screenSizeService.isTablet() || screenSizeService.isDesktop())) {

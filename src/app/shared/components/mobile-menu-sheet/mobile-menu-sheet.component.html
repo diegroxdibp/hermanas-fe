@@ -8,7 +8,7 @@
       <div class="user-email">{{ userEmail() }}</div>
     </div>
     <button class="close-btn" (click)="close()" aria-label="Fechar menu">
-      <mat-icon>close</mat-icon>
+      <span class="material-symbols-outlined">close</span>
     </button>
   </div>
 }
@@ -16,16 +16,16 @@
 @if (!navbarService.showUserMenu()) {
   <div class="close-row">
     <button class="close-btn" (click)="close()" aria-label="Fechar menu">
-      <mat-icon>close</mat-icon>
+      <span class="material-symbols-outlined">close</span>
     </button>
   </div>
 }
 
 @for (row of publicRows; track row.label; let i = $index) {
   <a class="row" [style.--row-delay.s]="0.12 + i * 0.04" (click)="go(row.page)">
-    <mat-icon class="icon">{{ row.icon }}</mat-icon>
+    <span class="material-symbols-outlined icon">{{ row.icon }}</span>
     <span class="label">{{ row.label }}</span>
-    <mat-icon class="chev">chevron_right</mat-icon>
+    <span class="material-symbols-outlined chev">chevron_right</span>
   </a>
 }
 
@@ -37,25 +37,25 @@
          ? row.ariaLabel + ', ' + notificationService.unreadCount() + ' não lidas'
          : null"
        (click)="go(row.page)">
-      <mat-icon class="icon">{{ row.icon }}</mat-icon>
+      <span class="material-symbols-outlined icon">{{ row.icon }}</span>
       <span class="label">{{ row.label }}</span>
       @if (row.showBadge && notificationService.unreadCount() > 0) {
         <span class="badge">{{ notificationService.unreadCount() }}</span>
       }
-      <mat-icon class="chev">chevron_right</mat-icon>
+      <span class="material-symbols-outlined chev">chevron_right</span>
     </a>
   }
 
   <a class="row row-danger" [style.--row-delay.s]="0.12 + (publicRows.length + userRows.length) * 0.04" (click)="logout()">
-    <mat-icon class="icon">logout</mat-icon>
+    <span class="material-symbols-outlined icon">logout</span>
     <span class="label">Terminar sessão</span>
   </a>
 }
 
 @if (navbarService.showAuthLinks()) {
   <a class="row" [style.--row-delay.s]="0.12 + publicRows.length * 0.04" (click)="signIn()">
-    <mat-icon class="icon">login</mat-icon>
+    <span class="material-symbols-outlined icon">login</span>
     <span class="label">Entrar</span>
-    <mat-icon class="chev">chevron_right</mat-icon>
+    <span class="material-symbols-outlined chev">chevron_right</span>
   </a>
 }

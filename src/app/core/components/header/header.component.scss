@@ -206,11 +206,16 @@
   100% { transform: scale(1); }
 }
 
-// ── mat-menu white surface override ─────────────────────────
-// ::ng-deep required: mat-menu renders in the CDK overlay,
-// outside this component's view encapsulation.
-::ng-deep .care-menu.mat-mdc-menu-panel {
-  background-color: #ffffff;
+// ── Custom dropdown panels ───────────────────────────────────
+.dropdown-wrap {
+  position: relative;
+}
+
+.care-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: #fff;
   min-width: 240px;
   border: 1px solid rgba(34, 50, 110, 0.06);
   border-radius: 12px;
@@ -218,10 +223,7 @@
     0 10px 30px rgba(34, 50, 110, 0.16),
     0 2px 6px rgba(34, 50, 110, 0.08);
   padding: 6px 0;
-
-  .mat-mdc-menu-content {
-    padding: 0;
-  }
+  z-index: 1000;
 
   .menu-user-header {
     padding: 14px 18px 12px;
@@ -243,55 +245,47 @@
     font-size: 12px;
     color: #8897ad;
   }
+}
 
-  .mat-mdc-menu-item {
-    font-family: typography.$sourceSans;
-    font-size: 15px;
-    font-weight: 500;
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  font-family: typography.$sourceSans;
+  font-size: 15px;
+  font-weight: 500;
+  color: palette.$primaryColorBlue;
+  min-height: 44px;
+  padding: 10px 18px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  text-decoration: none;
+  box-sizing: border-box;
+  gap: 0;
+
+  .material-symbols-outlined {
+    margin-right: 12px;
+    font-size: 20px;
     color: palette.$primaryColorBlue;
-    min-height: 44px;
-    padding: 10px 18px;
+    opacity: 0.85;
+    flex-shrink: 0;
+  }
 
-    .mat-icon {
-      margin-right: 12px;
-      color: palette.$primaryColorBlue;
-      opacity: 0.85;
-    }
+  &:hover { background: rgba(142, 127, 174, 0.10); }
 
-    &:hover,
-    &.cdk-focused,
-    &.cdk-program-focused {
-      background-color: rgba(142, 127, 174, 0.10);
-    }
-
-    &.menu-item-danger {
-      color: #b33049;
-
-      .mat-icon {
-        color: #b33049;
-        opacity: 1;
-      }
-
-      &:hover { background-color: rgba(179, 48, 73, 0.08); }
-    }
+  &--danger {
+    color: #b33049;
+    .material-symbols-outlined { color: #b33049; opacity: 1; }
+    &:hover { background: rgba(179, 48, 73, 0.08); }
   }
 }
 
-// ── Notifications panel extra overrides ─────────────────────
-::ng-deep .care-menu--notif.mat-mdc-menu-panel {
+// ── Notifications panel ──────────────────────────────────────
+.care-menu--notif {
   min-width: 360px;
   max-width: 360px;
-
-  .mat-mdc-menu-item {
-    height: auto;
-    align-items: flex-start;
-
-    &.is-unread {
-      background-color: rgba(142, 127, 174, 0.08);
-
-      .notif-text { font-weight: 600; }
-    }
-  }
 
   .notif-header {
     display: flex;
@@ -322,13 +316,33 @@
     &:hover { opacity: 0.7; }
   }
 
+  .notif-item {
+    display: flex;
+    align-items: flex-start;
+    width: 100%;
+    padding: 12px 18px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    box-sizing: border-box;
+    gap: 10px;
+
+    &:hover { background: rgba(142, 127, 174, 0.06); }
+
+    &.is-unread {
+      background: rgba(142, 127, 174, 0.08);
+      .notif-text { font-weight: 600; }
+    }
+  }
+
   .unread-dot {
     width: 8px;
     height: 8px;
     border-radius: 999px;
     background: palette.$primaryColorPurple;
     flex-shrink: 0;
-    margin-top: 8px;
+    margin-top: 6px;
     visibility: hidden;
 
     &.visible { visibility: visible; }
@@ -368,10 +382,10 @@
   }
 
   .notif-seeall {
-    text-align: center;
-    font-size: 13px !important;
-    font-weight: 700 !important;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
     border-top: 1px solid rgba(34, 50, 110, 0.08);
-    justify-content: center !important;
+    color: palette.$primaryColorBlue;
   }
 }

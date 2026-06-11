@@ -1,6 +1,4 @@
-import { Component, computed, effect, inject } from '@angular/core';
-import { MatBottomSheetRef } from '@angular/material/bottom-sheet';
-import { MatIconModule } from '@angular/material/icon';
+import { Component, computed, effect, inject, Output, EventEmitter } from '@angular/core';
 import { AuthService } from '../../../auth/auth.service';
 import { NavigationService } from '../../services/navigation.service';
 import { NavigationBarService } from '../../services/navigation-bar.service';
@@ -19,12 +17,13 @@ interface NavRow {
 
 @Component({
   selector: 'app-mobile-menu-sheet',
-  imports: [MatIconModule],
+  imports: [],
   templateUrl: './mobile-menu-sheet.component.html',
   styleUrl: './mobile-menu-sheet.component.scss',
 })
 export class MobileMenuSheetComponent {
-  private readonly ref = inject(MatBottomSheetRef<MobileMenuSheetComponent>);
+  @Output() closed = new EventEmitter<void>();
+
   private readonly authService = inject(AuthService);
   private readonly sessionService = inject(SessionService);
   private readonly screenSizeService = inject(ScreenSizeService);
@@ -34,10 +33,9 @@ export class MobileMenuSheetComponent {
   readonly Pages = Pages;
 
   constructor() {
-    // Auto-dismiss when the viewport expands to tablet or desktop.
     effect(() => {
       if (this.screenSizeService.isTablet() || this.screenSizeService.isDesktop()) {
-        this.ref.dismiss();
+        this.closed.emit();
       }
     });
   }
@@ -75,20 +73,20 @@ export class MobileMenuSheetComponent {
 
   go(page: Pages): void {
     this.navigationService.navigateTo(page);
-    this.ref.dismiss();
+    this.closed.emit();
   }
 
   signIn(): void {
     this.navigationService.navigateTo(Pages.SIGN_IN);
-    this.ref.dismiss();
+    this.closed.emit();
   }
 
   logout(): void {
     this.authService.logout();
-    this.ref.dismiss();
+    this.closed.emit();
   }
 
   close(): void {
-    this.ref.dismiss();
+    this.closed.emit();
   }
 }
