@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { SessionService } from '../shared/services/session.service';
 
-const AUTH_ENDPOINTS = ['/api/auth/login', '/api/auth/register'];
+const AUTH_ENDPOINTS = ['/api/auth/login', '/api/auth/register', '/api/auth/me'];
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
@@ -17,7 +17,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       const isAuthEndpoint = AUTH_ENDPOINTS.some(e => req.url.includes(e));
       if (err.status === 401 && !isAuthEndpoint) {
         sessionService.clear();
-        router.navigate(['/auth/login']);
+        router.navigate(['/auth/signin']);
       }
       return throwError(() => err);
     }),

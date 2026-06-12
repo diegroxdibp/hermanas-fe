@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { ErrorService } from '../services/error.service';
 
-const AUTH_ENDPOINTS = ['/api/auth/login', '/api/auth/register'];
+const AUTH_ENDPOINTS = ['/api/auth/login', '/api/auth/register', '/api/auth/me'];
 
 const ERROR_MESSAGES: Partial<Record<number, string>> = {
   400: 'Pedido inválido. Verifique os dados e tente novamente.',
