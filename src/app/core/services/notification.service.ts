@@ -6,6 +6,7 @@ import {
   NotificationResponse,
   UnreadCountResponse,
 } from '../../shared/models/notification.types';
+import { environment } from '../../../environments/environment';
 
 /**
  * Call connect() after the user logs in and disconnect() on logout.
@@ -19,7 +20,7 @@ import {
 @Injectable({ providedIn: 'root' })
 export class NotificationService implements OnDestroy {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = '/api/notifications';
+  private readonly baseUrl = `${environment.apiUrl}/api/notifications`;
 
   private readonly _notifications = signal<NotificationResponse[]>([]);
   private readonly _connected = signal(false);
