@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { ErrorService } from '../services/error.service';
 
+const AUTH_ENDPOINTS = ['/api/auth/login', '/api/auth/register'];
+
 const ERROR_MESSAGES: Partial<Record<number, string>> = {
   400: 'Pedido inválido. Verifique os dados e tente novamente.',
   403: 'Não tem permissão para realizar esta ação.',
@@ -22,9 +24,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => err);
       }
 
-      if (err.status === 0 || err.status >= 500) {
+      const isAuthEndpoint = AUTH_ENDPOINTS.some(e => req.url.includes(e));
+
+      if (!isAuthEndpoint && (err.status === 0 || err.status >= 500)) {
         router.navigate(['/error']);
-      } else {
+      } else if (!isAuthEndpoint) {
         const message =
           ERROR_MESSAGES[err.status] ??
           'Ocorreu um erro. Tente novamente mais tarde.';
