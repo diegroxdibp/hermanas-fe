@@ -1,7 +1,7 @@
 .toast {
   width: 380px;
-  background: var(--color-primary-blue);
-  border-radius: var(--radius-lg);
+  background: var(--color-primary-blue);          // #22326E
+  border-radius: var(--radius-lg);                // 12px
   filter: drop-shadow(0 12px 28px rgba(34, 50, 110, 0.32));
   overflow: hidden;
   animation: toast-in 0.4s var(--ease-care) both;
@@ -11,8 +11,8 @@
   &__msg {
     flex: 1;
     font-family: var(--font-sans);
-    font-size: var(--fs-body);
-    font-weight: var(--fw-bold);
+    font-size: var(--fs-body);                    // ~17px
+    font-weight: var(--fw-bold);                  // 700
     line-height: var(--lh-snug);
     color: var(--color-white);
   }
@@ -25,7 +25,7 @@
   }
 
   &__track { height: 4px; background: rgba(255, 255, 255, 0.18); }
-  &__bar   { height: 100%; background: var(--color-white); }
+  &__bar   { height: 100%; background: var(--color-white); } // white timer bar
 }
 
 @keyframes toast-in {

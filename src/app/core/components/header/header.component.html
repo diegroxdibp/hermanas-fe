@@ -22,7 +22,8 @@
       @if (navbarService.showAuthLinks()) {
         <ul class="auth">
           <li>
-            <a (click)="navigateTo(navigationService.Pages.SIGN_IN)">Sign In</a>
+            <a (click)="navigateTo(navigationService.Pages.SIGN_IN)"
+               [class.active]="isActive(navigationService.Pages.SIGN_IN) || isActive(navigationService.Pages.SIGN_UP)">Sign In</a>
           </li>
         </ul>
       }

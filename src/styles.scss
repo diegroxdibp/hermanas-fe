@@ -379,9 +379,9 @@ mat-divider {
 
   &.custom-snackbar {
     .mdc-snackbar__surface {
-      padding: 15px !important;
-      background-color: palette.$primaryColorBlue !important;
-      color: white;
+      padding: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
     }
 
     .mat-mdc-snack-bar-label {

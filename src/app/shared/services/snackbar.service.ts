@@ -25,12 +25,10 @@ export class SnackbarService {
     this._snackBar.openFromComponent(CustomSnackbarComponent, {
       data: {
         message: this.snackbarConfigurationObject.message,
-        action: this.snackbarConfigurationObject.action,
         duration: duration,
       },
       horizontalPosition: this.snackbarConfigurationObject.horizontalPosition,
       verticalPosition: this.snackbarConfigurationObject.verticalPosition,
-      duration: duration,
       panelClass: ['custom-snackbar'],
     });
   }
