@@ -18,14 +18,8 @@
 
     <div class="two-col">
       <div class="field">
-        <label for="ob-birth">Data de nascimento:</label>
-        <input
-          id="ob-birth"
-          type="date"
-          [formControl]="birthdateCtrl"
-          [max]="maxBirthdate"
-          [min]="minDate"
-        />
+        <label>Data de nascimento:</label>
+        <app-calendar [calendarConfiguration]="birthdateCalendarConfig" />
       </div>
 
       <div class="field">

@@ -159,16 +159,19 @@ h1 {
 
 .switch-link {
   display: flex;
+  align-items: center;
   justify-content: center;
   gap: 4px;
   margin-top: 22px;
   font-family: typography.$sourceSans;
   font-size: 15px;
+  line-height: 1;
   color: palette.$primaryColorBlue;
   font-weight: 400;
   text-align: center;
 
   a {
+    line-height: 1;
     color: palette.$primaryColorPurple;
     font-weight: 700;
     cursor: pointer;

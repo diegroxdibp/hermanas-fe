@@ -10,10 +10,13 @@ import { CountryModel, defaultCountry } from '../../models/country.model';
 import { Countries } from '../../../../assets/countries';
 import { Genders } from '../../enums/genders.enum';
 import { OnboardingResponse } from '../../models/onboarding-response.model';
+import { CalendarComponent } from '../calendar/calendar.component';
+import { CalendarConfigurationObject } from '../../models/input-configuration-objects/calendar-configuration-object';
+import { CalendarType } from '../../enums/calendar-type.enum';
 
 @Component({
   selector: 'app-onboarding',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, CalendarComponent],
   templateUrl: './onboarding.component.html',
   styleUrl: './onboarding.component.scss',
 })
@@ -26,8 +29,6 @@ export class OnboardingComponent implements OnInit {
 
   readonly countries = Countries;
   readonly genders = Object.values(Genders);
-  readonly maxBirthdate = (() => { const d = new Date(); d.setFullYear(d.getFullYear() - 18); return d.toISOString().slice(0, 10); })();
-  readonly minDate = new Date(new Date().getFullYear() - 120, 0, 1).toISOString().slice(0, 10);
   error: string | null = null;
 
   get nameCtrl(): FormControl {
@@ -36,6 +37,10 @@ export class OnboardingComponent implements OnInit {
 
   get birthdateCtrl(): FormControl {
     return this.formService.onboardingForm.get(FormControlsNames.BIRTHDATE) as FormControl;
+  }
+
+  get birthdateCalendarConfig(): CalendarConfigurationObject {
+    return { control: this.birthdateCtrl, calendarType: CalendarType.BIRTHDATE };
   }
 
   get genderCtrl(): FormControl {

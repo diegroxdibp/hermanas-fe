@@ -40,7 +40,7 @@ export const AppConstants = {
   },
 
   birthdate: {
-    minDate: new Date(),
+    minDate: new Date(new Date().setFullYear(new Date().getFullYear() - 18)),
     maxDate: new Date(new Date().setFullYear(new Date().getFullYear() - 100)),
   },
 

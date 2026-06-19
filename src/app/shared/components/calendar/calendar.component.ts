@@ -1,10 +1,9 @@
-import { CommonModule, DatePipe, registerLocaleData } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { Component, Injectable, Input, OnInit } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
   DateAdapter,
   MAT_DATE_FORMATS,
-  MAT_DATE_LOCALE,
   NativeDateAdapter,
 } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -22,9 +21,6 @@ import {
 } from '../../models/input-configuration-objects/calendar-configuration-object';
 import { CalendarType } from '../../enums/calendar-type.enum';
 import { DayOfWeek } from '../../enums/day-of-week.enum';
-
-import localePt from '@angular/common/locales/pt-PT';
-registerLocaleData(localePt);
 
 export const DD_MM_YYYY_FORMAT = {
   parse: {
@@ -82,7 +78,6 @@ export class CustomDateAdapter extends NativeDateAdapter {
   providers: [
     DatePipe,
     { provide: DateAdapter, useClass: CustomDateAdapter },
-    { provide: MAT_DATE_LOCALE, useValue: 'pt-PT' },
     { provide: MAT_DATE_FORMATS, useValue: DD_MM_YYYY_FORMAT },
   ],
 })
