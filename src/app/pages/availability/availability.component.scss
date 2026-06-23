@@ -116,11 +116,14 @@
 
     &.placeholder { color: var(--color-muted); font-weight: 400; }
 
-    // date input
+    // date input — hide the native calendar picker button; our Material icon handles it
     &[type="date"] {
       font-size: 16px;
       color: var(--color-primary-blue);
       font-family: var(--font-sans);
+
+      &::-webkit-calendar-picker-indicator { display: none; }
+      &::-webkit-inner-spin-button { display: none; }
     }
   }
 
@@ -128,6 +131,7 @@
     color: var(--color-secondary-indigo);
     font-size: 22px;
     flex-shrink: 0;
+    cursor: pointer;
   }
 }
 
@@ -471,11 +475,33 @@
   }
 }
 
+@keyframes cal-exit-left {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(-4%); }
+}
+@keyframes cal-exit-right {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(4%); }
+}
+@keyframes cal-enter-left {
+  from { opacity: 0; transform: translateX(-4%); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes cal-enter-right {
+  from { opacity: 0; transform: translateX(4%); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
 .cal {
   border: 1px solid var(--color-border-soft);
   border-radius: var(--radius-lg);
   overflow: hidden;
   background: #fff;
+
+  &.cal-exit-left  { animation: cal-exit-left  0.22s ease forwards; }
+  &.cal-exit-right { animation: cal-exit-right 0.22s ease forwards; }
+  &.cal-enter-left  { animation: cal-enter-left  0.28s ease forwards; }
+  &.cal-enter-right { animation: cal-enter-right 0.28s ease forwards; }
 }
 
 .cal-head {
@@ -544,13 +570,13 @@
   .hcell {
     height: 52px;
     border-top: 1px solid var(--color-border-soft);
-    cursor: pointer;
+    cursor: crosshair;
     transition: background 0.12s;
 
     &:first-child,
     &.first { border-top: none; }
 
-    &:hover { background: rgba(142,127,174,0.06); }
+    &:hover { background: rgba(142,127,174,0.08); }
   }
 }
 
@@ -569,7 +595,8 @@
   overflow: hidden;
   z-index: 2;
   box-shadow: 0 1px 4px rgba(0,0,0,0.14);
-  cursor: pointer;
+  cursor: grab;
+  touch-action: none;
   border: 1.5px solid transparent;
   transition: box-shadow 0.15s var(--ease-care);
 
@@ -631,10 +658,82 @@
   }
 }
 
-// Preview block (desktop)
+// Block move
+.block.moving-source {
+  opacity: 0.22;
+  pointer-events: none;
+  box-shadow: none;
+}
+
+.block.move-ghost {
+  pointer-events: none;
+  z-index: 5;
+  cursor: grabbing;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
+  opacity: 0.88;
+
+  .b-svc { opacity: 0.85; }
+  .b-slots, .b-badge, .b-resize-handle { display: none; }
+}
+
+// Drag-select ghost
+.block.drag-ghost {
+  pointer-events: none;
+  z-index: 4;
+  box-shadow: none;
+  background: color-mix(in srgb, var(--color-primary-purple) 15%, transparent);
+  border: 2px dashed color-mix(in srgb, var(--color-primary-purple) 55%, transparent);
+  color: var(--color-primary-purple);
+
+  .b-top { opacity: 0.85; font-weight: 600; }
+  .b-svc, .b-slots, .b-badge, .b-resize-handle { display: none; }
+}
+
+// Resize handle (shared desktop + mobile)
+.b-resize-handle {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 14px;
+  cursor: ns-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+
+  .grip {
+    width: 22px;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.45);
+    transition: background 0.15s, width 0.15s;
+  }
+
+  &:hover .grip {
+    background: rgba(255, 255, 255, 0.85);
+    width: 28px;
+  }
+}
+
+.block.resizing {
+  cursor: ns-resize;
+  user-select: none;
+  z-index: 10;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+  opacity: 0.92;
+}
+
+// Conflicted block indicator (existing block that overlaps the current preview)
+.block.conflicted {
+  border-color: #d32f2f;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px rgba(211, 47, 47, 0.7);
+}
+
+// Preview block (desktop) — z-index: 1 keeps it below existing blocks (z-index: 2)
 .block.preview {
   pointer-events: none;
-  z-index: 3;
+  z-index: 1;
   box-shadow: none;
   background: color-mix(in srgb, var(--color-primary-purple) 28%, transparent);
   border: 2px dashed color-mix(in srgb, var(--color-primary-purple) 80%, transparent);
@@ -1023,10 +1122,23 @@
     }
   }
 
-  // Preview block (mobile)
+  .m-block.resizing {
+    cursor: ns-resize;
+    user-select: none;
+    z-index: 10;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+    opacity: 0.92;
+  }
+
+  .m-block.conflicted {
+    border-color: #d32f2f;
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px rgba(211, 47, 47, 0.7);
+  }
+
+  // Preview block (mobile) — z-index: 1 keeps it below existing blocks
   .m-block.preview {
     pointer-events: none;
-    z-index: 3;
+    z-index: 1;
     box-shadow: none;
     background: color-mix(in srgb, var(--color-primary-purple) 28%, transparent);
     border: 2px dashed color-mix(in srgb, var(--color-primary-purple) 80%, transparent);

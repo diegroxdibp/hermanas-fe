@@ -13,6 +13,8 @@ import { ApiService, AvailabilityPayload } from '../../core/services/api.service
 import { AvailabilityModel } from '../../shared/models/availability.model';
 import { ScreenSizeService } from '../../shared/services/screen-size.service';
 import { SessionService } from '../../shared/services/session.service';
+import { SnackbarService } from '../../shared/services/snackbar.service';
+import { ProfessionalSessionService } from '../../shared/enums/professional-session-service.enum';
 
 // ─── Module-level constants ───────────────────────────────────────────────────
 
@@ -25,11 +27,22 @@ const PT_DOW_LONG = [
   'segunda-feira','terça-feira','quarta-feira',
   'quinta-feira','sexta-feira','sábado','domingo',
 ];
+const PT_DOW_PLURAL = [
+  'Segundas-feiras','Terças-feiras','Quartas-feiras',
+  'Quintas-feiras','Sextas-feiras','Sábados','Domingos',
+];
 const HOURS = [
   '08:00','09:00','10:00','11:00','12:00','13:00',
   '14:00','15:00','16:00','17:00','18:00','19:00',
 ];
 const HOURS_END = [...HOURS, '20:00'];
+const EDITOR_HOURS = [
+  '08:00','08:30','09:00','09:30','10:00','10:30',
+  '11:00','11:30','12:00','12:30','13:00','13:30',
+  '14:00','14:30','15:00','15:30','16:00','16:30',
+  '17:00','17:30','18:00','18:30','19:00','19:30',
+];
+const EDITOR_HOURS_END = [...EDITOR_HOURS, '20:00'];
 const ROW_H = 52;
 const MOB_ROW_H = 46;
 const COL_TO_DOW: DayOfWeek[] = [
@@ -41,7 +54,7 @@ const COL_TO_DOW: DayOfWeek[] = [
   DayOfWeek.SATURDAY,
   DayOfWeek.SUNDAY,
 ];
-const SESSION_DURATIONS = [50, 60, 90] as const;
+const SESSION_DURATIONS = [30, 60, 90] as const;
 const WEEKDAYS = COL_TO_DOW;
 
 // ─── Module-level helpers ─────────────────────────────────────────────────────
@@ -90,6 +103,12 @@ function toKey(d: Date): string {
 
 // ─── Models ───────────────────────────────────────────────────────────────────
 
+interface DragSelection {
+  colIndex: number;
+  startTime: string;
+  endTime: string;
+}
+
 interface PreviewBlock {
   colIndex: number;
   startTime: string;
@@ -108,7 +127,7 @@ interface TherapistBlock {
   startDate?: string;
   startTime: string;
   endTime: string;
-  sessionDuration: 50 | 60 | 90;
+  sessionDuration: 30 | 60 | 90;
   local?: string;
 }
 
@@ -136,12 +155,15 @@ const BACKEND_DOW_MAP: Record<string, DayOfWeek> = {
 export class AvailabilityComponent implements OnInit {
   // ─ Services
   private readonly apiService = inject(ApiService);
+  private readonly snackbarService = inject(SnackbarService);
   readonly screenSize = inject(ScreenSizeService);
   private readonly sessionService = inject(SessionService);
 
   // ─ Expose to template
   readonly HOURS = HOURS;
   readonly HOURS_END = HOURS_END;
+  readonly EDITOR_HOURS = EDITOR_HOURS;
+  readonly EDITOR_HOURS_END = EDITOR_HOURS_END;
   readonly ROW_H = ROW_H;
   readonly MOB_ROW_H = MOB_ROW_H;
   readonly Modality = Modality;
@@ -204,12 +226,35 @@ export class AvailabilityComponent implements OnInit {
   editorDate = signal<string>('');
   editorStartTime = signal<string>('09:00');
   editorEndTime = signal<string>('13:00');
-  editorSessionDuration = signal<50 | 60 | 90>(60);
+  editorSessionDuration = signal<30 | 60 | 90>(60);
   editorLocal = signal<string>('Consultório · R. da Misericórdia 53');
 
   // ─ Mobile
   selectedDayIndex = signal<number>(this._todayColumnIndex());
   sheetOpen = signal<boolean>(false);
+
+  // ─ Drag-select
+  dragSelection = signal<DragSelection | null>(null);
+
+  // ─ Block move
+  movingBlockId = signal<number | null>(null);
+  isDraggingMove = signal<boolean>(false);
+  moveLiveStart = signal<string>('');
+  moveLiveEnd = signal<string>('');
+  moveLiveCol = signal<number>(0);
+
+  readonly movingBlock = computed(() => {
+    const id = this.movingBlockId();
+    return id !== null ? (this.blocks().find(b => b.id === id) ?? null) : null;
+  });
+
+  // ─ Resize
+  resizingBlockId = signal<number | null>(null);
+  resizeLiveEndTime = signal<string>('');
+  private _resizeBlock: TherapistBlock | null = null;
+  private _resizeColEl: HTMLElement | null = null;
+  private _resizeRowH = ROW_H;
+  private _resizeDragged = false;
 
   // ─ Computed
   readonly selectedBlock = computed(() =>
@@ -231,31 +276,37 @@ export class AvailabilityComponent implements OnInit {
       const idx = COL_TO_DOW.indexOf(wds[0]);
       const name = idx >= 0 ? PT_DOW_LONG[idx] : wds[0].toLowerCase();
       return wds.length === 1
-        ? `Bloco de ${name}`
-        : `Bloco de ${wds.length} dias`;
+        ? `Disponibilidade de ${name}`
+        : `Disponibilidade de ${wds.length} dias`;
     } else {
-      if (!this.editorDate()) return 'Novo bloco';
+      if (!this.editorDate()) return 'Nova disponibilidade';
       const d = new Date(this.editorDate() + 'T00:00:00');
       const dow = PT_DOW_LONG[(d.getDay() + 6) % 7];
-      return `Bloco de ${dow}`;
+      return `Disponibilidade de ${dow}`;
     }
   });
 
   readonly editorSubtitle = computed<string>(() => {
+    const start = this.editorStartTime();
+    const end = this.editorEndTime();
+    const timeRange = start && end ? ` · das ${start} às ${end}` : '';
+
     if (this.editorFrequency() === 'weekly') {
       const wds = [...this.selectedWeekdays()];
       if (wds.length === 0) return 'Semanal';
-      return wds.map(wd => {
+      const days = wds.map(wd => {
         const idx = COL_TO_DOW.indexOf(wd);
-        return PT_DOW_SHORT[idx >= 0 ? idx : 0];
-      }).join(', ');
+        return idx >= 0 ? PT_DOW_PLURAL[idx] : wd;
+      });
+      const label = wds.length === 1 ? days[0] : days.join(', ');
+      return label + timeRange;
     } else {
       if (!this.editorDate()) return 'Data única';
       const d = new Date(this.editorDate() + 'T00:00:00');
       const day = d.getDate();
       const month = PT_MONTHS[d.getMonth()];
       const year = d.getFullYear();
-      return `${day} de ${month} · ${year}`;
+      return `${day} de ${month} · ${year}${timeRange}`;
     }
   });
 
@@ -294,6 +345,23 @@ export class AvailabilityComponent implements OnInit {
     });
   });
 
+  readonly conflictedBlockIds = computed<Set<number>>(() => {
+    const previews = this.previewBlocks();
+    if (previews.length === 0) return new Set<number>();
+    const editingId = this.selectedBlockId();
+    const ids = new Set<number>();
+    for (const p of previews) {
+      const pStart = timeToMin(p.startTime);
+      const pEnd = timeToMin(p.endTime);
+      for (const b of this.blocksForColumn(p.colIndex)) {
+        if (b.id !== editingId && pStart < timeToMin(b.endTime) && timeToMin(b.startTime) < pEnd) {
+          ids.add(b.id);
+        }
+      }
+    }
+    return ids;
+  });
+
   // ─ Lifecycle ────────────────────────────────────────────────────────────────
 
   ngOnInit(): void {
@@ -313,20 +381,46 @@ export class AvailabilityComponent implements OnInit {
 
   // ─ Week navigation ──────────────────────────────────────────────────────────
 
+  calSlideClass = signal<string>('');
+
   goToToday(): void {
-    this.weekStart.set(getWeekStart(new Date()));
+    const today = getWeekStart(new Date());
+    const cur = this.weekStart();
+    if (today.getTime() === cur.getTime()) return;
+    this.animateToWeek(today, today > cur ? 'left' : 'right');
   }
 
   prevWeek(): void {
     const d = new Date(this.weekStart());
     d.setDate(d.getDate() - 7);
-    this.weekStart.set(d);
+    this.animateToWeek(d, 'right');
   }
 
   nextWeek(): void {
     const d = new Date(this.weekStart());
     d.setDate(d.getDate() + 7);
-    this.weekStart.set(d);
+    this.animateToWeek(d, 'left');
+  }
+
+  onEditorDateChange(dateStr: string): void {
+    this.editorDate.set(dateStr);
+    if (!dateStr) return;
+    const isInCurrentWeek = this.weekDays().some(d => toKey(d) === dateStr);
+    if (isInCurrentWeek) return;
+    const target = new Date(dateStr + 'T00:00:00');
+    const newStart = getWeekStart(target);
+    this.animateToWeek(newStart, newStart > this.weekStart() ? 'left' : 'right');
+  }
+
+  private animateToWeek(newStart: Date, dir: 'left' | 'right'): void {
+    const exitCls = dir === 'left' ? 'cal-exit-left' : 'cal-exit-right';
+    const enterCls = dir === 'left' ? 'cal-enter-right' : 'cal-enter-left';
+    this.calSlideClass.set(exitCls);
+    setTimeout(() => {
+      this.weekStart.set(newStart);
+      this.calSlideClass.set(enterCls);
+      setTimeout(() => this.calSlideClass.set(''), 280);
+    }, 220);
   }
 
   // ─ Calendar helpers ─────────────────────────────────────────────────────────
@@ -352,6 +446,10 @@ export class AvailabilityComponent implements OnInit {
     return (hourRowIdx(block.endTime) - hourRowIdx(block.startTime)) * rowH - 6;
   }
 
+  blockResizeHeightPx(block: TherapistBlock, liveEndTime: string, rowH = ROW_H): number {
+    return (hourRowIdx(liveEndTime) - hourRowIdx(block.startTime)) * rowH - 6;
+  }
+
   previewBlocksForColumn(colIndex: number): PreviewBlock[] {
     return this.previewBlocks().filter(p => p.colIndex === colIndex);
   }
@@ -374,10 +472,15 @@ export class AvailabilityComponent implements OnInit {
     );
   }
 
+  serviceDisplayName(key: string): string {
+    return ProfessionalSessionService[key as keyof typeof ProfessionalSessionService] ?? key;
+  }
+
   blockServiceLabel(block: TherapistBlock): string {
     if (block.services.length === 0) return '';
-    if (block.services.length === 1) return block.services[0].name;
-    return `${block.services[0].name} +${block.services.length - 1}`;
+    const first = this.serviceDisplayName(block.services[0].name);
+    if (block.services.length === 1) return first;
+    return `${first} +${block.services.length - 1}`;
   }
 
   // ─ Selection / editor ───────────────────────────────────────────────────────
@@ -400,16 +503,182 @@ export class AvailabilityComponent implements OnInit {
     this.editorLocal.set(block.local ?? 'Consultório · R. da Misericórdia 53');
   }
 
-  openNewBlock(dayIndex: number, hourIndex: number): void {
-    this.resetEditor();
-    const dow = COL_TO_DOW[dayIndex];
-    this.selectedWeekdays.set(new Set([dow]));
-    this.editorFrequency.set('weekly');
-    const startTime = HOURS[hourIndex] ?? '09:00';
-    const endHourIdx = Math.min(hourIndex + 2, HOURS.length - 1);
-    const endTime = HOURS[endHourIdx] ?? '11:00';
-    this.editorStartTime.set(startTime);
-    this.editorEndTime.set(endTime);
+  startMove(event: PointerEvent, block: TherapistBlock, colIndex: number): void {
+    if ((event.target as HTMLElement).closest('.b-resize-handle')) return;
+
+    const blockEl = event.currentTarget as HTMLElement;
+    const daycol = blockEl.parentElement as HTMLElement;
+    const weekGrid = daycol.parentElement as HTMLElement;
+
+    const colEls = Array.from(weekGrid.querySelectorAll<HTMLElement>('.daycol'));
+    const colRects = colEls.map(el => el.getBoundingClientRect());
+    const colTopY = colRects[colIndex].top;
+
+    const blockRect = blockEl.getBoundingClientRect();
+    const grabOffsetMin = Math.max(0, (event.clientY - blockRect.top) / ROW_H * 60);
+    const durationMin = timeToMin(block.endTime) - timeToMin(block.startTime);
+
+    let moved = false;
+
+    this.movingBlockId.set(block.id);
+    this.moveLiveStart.set(block.startTime);
+    this.moveLiveEnd.set(block.endTime);
+    this.moveLiveCol.set(colIndex);
+
+    blockEl.setPointerCapture(event.pointerId);
+
+    const onMove = (e: PointerEvent) => {
+      if (!moved) {
+        moved = true;
+        this.isDraggingMove.set(true);
+      }
+
+      let newCol = colIndex;
+      for (let i = 0; i < colRects.length; i++) {
+        if (e.clientX >= colRects[i].left && e.clientX < colRects[i].right) { newCol = i; break; }
+      }
+      if (e.clientX < colRects[0].left) newCol = 0;
+      if (e.clientX >= colRects[colRects.length - 1].right) newCol = colRects.length - 1;
+
+      const anchoredStart = (e.clientY - colTopY) / ROW_H * 60 + 8 * 60 - grabOffsetMin;
+      const snapped = Math.round(anchoredStart / 30) * 30;
+      const clampedStart = Math.max(8 * 60, Math.min(20 * 60 - durationMin, snapped));
+
+      this.moveLiveCol.set(newCol);
+      this.moveLiveStart.set(minToTime(clampedStart));
+      this.moveLiveEnd.set(minToTime(clampedStart + durationMin));
+    };
+
+    const onUp = () => {
+      blockEl.removeEventListener('pointermove', onMove);
+      blockEl.removeEventListener('pointerup', onUp);
+      blockEl.removeEventListener('pointercancel', onUp);
+
+      const newCol = this.moveLiveCol();
+      const newStart = this.moveLiveStart();
+      const newEnd = this.moveLiveEnd();
+
+      this.movingBlockId.set(null);
+      this.isDraggingMove.set(false);
+
+      if (!moved) return;
+
+      document.addEventListener('click', e => e.stopPropagation(), { once: true, capture: true });
+
+      if (newStart === block.startTime && newEnd === block.endTime && newCol === colIndex) return;
+
+      const newWeekday = COL_TO_DOW[newCol];
+      const updated: TherapistBlock = { ...block, startTime: newStart, endTime: newEnd, weekdays: [newWeekday] };
+      this.blocks.update(bs => bs.map(b => b.id === block.id ? updated : b));
+
+      if (block.backendId !== null) {
+        const startDate = block.isRecurring
+          ? this.dateForWeekday(newWeekday)
+          : (block.startDate ?? '');
+        const payload: AvailabilityPayload = {
+          professionalServiceIds: block.services.map(s => s.id),
+          startDate,
+          startTime: newStart,
+          endTime: newEnd,
+          isRecurring: block.isRecurring,
+        };
+        this.apiService.updateAvailability(block.backendId, payload).subscribe({
+          error: () => this.blocks.update(bs => bs.map(b => b.id === block.id ? block : b)),
+        });
+      }
+    };
+
+    blockEl.addEventListener('pointermove', onMove);
+    blockEl.addEventListener('pointerup', onUp);
+    blockEl.addEventListener('pointercancel', onUp);
+  }
+
+  startDragSelect(event: PointerEvent, colIndex: number): void {
+    if ((event.target as HTMLElement).closest('.block, .b-resize-handle')) return;
+    event.preventDefault();
+
+    const hcell = event.currentTarget as HTMLElement;
+    const daycol = hcell.parentElement as HTMLElement;
+    const colRect = daycol.getBoundingClientRect();
+
+    const anchorMin = this._yToSnappedMin(event.clientY - colRect.top, ROW_H);
+    const minDuration = this.editorSessionDuration();
+    let dragMoved = false;
+
+    this.dragSelection.set({
+      colIndex,
+      startTime: minToTime(anchorMin),
+      endTime: minToTime(Math.min(anchorMin + 60, 20 * 60)),
+    });
+
+    hcell.setPointerCapture(event.pointerId);
+
+    const onMove = (e: PointerEvent) => {
+      const currentMin = this._yToSnappedMin(e.clientY - colRect.top, ROW_H);
+      if (currentMin !== anchorMin) dragMoved = true;
+      const lo = Math.max(8 * 60, Math.min(anchorMin, currentMin));
+      const hi = Math.min(20 * 60, Math.max(anchorMin + minDuration, currentMin));
+      this.dragSelection.set({ colIndex, startTime: minToTime(lo), endTime: minToTime(hi) });
+    };
+
+    const onUp = () => {
+      hcell.removeEventListener('pointermove', onMove);
+      hcell.removeEventListener('pointerup', onUp);
+      hcell.removeEventListener('pointercancel', onUp);
+
+      const sel = this.dragSelection();
+      this.dragSelection.set(null);
+      if (!sel) return;
+
+      if (dragMoved) {
+        document.addEventListener('click', e => e.stopPropagation(), { once: true, capture: true });
+      }
+
+      this.resetEditor();
+      this.selectedServiceIds.set(new Set(this.services().map(s => s.id)));
+      this.selectedWeekdays.set(new Set([COL_TO_DOW[colIndex]]));
+      this.editorFrequency.set('weekly');
+      this.editorStartTime.set(sel.startTime);
+      this.editorEndTime.set(sel.endTime);
+    };
+
+    hcell.addEventListener('pointermove', onMove);
+    hcell.addEventListener('pointerup', onUp);
+    hcell.addEventListener('pointercancel', onUp);
+  }
+
+  setEditorFrequency(freq: 'once' | 'weekly'): void {
+    if (freq === this.editorFrequency()) return;
+
+    if (freq === 'once') {
+      // Carry the day over: map first selected weekday → its actual date in the visible week
+      const wds = [...this.selectedWeekdays()];
+      const colIdx = wds.length > 0 ? COL_TO_DOW.indexOf(wds[0]) : -1;
+      if (colIdx >= 0) {
+        this.editorDate.set(toKey(this.weekDays()[colIdx]));
+      }
+    } else {
+      // Carry the day over: map editorDate → weekday column
+      const dateStr = this.editorDate();
+      if (dateStr) {
+        const d = new Date(dateStr + 'T00:00:00');
+        const dow = COL_TO_DOW[(d.getDay() + 6) % 7];
+        if (dow) this.selectedWeekdays.set(new Set([dow]));
+        // Navigate to that week if it's not the one currently shown
+        const newStart = getWeekStart(d);
+        if (newStart.getTime() !== this.weekStart().getTime()) {
+          this.animateToWeek(newStart, newStart > this.weekStart() ? 'left' : 'right');
+        }
+      }
+    }
+
+    this.editorFrequency.set(freq);
+  }
+
+  private _yToSnappedMin(y: number, rowH: number): number {
+    const raw = (y / rowH + 8) * 60;
+    const snapped = Math.round(raw / 30) * 30;
+    return Math.max(8 * 60, Math.min(20 * 60, snapped));
   }
 
   resetEditor(): void {
@@ -447,6 +716,8 @@ export class AvailabilityComponent implements OnInit {
 
   saveBlock(): void {
     const selectedSvcs = this.services().filter(s => this.selectedServiceIds().has(s.id));
+    if (selectedSvcs.length === 0) return;
+
     const isRecurring = this.editorFrequency() === 'weekly';
     const existingId = this.selectedBlockId();
 
@@ -454,14 +725,22 @@ export class AvailabilityComponent implements OnInit {
       const existing = this.blocks().find(b => b.id === existingId);
       if (!existing || existing.backendId === null) return;
 
+      // When converting a recurring block to once, use editorDate as the startDate
+      // (recurring blocks have no startDate of their own)
+      const effectiveStartDate = !isRecurring
+        ? (existing.startDate ?? this.editorDate())
+        : existing.startDate;
+
       const payload = this.buildPayload(
-        selectedSvcs, isRecurring, existing.weekdays[0], existing.startDate,
+        selectedSvcs, isRecurring, existing.weekdays[0], effectiveStartDate,
       );
       const updated: TherapistBlock = {
         ...existing,
         services: selectedSvcs,
         modality: this.editorModality(),
         isRecurring,
+        weekdays: isRecurring ? existing.weekdays : [],
+        startDate: isRecurring ? undefined : effectiveStartDate,
         startTime: this.editorStartTime(),
         endTime: this.editorEndTime(),
         sessionDuration: this.editorSessionDuration(),
@@ -479,8 +758,16 @@ export class AvailabilityComponent implements OnInit {
         },
       });
     } else {
+      if (this.previewBlocks().some(p => p.hasConflict)) {
+        this.snackbarService.openSnackBar({
+          message: 'Existe um conflito de horário. Resolva os conflitos antes de guardar.',
+        });
+        return;
+      }
+
       if (isRecurring) {
         [...this.selectedWeekdays()].forEach(wd => this.createSingleBlock(selectedSvcs, true, wd));
+        this.resetEditor();
       } else {
         this.createSingleBlock(selectedSvcs, false, undefined, this.editorDate());
       }
@@ -508,6 +795,82 @@ export class AvailabilityComponent implements OnInit {
   }
 
   // ─ Private helpers ──────────────────────────────────────────────────────────
+
+  startResize(event: PointerEvent, block: TherapistBlock, rowH = ROW_H): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const handle = event.currentTarget as HTMLElement;
+    const colEl = (handle.closest('.daycol') ?? handle.closest('.m-tl')) as HTMLElement | null;
+    if (!colEl) return;
+
+    this._resizeBlock = block;
+    this._resizeColEl = colEl;
+    this._resizeRowH = rowH;
+    this._resizeDragged = false;
+    this.resizingBlockId.set(block.id);
+    this.resizeLiveEndTime.set(block.endTime);
+
+    handle.setPointerCapture(event.pointerId);
+
+    const onMove = (e: PointerEvent) => {
+      if (!this._resizeBlock || !this._resizeColEl) return;
+      const rect = this._resizeColEl.getBoundingClientRect();
+      const endMinRaw = ((e.clientY - rect.top + 3) / this._resizeRowH + 8) * 60;
+      const snapped = Math.round(endMinRaw / 30) * 30;
+      const startMin = timeToMin(this._resizeBlock.startTime);
+      const clamped = Math.max(startMin + 30, Math.min(20 * 60, snapped));
+      const next = minToTime(clamped);
+      if (next !== this.resizeLiveEndTime()) {
+        this._resizeDragged = true;
+        this.resizeLiveEndTime.set(next);
+      }
+    };
+
+    const onUp = () => {
+      handle.removeEventListener('pointermove', onMove);
+      handle.removeEventListener('pointerup', onUp);
+      handle.removeEventListener('pointercancel', onUp);
+
+      const b = this._resizeBlock;
+      const newEnd = this.resizeLiveEndTime();
+      const dragged = this._resizeDragged;
+
+      this.resizingBlockId.set(null);
+      this._resizeBlock = null;
+      this._resizeColEl = null;
+      this._resizeDragged = false;
+
+      if (!b || !dragged || newEnd === b.endTime) return;
+
+      // Swallow the synthetic click the browser fires after pointerup
+      document.addEventListener('click', e => e.stopPropagation(), { once: true, capture: true });
+
+      const updated = { ...b, endTime: newEnd };
+      this.blocks.update(bs => bs.map(bl => bl.id === b.id ? updated : bl));
+      if (this.selectedBlockId() === b.id) this.editorEndTime.set(newEnd);
+
+      if (b.backendId !== null) {
+        const startDate = b.isRecurring && b.weekdays[0]
+          ? this.dateForWeekday(b.weekdays[0])
+          : (b.startDate ?? '');
+        const payload: AvailabilityPayload = {
+          professionalServiceIds: b.services.map(s => s.id),
+          startDate,
+          startTime: b.startTime,
+          endTime: newEnd,
+          isRecurring: b.isRecurring,
+        };
+        this.apiService.updateAvailability(b.backendId, payload).subscribe({
+          error: () => this.blocks.update(bs => bs.map(bl => bl.id === b.id ? b : bl)),
+        });
+      }
+    };
+
+    handle.addEventListener('pointermove', onMove);
+    handle.addEventListener('pointerup', onUp);
+    handle.addEventListener('pointercancel', onUp);
+  }
 
   private createSingleBlock(
     services: ProfessionalService[],
@@ -539,13 +902,13 @@ export class AvailabilityComponent implements OnInit {
     this.apiService.createAvailability(payload).subscribe({
       next: (res) => {
         this.blocks.update(bs => bs.map(b =>
-          b.id === tempId ? { ...b, id: res.id, backendId: res.id } : b,
+          b.id === tempId ? { ...b, backendId: res.id } : b,
         ));
-        this.selectedBlockId.set(res.id);
       },
       error: (e) => {
         console.error('createAvailability error', e);
         this.blocks.update(bs => bs.filter(b => b.id !== tempId));
+        if (this.selectedBlockId() === tempId) this.selectedBlockId.set(null);
       },
     });
   }
@@ -577,7 +940,7 @@ export class AvailabilityComponent implements OnInit {
     return avails.map(a => {
       const dow = BACKEND_DOW_MAP[a.dayOfWeek as unknown as string] ?? DayOfWeek.MONDAY;
       return {
-        id: a.id,
+        id: ++this._nextId,
         backendId: a.id,
         services: a.services,
         modality: this.deriveModality(a.services),
@@ -616,6 +979,7 @@ export class AvailabilityComponent implements OnInit {
 
   openSheet(): void {
     this.resetEditor();
+    this.selectedServiceIds.set(new Set(this.services().map(s => s.id)));
     const dow = COL_TO_DOW[this.selectedDayIndex()];
     this.selectedWeekdays.set(new Set([dow]));
     this.sheetOpen.set(true);
