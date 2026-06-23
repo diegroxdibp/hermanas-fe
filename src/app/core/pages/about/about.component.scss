@@ -24,9 +24,19 @@
     overflow: hidden;
     position: relative;
     mask-repeat: no-repeat;
-    background-image: url(/assets/images/gradient.png);
-    background-size: cover;
-    background-position: 50% 30%;
+    background: #FFFFFF;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 1px;
+      bottom: 1px;
+      background-image: url(/assets/images/gradient.png);
+      background-size: cover;
+      background-position: 50% 30%;
+    }
 
     .custom-shape-divider-bottom-1775951696 {
       position: absolute;

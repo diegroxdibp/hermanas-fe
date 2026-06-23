@@ -1,0 +1,479 @@
+<div class="av">
+  <!-- ─── Shared panel head ─── -->
+  <div class="panel-head">
+    <div class="kicker">Disponibilidades · Vista semanal</div>
+    <h1>A sua semana de atendimentos</h1>
+    <p class="sub">
+      Toque numa célula para abrir um bloco, ou num bloco existente para o editar. Os detalhes — serviço, modalidade, horas — ficam na coluna à direita.
+    </p>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────────────────── -->
+  <!-- DESKTOP LAYOUT                                                       -->
+  <!-- ─────────────────────────────────────────────────────────────────── -->
+  @if (!screenSize.isMobile()) {
+    <div class="panel-body">
+      <div class="merge-layout">
+
+        <!-- ─── Calendar column ─── -->
+        <div>
+          <!-- Toolbar -->
+          <div class="cal-toolbar">
+            <div class="wk-nav">
+              <button class="today-btn" (click)="goToToday()">Hoje</button>
+              <button (click)="prevWeek()">
+                <span class="material-symbols-outlined">chevron_left</span>
+              </button>
+              <span class="wk-label">{{ weekLabel() }}</span>
+              <button (click)="nextWeek()">
+                <span class="material-symbols-outlined">chevron_right</span>
+              </button>
+            </div>
+            <div class="legend">
+              <span class="lg"><span class="sw presencial"></span>Presencial</span>
+              <span class="lg"><span class="sw remoto"></span>Remoto</span>
+              <span class="lg"><span class="sw any"></span>Qualquer</span>
+              <span class="lg-sep"></span>
+              <span class="lg">
+                <span class="material-symbols-outlined">event_repeat</span>Semanal
+              </span>
+              <span class="lg">
+                <span class="pin-badge">
+                  <span class="material-symbols-outlined">push_pin</span>
+                </span>Data única
+              </span>
+            </div>
+          </div>
+
+          <!-- Calendar grid -->
+          <div class="cal">
+            <!-- Header -->
+            <div class="cal-head">
+              <div class="corner"></div>
+              @for (day of weekDays(); track day.getTime(); let di = $index) {
+                <div class="dh" [class.today]="isToday(day)">
+                  <div class="dow">{{ PT_DOW_SHORT[di] }}</div>
+                  <div class="dn">{{ day.getDate() }}</div>
+                </div>
+              }
+            </div>
+
+            <!-- Body -->
+            <div class="cal-body">
+              <!-- Gutter -->
+              <div class="cal-gutter">
+                @for (h of HOURS; track h; let first = $first) {
+                  <div class="tcell" [class.first]="first">{{ h }}</div>
+                }
+              </div>
+
+              <!-- Day columns -->
+              @for (day of weekDays(); track day.getTime(); let di = $index) {
+                <div class="daycol">
+                  @for (h of HOURS; track h; let hi = $index; let first = $first) {
+                    <div
+                      class="hcell"
+                      [class.first]="first"
+                      (click)="openNewBlock(di, hi)"
+                    ></div>
+                  }
+                  @for (block of blocksForColumn(di); track block.id) {
+                    <div
+                      class="block"
+                      [class.remoto]="block.modality === Modality.REMOTE"
+                      [class.any]="block.modality === Modality.ANY"
+                      [class.unica]="!block.isRecurring"
+                      [class.selected]="selectedBlockId() === block.id"
+                      [style.top.px]="blockTopPx(block)"
+                      [style.height.px]="blockHeightPx(block)"
+                      (click)="selectBlock($event, block)"
+                    >
+                      <div class="b-top">
+                        <span class="b-time">{{ block.startTime }}–{{ block.endTime }}</span>
+                        <span class="b-badge">
+                          <span class="material-symbols-outlined">
+                            {{ block.isRecurring ? 'event_repeat' : 'push_pin' }}
+                          </span>
+                        </span>
+                      </div>
+                      <div class="b-svc">{{ blockServiceLabel(block) }}</div>
+                      <div class="b-slots">{{ blockSlotCount(block) }} sessões</div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="cal-hint">
+            <span class="material-symbols-outlined">touch_app</span>
+            Clique numa célula para criar um novo bloco nessa hora. Clique num bloco existente para o editar.
+          </div>
+        </div>
+
+        <!-- ─── Block editor ─── -->
+        <aside class="block-editor">
+          <div class="be-head">
+            <div>
+              <div class="be-title">{{ editorTitle() }}</div>
+              <div class="be-sub">{{ editorSubtitle() }}</div>
+            </div>
+            <span class="be-chip">
+              <span class="material-symbols-outlined">
+                {{ editorFrequency() === 'weekly' ? 'event_repeat' : 'push_pin' }}
+              </span>
+              {{ editorFrequency() === 'weekly' ? 'Semanal' : 'Única' }}
+            </span>
+          </div>
+
+          <div class="be-body">
+            <ng-container [ngTemplateOutlet]="formSections"></ng-container>
+          </div>
+
+          <div class="be-actions">
+            <button class="btn-add" (click)="saveBlock()">
+              <span class="material-symbols-outlined">check</span>
+              Guardar bloco
+            </button>
+            @if (selectedBlockId() !== null) {
+              <button class="btn-remove" (click)="removeBlock()">
+                <span class="material-symbols-outlined">delete</span>
+                Remover bloco
+              </button>
+            }
+          </div>
+        </aside>
+
+      </div>
+    </div>
+  }
+
+  <!-- ─────────────────────────────────────────────────────────────────── -->
+  <!-- MOBILE LAYOUT                                                        -->
+  <!-- ─────────────────────────────────────────────────────────────────── -->
+  @if (screenSize.isMobile()) {
+    <div class="mob">
+      <!-- Top bar -->
+      <div class="m-top">
+        <div class="m-title">
+          {{ monthLabel() }}
+          <small>Disponibilidades · {{ weekRangeLabel() }}</small>
+        </div>
+        <div class="m-actions">
+          <button class="m-icon">
+            <span class="material-symbols-outlined">calendar_view_week</span>
+          </button>
+          <div class="m-avatar">{{ userInitials() }}</div>
+        </div>
+      </div>
+
+      <!-- Week strip -->
+      <div class="m-strip">
+        @for (day of weekDays(); track day.getTime(); let di = $index) {
+          <button
+            class="m-day"
+            [class.sel]="selectedDayIndex() === di"
+            (click)="selectDay(di)"
+          >
+            <span class="wd">{{ PT_DOW_SHORT[di][0] }}</span>
+            <span class="dn">{{ day.getDate() }}</span>
+            <span class="dot" [class.hidden]="!hasBlocks(di)"></span>
+          </button>
+        }
+      </div>
+
+      <!-- Day agenda -->
+      <div class="m-agenda">
+        <div class="m-daylabel">{{ mobileDayLabel() }}</div>
+        <div class="m-tl">
+          @for (h of HOURS; track h; let first = $first) {
+            <div class="m-hour" [class.first]="first">
+              <span class="lbl">{{ h }}</span>
+            </div>
+          }
+          @for (block of mobileDayBlocks(); track block.id) {
+            <div
+              class="m-block"
+              [class.remoto]="block.modality === Modality.REMOTE"
+              [class.any]="block.modality === Modality.ANY"
+              [class.unica]="!block.isRecurring"
+              [style.top.px]="blockTopPx(block, MOB_ROW_H)"
+              [style.height.px]="blockHeightPx(block, MOB_ROW_H)"
+              (click)="selectBlock($event, block)"
+            >
+              <div class="mb-top">
+                <span class="mb-time">{{ block.startTime }} – {{ block.endTime }}</span>
+                <span class="mb-badge">
+                  <span class="material-symbols-outlined">
+                    {{ block.isRecurring ? 'event_repeat' : 'push_pin' }}
+                  </span>
+                </span>
+              </div>
+              <div class="mb-svc">{{ blockServiceLabel(block) }}</div>
+              <div class="mb-meta">
+                @if (block.modality !== Modality.REMOTE && block.local) {
+                  <span>
+                    <span class="material-symbols-outlined">location_on</span>
+                    Consultório
+                  </span>
+                }
+                @if (block.modality === Modality.REMOTE) {
+                  <span>
+                    <span class="material-symbols-outlined">videocam</span>
+                    Remoto
+                  </span>
+                }
+                <span>
+                  <span class="material-symbols-outlined">grid_view</span>
+                  {{ blockSlotCount(block) }} sessões
+                </span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- FAB -->
+      <button class="m-fab" aria-label="Nova disponibilidade" (click)="openSheet()">
+        <span class="material-symbols-outlined">add</span>
+      </button>
+
+      <!-- Bottom nav -->
+      <nav class="m-nav">
+        <a>
+          <span class="material-symbols-outlined">home</span>
+          <span>Início</span>
+        </a>
+        <a class="active">
+          <span class="material-symbols-outlined">calendar_month</span>
+          <span>Agenda</span>
+        </a>
+        <a>
+          <span class="material-symbols-outlined">forum</span>
+          <span>Mensagens</span>
+        </a>
+        <a>
+          <span class="material-symbols-outlined">person</span>
+          <span>Conta</span>
+        </a>
+      </nav>
+
+      <!-- Bottom sheet -->
+      @if (sheetOpen()) {
+        <div class="m-scrim" (click)="closeSheet()"></div>
+        <div class="m-sheet">
+          <div class="handle"></div>
+          <div class="sh-head">
+            <h3>Nova disponibilidade</h3>
+            <button class="sh-close" (click)="closeSheet()">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+          <div class="sh-body">
+            <ng-container [ngTemplateOutlet]="formSections"></ng-container>
+          </div>
+          <div class="sh-foot">
+            <button class="btn-add" (click)="saveBlock()">
+              <span class="material-symbols-outlined">check</span>
+              Guardar disponibilidade
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- ─── Shared form template (desktop editor + mobile sheet) ─── -->
+<ng-template #formSections>
+
+  <!-- Serviço -->
+  <div class="be-section">
+    <label class="control-label">
+      Serviço <span class="req">*</span>
+    </label>
+    <div class="chips">
+      @for (svc of services(); track svc.id) {
+        <button
+          class="chip"
+          [class.on]="selectedServiceIds().has(svc.id)"
+          (click)="toggleService(svc.id)"
+        >
+          <span class="material-symbols-outlined">check</span>
+          {{ svc.name }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Modalidade -->
+  <div class="be-section">
+    <label class="control-label">
+      Modalidade <span class="req">*</span>
+    </label>
+    <div class="seg">
+      <button
+        [class.on]="editorModality() === Modality.LOCAL"
+        class="presencial"
+        (click)="editorModality.set(Modality.LOCAL)"
+      >
+        @if (editorModality() === Modality.LOCAL) {
+          <span class="material-symbols-outlined">check</span>
+        }
+        Presencial
+      </button>
+      <button
+        [class.on]="editorModality() === Modality.REMOTE"
+        class="remoto"
+        (click)="editorModality.set(Modality.REMOTE)"
+      >
+        @if (editorModality() === Modality.REMOTE) {
+          <span class="material-symbols-outlined">check</span>
+        }
+        Remoto
+      </button>
+      <button
+        [class.on]="editorModality() === Modality.ANY"
+        (click)="editorModality.set(Modality.ANY)"
+      >
+        @if (editorModality() === Modality.ANY) {
+          <span class="material-symbols-outlined">check</span>
+        }
+        Qualquer
+      </button>
+    </div>
+    @if (editorModality() !== Modality.REMOTE) {
+      <div class="field" style="margin-top: 12px;">
+        <div class="field-inner">
+          <span class="field-label">Local</span>
+          <input
+            class="field-value"
+            type="text"
+            [value]="editorLocal()"
+            (input)="editorLocal.set($any($event.target).value)"
+            placeholder="Endereço do consultório"
+          />
+        </div>
+        <span class="material-symbols-outlined field-icon">location_on</span>
+      </div>
+    }
+  </div>
+
+  <!-- Frequência -->
+  <div class="be-section">
+    <label class="control-label">Frequência</label>
+    <div class="seg">
+      <button
+        [class.on]="editorFrequency() === 'once'"
+        (click)="editorFrequency.set('once')"
+      >
+        @if (editorFrequency() === 'once') {
+          <span class="material-symbols-outlined">check</span>
+        }
+        Data única
+      </button>
+      <button
+        [class.on]="editorFrequency() === 'weekly'"
+        (click)="editorFrequency.set('weekly')"
+      >
+        @if (editorFrequency() === 'weekly') {
+          <span class="material-symbols-outlined">check</span>
+        }
+        Semanal
+      </button>
+    </div>
+
+    @if (editorFrequency() === 'weekly') {
+      <div style="margin-top: 14px;">
+        <label class="control-label">Dias da semana</label>
+        <div class="weekdays">
+          @for (wd of WEEKDAYS; track wd; let i = $index) {
+            <button
+              class="weekday"
+              [class.on]="selectedWeekdays().has(wd)"
+              (click)="toggleWeekday(wd)"
+            >
+              {{ PT_DOW_SHORT[i][0] }}
+            </button>
+          }
+        </div>
+      </div>
+    } @else {
+      <div class="field" style="margin-top: 14px;">
+        <div class="field-inner">
+          <span class="field-label">Data</span>
+          <input
+            class="field-value"
+            type="date"
+            [value]="editorDate()"
+            (change)="editorDate.set($any($event.target).value)"
+          />
+        </div>
+        <span class="material-symbols-outlined field-icon">calendar_today</span>
+      </div>
+    }
+  </div>
+
+  <!-- Horas -->
+  <div class="be-section">
+    <label class="control-label">Intervalo de horas</label>
+    <div class="time-row">
+      <div class="time-field">
+        <span class="field-label">Início</span>
+        <div class="time-value">
+          <span class="material-symbols-outlined">schedule</span>
+          <select
+            [value]="editorStartTime()"
+            (change)="editorStartTime.set($any($event.target).value)"
+          >
+            @for (h of HOURS; track h) {
+              <option [value]="h">{{ h }}</option>
+            }
+          </select>
+        </div>
+      </div>
+      <div class="time-field">
+        <span class="field-label">Fim</span>
+        <div class="time-value">
+          <span class="material-symbols-outlined">schedule</span>
+          <select
+            [value]="editorEndTime()"
+            (change)="editorEndTime.set($any($event.target).value)"
+          >
+            @for (h of HOURS_END; track h) {
+              <option [value]="h">{{ h }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <label class="control-label" style="margin-top: 14px;">Duração de cada sessão</label>
+    <div class="seg">
+      @for (dur of SESSION_DURATIONS; track dur) {
+        <button
+          [class.on]="editorSessionDuration() === dur"
+          (click)="editorSessionDuration.set(dur)"
+        >
+          @if (editorSessionDuration() === dur) {
+            <span class="material-symbols-outlined">check</span>
+          }
+          {{ dur }} min
+        </button>
+      }
+    </div>
+
+    @if (generatedSlots().length > 0) {
+      <div class="hint">
+        <span class="material-symbols-outlined">info</span>
+        Gera {{ generatedSlots().length }} sessões agendáveis:
+      </div>
+      <div class="slots-preview">
+        @for (slot of generatedSlots(); track slot) {
+          <span class="slot-pill">{{ slot }}</span>
+        }
+      </div>
+    }
+  </div>
+
+</ng-template>

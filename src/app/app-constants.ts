@@ -106,33 +106,157 @@ export const AppConstants = {
   faq: [
     {
       topicName: 'Consulta',
-      items: [{ question: 'Qual a duração de uma consulta? ', answer: 'A duração é estipulada por casa pessoa profissional, contudo, no geral, varia entre 30 minutos até 2 horas. ' } as FaqTopicItem,
-      { question: 'Há consulta no formato online?', answer: 'Sim, a plataforma utilizada é de escolha de cada pessoa profissional. Ademais, em alguns serviços há o formato presencial. As opção estão visíveis no momento do agendamento.' } as FaqTopicItem,
-      { question: 'Como faço o cancelamento de uma consulta?', answer: 'Chama a puliça.' } as FaqTopicItem
-      ]
+      items: [
+        {
+          question: 'Qual a duração de uma consulta?',
+          answer: {
+            intro: 'Cada profissional estipula sua própria duração. Como referência, a maioria das consultas tem entre 30 minutos e 2 horas.',
+          },
+        } as FaqTopicItem,
+        {
+          question: 'Há consulta no formato online?',
+          answer: {
+            intro: 'Sim. O profissional escolhe a plataforma que utiliza. Alguns serviços também oferecem atendimento presencial. As modalidades disponíveis aparecem no momento do agendamento.',
+          },
+        } as FaqTopicItem,
+        {
+          question: 'Como faço o cancelamento de uma consulta?',
+          answer: {
+            intro: 'Pelo perfil no botão “Agendamentos” é possível cancelar ou reagendar uma consulta já marcada.',
+          },
+        } as FaqTopicItem,
+      ],
     } as FaqTopic,
     {
       topicName: 'Agendamento',
-      items: [{ question: 'Como faço um (ou o?)agendamento?', answer: 'Para o agendamento é necessário primeiramente fazer Log in (terá link?). Depois poderá clicar  no botão de Agendamento (terá link?) e prosseguirá para a escolha do serviço e em seguida da pessoa profissional e assim, ter acesso a agenda com horários disponíveis.' } as FaqTopicItem,
-        { question: 'É obrigatório fazer Log in para iniciar o agendamento?', answer: 'Sim, é obrigatório e sem custos.' } as FaqTopicItem,
-        { question: 'Como tenho acesso a agenda da pessoa profissional?', answer: 'Ao fazer o Log in e escolher o serviço e o profissional, terá acesso a agenda com datas e horários disponíveis.' } as FaqTopicItem,
-        { question: 'Como cancelo um agendamento?', answer: 'Com magia negra.' } as FaqTopicItem,
-        { question: 'Depois do primeiro agendamento e pactuação de continuidade com a pessoa profissional, terei que agendar as seguintes consultas através da CARE?', answer: 'O meio de agendamento poderá ser negociado diretamente com a pessoa profissional. ' } as FaqTopicItem,
-      ]
+      items: [
+        {
+          question: 'Como faço um agendamento?',
+          answer: {
+            steps: [
+              'Faça login na plataforma.',
+              'Clique em “Agendamento” na coluna do lado esquerdo.',
+              'Escolha o serviço, a pessoa profissional e aceda à agenda com horários disponíveis, modalidade de atendimento e valor.',
+            ],
+          },
+        } as FaqTopicItem,
+        {
+          question: 'É obrigatório fazer Log in para iniciar o agendamento?',
+          answer: {
+            intro: 'Sim, é obrigatório. Não há custo para criar ou manter o login.',
+          },
+        } as FaqTopicItem,
+        {
+          question: 'Como tenho acesso à agenda de cada profissional?',
+          answer: {
+            intro: 'O acesso ocorre após o Log in e a escolha do serviço e da pessoa profissional. A agenda com datas e horários será disponibilizada.',
+          },
+        } as FaqTopicItem,
+        {
+          question: 'Como cancelar um agendamento?',
+          answer: {
+            intro: 'Pelo perfil no botão “Agendamentos”, com as opções de cancelamento ou reagendamento.',
+          },
+        } as FaqTopicItem,
+        {
+          question: 'Depois da primeira consulta com uma pessoa profissional ou grupo, terei que agendar as seguintes consultas através da CARE?',
+          answer: {
+            intro: 'Não é obrigatório. O agendamento das sessões seguintes pode ser negociado diretamente com a pessoa profissional na primeira consulta ou grupo.',
+          },
+        } as FaqTopicItem,
+      ],
     } as FaqTopic,
     {
       topicName: 'Clínica',
       items: [
-        { question: 'O que é a CARE?', answer: 'Sei lá.' } as FaqTopicItem,
-        { question: 'Q2', answer: 'A2' } as FaqTopicItem,
-        { question: 'Q3', answer: 'A3' } as FaqTopicItem]
+        {
+          question: 'O que é a CARE?',
+          answer: {
+            intro: 'CARE significa Clínica Ampliada Ressignificações. Tem como missão impulsionar e garantir a acessibilidade a cuidados de saúde mental, relacional, física e social. Seus valores desafiam modelos tradicionais que ignoram a integralidade do ser humano e reduzem a saúde à mera ausência de doença.',
+          },
+        } as FaqTopicItem,
+        {
+          question: 'Quais os serviços disponibilizados na CARE?',
+          answer: {
+            intro: 'Atualmente a CARE disponibiliza os seguintes serviços:',
+            steps: [
+              'Análise Reichiana — abordagem psicanalítica com enfoque no corpo;',
+              'Mindfulness — prática de atenção plena;',
+              'Somatic Experiencing® — voltado à regulação do sistema nervoso autônomo e à renegociação de trauma;',
+              'Supervisão na abordagem Reichiana — destinada a profissionais.',
+            ],
+            outro: 'Os serviços podem mudar.',
+            links: [
+              { label: 'Confira sempre a lista atualizada', url: '/', fragment: 'services' },
+            ],
+          },
+        } as FaqTopicItem,
+      ],
     } as FaqTopic,
     {
       topicName: 'Política de privacidade e Termo de uso',
       items: [
-        { question: 'O que é ..?', answer: 'Sei lá.' } as FaqTopicItem,
-        { question: 'Q2', answer: 'A2' } as FaqTopicItem,
-        { question: 'Q3', answer: 'A3' } as FaqTopicItem]
+        {
+          question: 'O que é Política de Privacidade e Termo de Uso?',
+          answer: {
+            intro: 'A Política de Privacidade contém informações acerca da utilização e coleta de dados pessoais, além de explicitar o tratamento, a transparência e a segurança dos mesmos.',
+            outro: 'O Termo de Uso enuncia as regras de utilização da plataforma, assim como os direitos, deveres e responsabilidades das partes, e define políticas de desistência, suspensão e bloqueio do usuário.',
+            links: [
+              { label: 'Aceda a ambos os documentos aqui', url: '/politica-privacidade' },
+            ],
+          },
+        } as FaqTopicItem,
+        {
+          question: 'Errei um dado pessoal ao me inscrever na plataforma. Como faço para retificar meus dados?',
+          answer: {
+            intro: 'É possível corrigir os dados a qualquer momento. Basta fazer Log in, aceder “Dados Pessoais” e realizar as correções.',
+          },
+        } as FaqTopicItem,
+        {
+          question: 'Pessoas menores de 18 anos podem se inscrever na CARE?',
+          answer: {
+            intro: 'Não. O serviço é destinado exclusivamente a pessoas com 18 anos ou mais.',
+          },
+        } as FaqTopicItem,
+        {
+          question: 'Com quem meus dados são compartilhados?',
+          answer: {
+            intro: 'Os dados da conta (nome, contato telefônico e email) são compartilhados apenas com a pessoa profissional com quem tem ou teve atendimento. Não compartilhamos dados com terceiros para fins de marketing ou outras finalidades alheias aos serviços da CARE.',
+          },
+        } as FaqTopicItem,
+        {
+          question: 'Posso excluir permanentemente minha conta e meus dados?',
+          answer: {
+            intro: 'Sim. Basta aceder a conta e clicar na opção de “Exclusão de conta”. Após a exclusão, os seus dados pessoais serão removidos do sistema ativo.',
+            outro: 'Importante: atualmente, não há registros clínicos armazenados na plataforma. Caso o profissional mantenha seus próprios registros fora da CARE, a exclusão da sua conta na plataforma não afeta esses arquivos externos.',
+          },
+        } as FaqTopicItem,
+        {
+          question: 'Como serei notificado sobre mudanças na política ou termos?',
+          answer: {
+            intro: 'As notificações sobre alterações na Política de Privacidade ou no Termo de Uso aparecerão no seu perfil.',
+            links: [
+              { label: 'A versão atualizada dos documentos está sempre disponível aqui', url: '/politica-privacidade' },
+            ],
+          },
+        } as FaqTopicItem,
+        {
+          question: 'A plataforma utiliza cookies?',
+          answer: {
+            intro: 'Sim. A CARE utiliza cookies apenas para autenticação, ou seja, para manter a sua sessão ativa enquanto navega na área logada. Não usamos cookies para rastreamento de comportamento, anúncios ou marketing.',
+            outro: 'Pode configurar o seu navegador para recusar cookies, mas isso pode comprometer o funcionamento do login e do agendamento.',
+          },
+        } as FaqTopicItem,
+        {
+          question: 'O que acontece se eu descumprir o Termo de Uso?',
+          answer: {
+            intro: 'O descumprimento pode resultar em advertência, suspensão ou exclusão da conta. Você será informado e poderá contestar, exceto em casos graves. A CARE pode reter dados apenas pelo prazo exigido por lei.',
+            links: [
+              { label: 'Consulte os detalhes no Termo de Uso', url: '/termos-uso' },
+            ],
+          },
+        } as FaqTopicItem,
+      ],
     } as FaqTopic,
   ]
 };

@@ -7,8 +7,12 @@ export interface FaqTopic {
   items: FaqTopicItem[];
 }
 
-
 export interface FaqTopicItem {
   question: string;
-  answer: string;
+  answer: {
+    intro?: string;
+    steps?: string[];
+    outro?: string;
+    links?: { label: string; url: string; fragment?: string }[];
+  };
 }

@@ -1,0 +1,174 @@
+@use "../../../../assets/styles/breakpoints.scss" as breakpoint;
+
+.legal {
+  background: var(--color-white);
+  color: var(--color-primary-blue);
+  font-family: var(--font-sans);
+  box-sizing: border-box;
+  padding: 48px 22px 64px;
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  @media (min-width: breakpoint.$breakpoint-sm) {
+    padding: 64px 52px 80px;
+  }
+}
+
+.legal__container {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+// ── Header ────────────────────────────────────────────────────
+.legal__header {
+  margin-bottom: 36px;
+  text-align: center;
+}
+
+.legal__eyebrow {
+  margin: 0 0 12px;
+  font-size: 12px;
+  font-weight: 700;
+  font-style: italic;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--color-primary-purple);
+}
+
+.legal__title {
+  margin: 0 0 10px;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.4px;
+  color: var(--color-primary-blue);
+
+  @media (min-width: breakpoint.$breakpoint-sm) { font-size: 38px; }
+}
+
+.legal__meta {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-muted);
+}
+
+// ── Tab nav ───────────────────────────────────────────────────
+.legal__tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 36px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border-soft);
+}
+
+.legal__tab {
+  padding: 8px 18px;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-tint);
+  color: var(--color-secondary-indigo);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s var(--ease-care), color 0.2s var(--ease-care);
+
+  &:hover {
+    background: var(--color-primary-purple);
+    color: var(--color-white);
+  }
+}
+
+// ── Intro preamble ────────────────────────────────────────────
+.legal__intro {
+  margin-bottom: 48px;
+
+  p {
+    margin: 0 0 16px;
+    font-size: 15.5px;
+    line-height: 1.7;
+    color: var(--color-secondary-indigo);
+    text-align: justify;
+
+    &:last-child { margin-bottom: 0; }
+  }
+}
+
+// ── Document sections ─────────────────────────────────────────
+.legal__doc {
+  margin-bottom: 52px;
+  scroll-margin-top: 100px;
+}
+
+.legal__doc-title {
+  margin: 0 0 28px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  color: var(--color-primary-blue);
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--color-primary-purple);
+
+  @media (min-width: breakpoint.$breakpoint-sm) { font-size: 26px; }
+}
+
+.legal__item {
+  margin-bottom: 28px;
+  padding-bottom: 28px;
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+.legal__item-title {
+  margin: 0 0 10px;
+  font-size: 16.5px;
+  font-weight: 700;
+  color: var(--color-primary-blue);
+
+  @media (min-width: breakpoint.$breakpoint-sm) { font-size: 17.5px; }
+}
+
+.legal__item p {
+  margin: 0 0 10px;
+  font-size: 15.5px;
+  line-height: 1.7;
+  color: var(--color-secondary-indigo);
+  text-align: justify;
+
+  &:last-child { margin-bottom: 0; }
+}
+
+.legal__list {
+  margin: 8px 0 12px;
+  padding: 0 0 0 22px;
+  color: var(--color-secondary-indigo);
+  font-size: 15.5px;
+  line-height: 1.7;
+
+  li { margin-bottom: 6px; }
+}
+
+.legal__link {
+  color: var(--color-primary-purple);
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+
+  &:hover { opacity: 0.75; }
+}
+
+// ── Back link ─────────────────────────────────────────────────
+.legal__back {
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border-soft);
+}
+
+.legal__back-link {
+  color: var(--color-muted);
+  font-size: 14px;
+  text-decoration: none;
+  transition: color 0.2s var(--ease-care);
+
+  &:hover { color: var(--color-primary-purple); }
+}

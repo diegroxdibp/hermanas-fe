@@ -91,6 +91,29 @@ export class ApiService {
     );
   }
 
+  createTherapistBlock(payload: any): Observable<any> {
+    return this.http.post(
+      `${environment.apiUrl}/api/availability/block`,
+      payload,
+      { withCredentials: true },
+    );
+  }
+
+  updateTherapistBlock(id: number, payload: any): Observable<any> {
+    return this.http.put(
+      `${environment.apiUrl}/api/availability/block/${id}`,
+      payload,
+      { withCredentials: true },
+    );
+  }
+
+  deleteTherapistBlock(id: number): Observable<void> {
+    return this.http.delete<void>(
+      `${environment.apiUrl}/api/availability/block/${id}`,
+      { withCredentials: true },
+    );
+  }
+
   sendEmail(subject: string, body: string) {
     this.http
       .post(`${environment.apiUrl}/email/send`, {

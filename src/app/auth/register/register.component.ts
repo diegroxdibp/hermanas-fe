@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { FormService } from '../../core/services/form.service';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
@@ -10,7 +11,7 @@ import { AppConstants } from '../../app-constants';
 
 @Component({
   selector: 'app-register',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
 })
