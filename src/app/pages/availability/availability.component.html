@@ -100,6 +100,23 @@
                       <div class="b-slots">{{ blockSlotCount(block) }} sessões</div>
                     </div>
                   }
+                  @for (preview of previewBlocksForColumn(di); track preview.colIndex) {
+                    <div
+                      class="block preview"
+                      [class.remoto]="preview.modality === Modality.REMOTE"
+                      [class.any]="preview.modality === Modality.ANY"
+                      [class.conflict]="preview.hasConflict"
+                      [style.top.px]="previewTopPx(preview.startTime)"
+                      [style.height.px]="previewHeightPx(preview.startTime, preview.endTime)"
+                    >
+                      <div class="b-top">
+                        <span class="b-time">{{ preview.startTime }}–{{ preview.endTime }}</span>
+                        @if (preview.hasConflict) {
+                          <span class="material-symbols-outlined" style="font-size:13px">warning</span>
+                        }
+                      </div>
+                    </div>
+                  }
                 </div>
               }
             </div>
@@ -189,6 +206,23 @@
           @for (h of HOURS; track h; let first = $first) {
             <div class="m-hour" [class.first]="first">
               <span class="lbl">{{ h }}</span>
+            </div>
+          }
+          @for (preview of mobileDayPreview(); track preview.colIndex) {
+            <div
+              class="m-block preview"
+              [class.remoto]="preview.modality === Modality.REMOTE"
+              [class.any]="preview.modality === Modality.ANY"
+              [class.conflict]="preview.hasConflict"
+              [style.top.px]="previewTopPx(preview.startTime, MOB_ROW_H)"
+              [style.height.px]="previewHeightPx(preview.startTime, preview.endTime, MOB_ROW_H)"
+            >
+              <div class="mb-top">
+                <span class="mb-time">{{ preview.startTime }} – {{ preview.endTime }}</span>
+                @if (preview.hasConflict) {
+                  <span class="material-symbols-outlined" style="font-size:13px">warning</span>
+                }
+              </div>
             </div>
           }
           @for (block of mobileDayBlocks(); track block.id) {

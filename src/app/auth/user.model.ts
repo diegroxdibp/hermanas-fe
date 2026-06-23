@@ -2,6 +2,7 @@ import { Genders } from '../shared/enums/genders.enum';
 import { Roles } from '../shared/enums/roles.enum';
 
 export interface User {
+  id?: number;
   name?: string;
   email: string;
   birthDate?: string;

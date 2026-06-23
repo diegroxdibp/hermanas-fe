@@ -9,7 +9,8 @@ import {
 import { Modality } from '../../shared/enums/modality.enum';
 import { DayOfWeek } from '../../shared/enums/day-of-week.enum';
 import { ProfessionalService } from '../../shared/models/professional-service.model';
-import { ApiService } from '../../core/services/api.service';
+import { ApiService, AvailabilityPayload } from '../../core/services/api.service';
+import { AvailabilityModel } from '../../shared/models/availability.model';
 import { ScreenSizeService } from '../../shared/services/screen-size.service';
 import { SessionService } from '../../shared/services/session.service';
 
@@ -87,10 +88,19 @@ function toKey(d: Date): string {
   return `${y}-${m}-${day}`;
 }
 
-// ─── Model ────────────────────────────────────────────────────────────────────
+// ─── Models ───────────────────────────────────────────────────────────────────
+
+interface PreviewBlock {
+  colIndex: number;
+  startTime: string;
+  endTime: string;
+  hasConflict: boolean;
+  modality: Modality;
+}
 
 interface TherapistBlock {
   id: number;
+  backendId: number | null;
   services: ProfessionalService[];
   modality: Modality;
   isRecurring: boolean;
@@ -102,14 +112,17 @@ interface TherapistBlock {
   local?: string;
 }
 
-// ─── Mock seed services ───────────────────────────────────────────────────────
+// ─── Backend → frontend enum maps ─────────────────────────────────────────────
 
-const MOCK_SERVICES: ProfessionalService[] = [
-  { id: 1, name: 'Análise Reichiana', format: 'INDIVIDUAL' as any, modality: 'LOCAL' as any, price: '80', active: true },
-  { id: 2, name: 'Mindfulness', format: 'INDIVIDUAL' as any, modality: 'REMOTE' as any, price: '70', active: true },
-  { id: 3, name: 'Somatic Experience®', format: 'INDIVIDUAL' as any, modality: 'LOCAL' as any, price: '90', active: true },
-  { id: 4, name: 'Supervisão', format: 'GROUP' as any, modality: 'REMOTE' as any, price: '60', active: true },
-];
+const BACKEND_DOW_MAP: Record<string, DayOfWeek> = {
+  MONDAY: DayOfWeek.MONDAY,
+  TUESDAY: DayOfWeek.TUESDAY,
+  WEDNESDAY: DayOfWeek.WEDNESDAY,
+  THURSDAY: DayOfWeek.THURSDAY,
+  FRIDAY: DayOfWeek.FRIDAY,
+  SATURDAY: DayOfWeek.SATURDAY,
+  SUNDAY: DayOfWeek.SUNDAY,
+};
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -175,44 +188,11 @@ export class AvailabilityComponent implements OnInit {
   });
 
   // ─ Data
-  services = signal<ProfessionalService[]>(MOCK_SERVICES);
+  services = signal<ProfessionalService[]>([]);
 
-  private _nextId = 100;
+  private _nextId = 0;
 
-  blocks = signal<TherapistBlock[]>([
-    {
-      id: 1,
-      services: [MOCK_SERVICES[0]],
-      modality: Modality.LOCAL,
-      isRecurring: true,
-      weekdays: [DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY],
-      startTime: '09:00',
-      endTime: '12:00',
-      sessionDuration: 60,
-      local: 'Consultório · R. da Misericórdia 53',
-    },
-    {
-      id: 2,
-      services: [MOCK_SERVICES[1]],
-      modality: Modality.REMOTE,
-      isRecurring: true,
-      weekdays: [DayOfWeek.TUESDAY, DayOfWeek.THURSDAY],
-      startTime: '14:00',
-      endTime: '18:00',
-      sessionDuration: 60,
-    },
-    {
-      id: 3,
-      services: [MOCK_SERVICES[2]],
-      modality: Modality.ANY,
-      isRecurring: false,
-      weekdays: [],
-      startDate: toKey(new Date()),
-      startTime: '10:00',
-      endTime: '12:00',
-      sessionDuration: 50,
-    },
-  ]);
+  blocks = signal<TherapistBlock[]>([]);
 
   selectedBlockId = signal<number | null>(null);
 
@@ -279,19 +259,56 @@ export class AvailabilityComponent implements OnInit {
     }
   });
 
+  readonly previewBlocks = computed<PreviewBlock[]>(() => {
+    const startTime = this.editorStartTime();
+    const endTime = this.editorEndTime();
+    if (timeToMin(endTime) <= timeToMin(startTime)) return [];
+
+    const frequency = this.editorFrequency();
+    const modality = this.editorModality();
+    const colIndices: number[] = [];
+
+    if (frequency === 'weekly') {
+      for (const wd of this.selectedWeekdays()) {
+        const idx = COL_TO_DOW.indexOf(wd);
+        if (idx >= 0) colIndices.push(idx);
+      }
+    } else {
+      const dateStr = this.editorDate();
+      if (!dateStr) return [];
+      const idx = this.weekDays().findIndex(d => toKey(d) === dateStr);
+      if (idx >= 0) colIndices.push(idx);
+    }
+
+    if (colIndices.length === 0) return [];
+
+    const startMin = timeToMin(startTime);
+    const endMin = timeToMin(endTime);
+    const editingId = this.selectedBlockId();
+
+    return colIndices.map(colIdx => {
+      const hasConflict = this.blocksForColumn(colIdx)
+        .filter(b => b.id !== editingId)
+        .some(b => startMin < timeToMin(b.endTime) && timeToMin(b.startTime) < endMin);
+      return { colIndex: colIdx, startTime, endTime, hasConflict, modality };
+    });
+  });
+
   // ─ Lifecycle ────────────────────────────────────────────────────────────────
 
   ngOnInit(): void {
     this.apiService.getServices().subscribe({
-      next: (svcs) => {
-        if (svcs && svcs.length > 0) {
-          this.services.set(svcs);
-        }
-      },
-      error: () => {
-        // Keep mock services on error
-      },
+      next: (svcs) => { if (svcs?.length) this.services.set(svcs); },
+      error: () => {},
     });
+
+    const userId = this.sessionService.user()?.id;
+    if (userId) {
+      this.apiService.getAvailabilitiesByProfessionalId(userId).subscribe({
+        next: (avails) => this.blocks.set(this.mapAvailabilities(avails)),
+        error: () => {},
+      });
+    }
   }
 
   // ─ Week navigation ──────────────────────────────────────────────────────────
@@ -333,6 +350,22 @@ export class AvailabilityComponent implements OnInit {
 
   blockHeightPx(block: TherapistBlock, rowH: number = ROW_H): number {
     return (hourRowIdx(block.endTime) - hourRowIdx(block.startTime)) * rowH - 6;
+  }
+
+  previewBlocksForColumn(colIndex: number): PreviewBlock[] {
+    return this.previewBlocks().filter(p => p.colIndex === colIndex);
+  }
+
+  mobileDayPreview(): PreviewBlock[] {
+    return this.previewBlocks().filter(p => p.colIndex === this.selectedDayIndex());
+  }
+
+  previewTopPx(startTime: string, rowH = ROW_H): number {
+    return hourRowIdx(startTime) * rowH + 3;
+  }
+
+  previewHeightPx(startTime: string, endTime: string, rowH = ROW_H): number {
+    return (hourRowIdx(endTime) - hourRowIdx(startTime)) * rowH - 6;
   }
 
   blockSlotCount(block: TherapistBlock): number {
@@ -413,57 +446,170 @@ export class AvailabilityComponent implements OnInit {
   }
 
   saveBlock(): void {
-    const selectedSvcs = this.services().filter(s =>
-      this.selectedServiceIds().has(s.id),
-    );
+    const selectedSvcs = this.services().filter(s => this.selectedServiceIds().has(s.id));
     const isRecurring = this.editorFrequency() === 'weekly';
-
-    const block: TherapistBlock = {
-      id: this.selectedBlockId() ?? ++this._nextId,
-      services: selectedSvcs,
-      modality: this.editorModality(),
-      isRecurring,
-      weekdays: isRecurring ? [...this.selectedWeekdays()] : [],
-      startDate: isRecurring ? undefined : this.editorDate(),
-      startTime: this.editorStartTime(),
-      endTime: this.editorEndTime(),
-      sessionDuration: this.editorSessionDuration(),
-      local: this.editorModality() !== Modality.REMOTE ? this.editorLocal() : undefined,
-    };
-
     const existingId = this.selectedBlockId();
+
     if (existingId !== null) {
-      this.blocks.update(bs => bs.map(b => (b.id === existingId ? block : b)));
-      this.apiService.updateTherapistBlock(existingId, block).subscribe({
-        error: (e) => console.error('updateTherapistBlock error', e),
+      const existing = this.blocks().find(b => b.id === existingId);
+      if (!existing || existing.backendId === null) return;
+
+      const payload = this.buildPayload(
+        selectedSvcs, isRecurring, existing.weekdays[0], existing.startDate,
+      );
+      const updated: TherapistBlock = {
+        ...existing,
+        services: selectedSvcs,
+        modality: this.editorModality(),
+        isRecurring,
+        startTime: this.editorStartTime(),
+        endTime: this.editorEndTime(),
+        sessionDuration: this.editorSessionDuration(),
+        local: this.editorModality() !== Modality.REMOTE ? this.editorLocal() : undefined,
+      };
+
+      this.blocks.update(bs => bs.map(b => b.id === existingId ? updated : b));
+      this.apiService.updateAvailability(existing.backendId, payload).subscribe({
+        next: (res) => this.blocks.update(bs => bs.map(b =>
+          b.id === existingId ? { ...updated, ...this.extractBlockFields(res) } : b,
+        )),
+        error: (e) => {
+          console.error('updateAvailability error', e);
+          this.blocks.update(bs => bs.map(b => b.id === existingId ? existing : b));
+        },
       });
     } else {
-      this.blocks.update(bs => [...bs, block]);
-      this.apiService.createTherapistBlock(block).subscribe({
-        next: (res) => {
-          if (res?.id) {
-            this.blocks.update(bs =>
-              bs.map(b => (b.id === block.id ? { ...b, id: res.id } : b)),
-            );
-          }
-        },
-        error: (e) => console.error('createTherapistBlock error', e),
-      });
+      if (isRecurring) {
+        [...this.selectedWeekdays()].forEach(wd => this.createSingleBlock(selectedSvcs, true, wd));
+      } else {
+        this.createSingleBlock(selectedSvcs, false, undefined, this.editorDate());
+      }
     }
 
-    this.selectedBlockId.set(block.id);
     this.closeSheet();
   }
 
   removeBlock(): void {
     const id = this.selectedBlockId();
     if (id === null) return;
+    const block = this.blocks().find(b => b.id === id);
     this.blocks.update(bs => bs.filter(b => b.id !== id));
-    this.apiService.deleteTherapistBlock(id).subscribe({
-      error: (e) => console.error('deleteTherapistBlock error', e),
-    });
     this.resetEditor();
     this.closeSheet();
+
+    if (block?.backendId != null) {
+      this.apiService.deleteAvailability(block.backendId).subscribe({
+        error: (e) => {
+          console.error('deleteAvailability error', e);
+          if (block) this.blocks.update(bs => [...bs, block]);
+        },
+      });
+    }
+  }
+
+  // ─ Private helpers ──────────────────────────────────────────────────────────
+
+  private createSingleBlock(
+    services: ProfessionalService[],
+    isRecurring: boolean,
+    weekday?: DayOfWeek,
+    startDate?: string,
+  ): void {
+    const tempId = ++this._nextId;
+    const date = isRecurring && weekday ? this.dateForWeekday(weekday) : (startDate ?? '');
+
+    const tempBlock: TherapistBlock = {
+      id: tempId,
+      backendId: null,
+      services,
+      modality: this.editorModality(),
+      isRecurring,
+      weekdays: isRecurring && weekday ? [weekday] : [],
+      startDate: isRecurring ? undefined : date,
+      startTime: this.editorStartTime(),
+      endTime: this.editorEndTime(),
+      sessionDuration: this.editorSessionDuration(),
+      local: this.editorModality() !== Modality.REMOTE ? this.editorLocal() : undefined,
+    };
+
+    this.blocks.update(bs => [...bs, tempBlock]);
+    this.selectedBlockId.set(tempId);
+
+    const payload = this.buildPayload(services, isRecurring, weekday, startDate);
+    this.apiService.createAvailability(payload).subscribe({
+      next: (res) => {
+        this.blocks.update(bs => bs.map(b =>
+          b.id === tempId ? { ...b, id: res.id, backendId: res.id } : b,
+        ));
+        this.selectedBlockId.set(res.id);
+      },
+      error: (e) => {
+        console.error('createAvailability error', e);
+        this.blocks.update(bs => bs.filter(b => b.id !== tempId));
+      },
+    });
+  }
+
+  private buildPayload(
+    services: ProfessionalService[],
+    isRecurring: boolean,
+    weekday?: DayOfWeek,
+    startDate?: string,
+  ): AvailabilityPayload {
+    const date = isRecurring && weekday ? this.dateForWeekday(weekday) : (startDate ?? '');
+    return {
+      professionalServiceIds: services.map(s => s.id),
+      startDate: date,
+      startTime: this.editorStartTime(),
+      endTime: this.editorEndTime(),
+      isRecurring,
+    };
+  }
+
+  private dateForWeekday(wd: DayOfWeek): string {
+    const colIdx = COL_TO_DOW.indexOf(wd);
+    const d = new Date(this.weekStart());
+    d.setDate(d.getDate() + colIdx);
+    return toKey(d);
+  }
+
+  private mapAvailabilities(avails: AvailabilityModel[]): TherapistBlock[] {
+    return avails.map(a => {
+      const dow = BACKEND_DOW_MAP[a.dayOfWeek as unknown as string] ?? DayOfWeek.MONDAY;
+      return {
+        id: a.id,
+        backendId: a.id,
+        services: a.services,
+        modality: this.deriveModality(a.services),
+        isRecurring: a.isRecurring,
+        weekdays: a.isRecurring ? [dow] : [],
+        startDate: a.isRecurring ? undefined : a.startDate,
+        startTime: a.startTime,
+        endTime: a.endTime,
+        sessionDuration: 60 as const,
+      };
+    });
+  }
+
+  private extractBlockFields(res: AvailabilityModel): Partial<TherapistBlock> {
+    const dow = BACKEND_DOW_MAP[res.dayOfWeek as unknown as string] ?? DayOfWeek.MONDAY;
+    return {
+      backendId: res.id,
+      startTime: res.startTime,
+      endTime: res.endTime,
+      startDate: res.isRecurring ? undefined : res.startDate,
+      weekdays: res.isRecurring ? [dow] : [],
+    };
+  }
+
+  private deriveModality(services: ProfessionalService[]): Modality {
+    if (!services?.length) return Modality.ANY;
+    const mods = services.map(s => String(s.modality));
+    const hasLocal = mods.some(m => m === 'LOCAL' || m === 'Presencial');
+    const hasRemote = mods.some(m => m === 'REMOTE' || m === 'Remoto');
+    if (hasLocal && !hasRemote) return Modality.LOCAL;
+    if (!hasLocal && hasRemote) return Modality.REMOTE;
+    return Modality.ANY;
   }
 
   // ─ Mobile sheet ─────────────────────────────────────────────────────────────

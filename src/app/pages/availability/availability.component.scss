@@ -631,6 +631,38 @@
   }
 }
 
+// Preview block (desktop)
+.block.preview {
+  pointer-events: none;
+  z-index: 3;
+  box-shadow: none;
+  background: color-mix(in srgb, var(--color-primary-purple) 28%, transparent);
+  border: 2px dashed color-mix(in srgb, var(--color-primary-purple) 80%, transparent);
+  color: var(--color-primary-purple);
+
+  &.remoto {
+    background: color-mix(in srgb, var(--color-secondary-green) 28%, transparent);
+    border-color: color-mix(in srgb, var(--color-secondary-green) 80%, transparent);
+    color: var(--color-secondary-green);
+  }
+
+  &.any {
+    background: color-mix(in srgb, var(--color-secondary-cyan) 28%, transparent);
+    border-color: color-mix(in srgb, var(--color-secondary-cyan) 80%, transparent);
+    color: var(--color-primary-blue);
+  }
+
+  &.conflict {
+    background: rgba(211, 47, 47, 0.18);
+    border-color: #d32f2f;
+    border-style: solid;
+    color: #d32f2f;
+  }
+
+  .b-top { opacity: 0.9; }
+  .b-svc, .b-slots { display: none; }
+}
+
 .cal-hint {
   margin-top: 14px;
   display: flex;
@@ -988,6 +1020,35 @@
       }
 
       .material-symbols-outlined { font-size: 12px; }
+    }
+  }
+
+  // Preview block (mobile)
+  .m-block.preview {
+    pointer-events: none;
+    z-index: 3;
+    box-shadow: none;
+    background: color-mix(in srgb, var(--color-primary-purple) 28%, transparent);
+    border: 2px dashed color-mix(in srgb, var(--color-primary-purple) 80%, transparent);
+    color: var(--color-primary-purple);
+
+    &.remoto {
+      background: color-mix(in srgb, var(--color-secondary-green) 28%, transparent);
+      border-color: color-mix(in srgb, var(--color-secondary-green) 80%, transparent);
+      color: var(--color-secondary-green);
+    }
+
+    &.any {
+      background: color-mix(in srgb, var(--color-secondary-cyan) 28%, transparent);
+      border-color: color-mix(in srgb, var(--color-secondary-cyan) 80%, transparent);
+      color: var(--color-primary-blue);
+    }
+
+    &.conflict {
+      background: rgba(211, 47, 47, 0.18);
+      border-color: #d32f2f;
+      border-style: solid;
+      color: #d32f2f;
     }
   }
 
