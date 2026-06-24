@@ -403,8 +403,15 @@
       place-items: center;
       color: var(--color-primary-blue);
       font-family: var(--font-sans);
+      transition: background 0.18s var(--ease-care), color 0.18s var(--ease-care), border-color 0.18s var(--ease-care);
 
       .material-symbols-outlined { font-size: 20px; }
+
+      &:hover {
+        background: var(--color-primary-purple);
+        color: #fff;
+        border-color: var(--color-primary-purple);
+      }
     }
 
     .today-btn {
@@ -412,6 +419,13 @@
       padding: 0 14px;
       font-weight: 600;
       font-size: 13px;
+      transition: background 0.18s var(--ease-care), color 0.18s var(--ease-care), border-color 0.18s var(--ease-care);
+
+      &:hover {
+        background: var(--color-primary-purple);
+        color: #fff;
+        border-color: var(--color-primary-purple);
+      }
     }
 
     .wk-label {
@@ -537,8 +551,10 @@
       margin-top: 2px;
     }
 
-    &.today .dn {
-      color: var(--color-primary-purple);
+    &.today {
+      background: color-mix(in srgb, var(--color-primary-purple) 7%, transparent);
+
+      .dn { color: var(--color-primary-purple); }
     }
   }
 }
@@ -566,6 +582,10 @@
 .daycol {
   position: relative;
   border-left: 1px solid var(--color-border-soft);
+
+  &.today {
+    background: color-mix(in srgb, var(--color-primary-purple) 4%, transparent);
+  }
 
   .hcell {
     height: 52px;
@@ -732,7 +752,7 @@
 
 // Preview block (desktop) — z-index: 1 keeps it below existing blocks (z-index: 2)
 .block.preview {
-  pointer-events: none;
+  pointer-events: auto;
   z-index: 1;
   box-shadow: none;
   background: color-mix(in srgb, var(--color-primary-purple) 28%, transparent);
@@ -760,6 +780,14 @@
 
   .b-top { opacity: 0.9; }
   .b-svc, .b-slots { display: none; }
+}
+
+.cal-toolbar:has(.today-btn:hover) ~ .cal .dh.today {
+  background: color-mix(in srgb, var(--color-primary-purple) 14%, transparent);
+}
+
+.cal-toolbar:has(.today-btn:hover) ~ .cal .daycol.today {
+  background: color-mix(in srgb, var(--color-primary-purple) 10%, transparent);
 }
 
 .cal-hint {
@@ -1137,7 +1165,7 @@
 
   // Preview block (mobile) — z-index: 1 keeps it below existing blocks
   .m-block.preview {
-    pointer-events: none;
+    pointer-events: auto;
     z-index: 1;
     box-shadow: none;
     background: color-mix(in srgb, var(--color-primary-purple) 28%, transparent);

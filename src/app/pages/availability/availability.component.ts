@@ -256,6 +256,12 @@ export class AvailabilityComponent implements OnInit {
   private _resizeRowH = ROW_H;
   private _resizeDragged = false;
 
+  // ─ Preview move
+  isMovingPreview = signal<boolean>(false);
+  previewMoveLiveStart = signal<string>('');
+  previewMoveLiveEnd = signal<string>('');
+  previewMoveLiveCol = signal<number>(0);
+
   // ─ Computed
   readonly selectedBlock = computed(() =>
     this.blocks().find(b => b.id === this.selectedBlockId()) ?? null,
@@ -864,6 +870,119 @@ export class AvailabilityComponent implements OnInit {
         this.apiService.updateAvailability(b.backendId, payload).subscribe({
           error: () => this.blocks.update(bs => bs.map(bl => bl.id === b.id ? b : bl)),
         });
+      }
+    };
+
+    handle.addEventListener('pointermove', onMove);
+    handle.addEventListener('pointerup', onUp);
+    handle.addEventListener('pointercancel', onUp);
+  }
+
+  startPreviewMove(event: PointerEvent, preview: PreviewBlock, colIndex: number): void {
+    if ((event.target as HTMLElement).closest('.b-resize-handle')) return;
+
+    const blockEl = event.currentTarget as HTMLElement;
+    const daycol = blockEl.parentElement as HTMLElement;
+    const weekGrid = daycol.parentElement as HTMLElement;
+
+    const colEls = Array.from(weekGrid.querySelectorAll<HTMLElement>('.daycol'));
+    const colRects = colEls.map(el => el.getBoundingClientRect());
+    const colTopY = colRects[colIndex].top;
+
+    const blockRect = blockEl.getBoundingClientRect();
+    const grabOffsetMin = Math.max(0, (event.clientY - blockRect.top) / ROW_H * 60);
+    const durationMin = timeToMin(preview.endTime) - timeToMin(preview.startTime);
+
+    this.isMovingPreview.set(true);
+    this.previewMoveLiveStart.set(preview.startTime);
+    this.previewMoveLiveEnd.set(preview.endTime);
+    this.previewMoveLiveCol.set(colIndex);
+
+    let moved = false;
+
+    blockEl.setPointerCapture(event.pointerId);
+
+    const onMove = (e: PointerEvent) => {
+      moved = true;
+
+      let newCol = colIndex;
+      for (let i = 0; i < colRects.length; i++) {
+        if (e.clientX >= colRects[i].left && e.clientX < colRects[i].right) { newCol = i; break; }
+      }
+      if (e.clientX < colRects[0].left) newCol = 0;
+      if (e.clientX >= colRects[colRects.length - 1].right) newCol = colRects.length - 1;
+
+      const anchoredStart = (e.clientY - colTopY) / ROW_H * 60 + 8 * 60 - grabOffsetMin;
+      const snapped = Math.round(anchoredStart / 30) * 30;
+      const clampedStart = Math.max(8 * 60, Math.min(20 * 60 - durationMin, snapped));
+
+      this.previewMoveLiveCol.set(newCol);
+      this.previewMoveLiveStart.set(minToTime(clampedStart));
+      this.previewMoveLiveEnd.set(minToTime(clampedStart + durationMin));
+    };
+
+    const onUp = () => {
+      blockEl.removeEventListener('pointermove', onMove);
+      blockEl.removeEventListener('pointerup', onUp);
+      blockEl.removeEventListener('pointercancel', onUp);
+
+      const newStart = this.previewMoveLiveStart();
+      const newEnd = this.previewMoveLiveEnd();
+      const newCol = this.previewMoveLiveCol();
+
+      this.isMovingPreview.set(false);
+
+      if (!moved) return;
+
+      document.addEventListener('click', e => e.stopPropagation(), { once: true, capture: true });
+
+      this.editorStartTime.set(newStart);
+      this.editorEndTime.set(newEnd);
+
+      const newDow = COL_TO_DOW[newCol];
+      if (this.editorFrequency() === 'weekly') {
+        this.selectedWeekdays.set(new Set([newDow]));
+      } else {
+        this.editorDate.set(toKey(this.weekDays()[newCol]));
+      }
+    };
+
+    blockEl.addEventListener('pointermove', onMove);
+    blockEl.addEventListener('pointerup', onUp);
+    blockEl.addEventListener('pointercancel', onUp);
+  }
+
+  startPreviewResize(event: PointerEvent, preview: PreviewBlock, rowH = ROW_H): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const handle = event.currentTarget as HTMLElement;
+    const colEl = (handle.closest('.daycol') ?? handle.closest('.m-tl')) as HTMLElement | null;
+    if (!colEl) return;
+
+    let dragged = false;
+
+    handle.setPointerCapture(event.pointerId);
+
+    const onMove = (e: PointerEvent) => {
+      const rect = colEl.getBoundingClientRect();
+      const endMinRaw = ((e.clientY - rect.top + 3) / rowH + 8) * 60;
+      const snapped = Math.round(endMinRaw / 30) * 30;
+      const startMin = timeToMin(preview.startTime);
+      const clamped = Math.max(startMin + 30, Math.min(20 * 60, snapped));
+      const next = minToTime(clamped);
+      if (next !== this.editorEndTime()) {
+        dragged = true;
+        this.editorEndTime.set(next);
+      }
+    };
+
+    const onUp = () => {
+      handle.removeEventListener('pointermove', onMove);
+      handle.removeEventListener('pointerup', onUp);
+      handle.removeEventListener('pointercancel', onUp);
+      if (dragged) {
+        document.addEventListener('click', e => e.stopPropagation(), { once: true, capture: true });
       }
     };
 

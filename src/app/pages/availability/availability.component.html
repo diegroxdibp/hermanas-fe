@@ -69,7 +69,7 @@
 
               <!-- Day columns -->
               @for (day of weekDays(); track day.getTime(); let di = $index) {
-                <div class="daycol">
+                <div class="daycol" [class.today]="isToday(day)">
                   @for (h of HOURS; track h; let hi = $index; let first = $first) {
                     <div
                       class="hcell"
@@ -117,14 +117,30 @@
                       [class.remoto]="preview.modality === Modality.REMOTE"
                       [class.any]="preview.modality === Modality.ANY"
                       [class.conflict]="preview.hasConflict"
+                      [class.moving-source]="isMovingPreview()"
                       [style.top.px]="previewTopPx(preview.startTime)"
                       [style.height.px]="previewHeightPx(preview.startTime, preview.endTime)"
+                      (pointerdown)="startPreviewMove($event, preview, di)"
                     >
                       <div class="b-top">
                         <span class="b-time">{{ preview.startTime }}–{{ preview.endTime }}</span>
                         @if (preview.hasConflict) {
                           <span class="material-symbols-outlined" style="font-size:13px">warning</span>
                         }
+                      </div>
+                      <div class="b-resize-handle" (pointerdown)="startPreviewResize($event, preview)">
+                        <span class="grip"></span>
+                      </div>
+                    </div>
+                  }
+                  @if (isMovingPreview() && previewMoveLiveCol() === di) {
+                    <div
+                      class="block move-ghost"
+                      [style.top.px]="previewTopPx(previewMoveLiveStart())"
+                      [style.height.px]="previewHeightPx(previewMoveLiveStart(), previewMoveLiveEnd())"
+                    >
+                      <div class="b-top">
+                        <span class="b-time">{{ previewMoveLiveStart() }}–{{ previewMoveLiveEnd() }}</span>
                       </div>
                     </div>
                   }
@@ -258,6 +274,9 @@
                 @if (preview.hasConflict) {
                   <span class="material-symbols-outlined" style="font-size:13px">warning</span>
                 }
+              </div>
+              <div class="b-resize-handle" (pointerdown)="startPreviewResize($event, preview, MOB_ROW_H)">
+                <span class="grip"></span>
               </div>
             </div>
           }
