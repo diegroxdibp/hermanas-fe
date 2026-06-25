@@ -275,6 +275,21 @@ export class AvailabilityComponent implements OnInit {
     ),
   );
 
+  readonly editorStartTimeOptions = computed<string[]>(() => {
+    const dur = this.editorSessionDuration();
+    return EDITOR_HOURS.filter(h => timeToMin(h) + dur <= 20 * 60);
+  });
+
+  readonly editorEndTimeOptions = computed<string[]>(() => {
+    const startMin = timeToMin(this.editorStartTime());
+    const dur = this.editorSessionDuration();
+    const opts: string[] = [];
+    for (let n = 1; startMin + n * dur <= 20 * 60; n++) {
+      opts.push(minToTime(startMin + n * dur));
+    }
+    return opts;
+  });
+
   readonly editorTitle = computed<string>(() => {
     if (this.editorFrequency() === 'weekly') {
       const wds = [...this.selectedWeekdays()];
@@ -710,6 +725,26 @@ export class AvailabilityComponent implements OnInit {
     this.selectedServiceIds.set(set);
   }
 
+  setEditorSessionDuration(dur: 30 | 60 | 90): void {
+    this.editorSessionDuration.set(dur);
+    this._snapTimeRange(dur);
+  }
+
+  setEditorStartTime(time: string): void {
+    this.editorStartTime.set(time);
+    this._snapTimeRange(this.editorSessionDuration());
+  }
+
+  private _snapTimeRange(dur: number): void {
+    const startMin = timeToMin(this.editorStartTime());
+    const endMin   = timeToMin(this.editorEndTime());
+    const sessions = Math.max(1, Math.floor((endMin - startMin) / dur));
+    const snappedEnd = Math.min(startMin + sessions * dur, 20 * 60);
+    if (snappedEnd !== endMin) {
+      this.editorEndTime.set(minToTime(snappedEnd));
+    }
+  }
+
   toggleWeekday(wd: DayOfWeek): void {
     const set = new Set(this.selectedWeekdays());
     if (set.has(wd)) {
@@ -823,9 +858,10 @@ export class AvailabilityComponent implements OnInit {
       if (!this._resizeBlock || !this._resizeColEl) return;
       const rect = this._resizeColEl.getBoundingClientRect();
       const endMinRaw = ((e.clientY - rect.top + 3) / this._resizeRowH + 8) * 60;
-      const snapped = Math.round(endMinRaw / 30) * 30;
+      const dur = this._resizeBlock.sessionDuration;
+      const snapped = Math.round(endMinRaw / dur) * dur;
       const startMin = timeToMin(this._resizeBlock.startTime);
-      const clamped = Math.max(startMin + 30, Math.min(20 * 60, snapped));
+      const clamped = Math.max(startMin + dur, Math.min(20 * 60, snapped));
       const next = minToTime(clamped);
       if (next !== this.resizeLiveEndTime()) {
         this._resizeDragged = true;
@@ -967,9 +1003,10 @@ export class AvailabilityComponent implements OnInit {
     const onMove = (e: PointerEvent) => {
       const rect = colEl.getBoundingClientRect();
       const endMinRaw = ((e.clientY - rect.top + 3) / rowH + 8) * 60;
-      const snapped = Math.round(endMinRaw / 30) * 30;
+      const dur = this.editorSessionDuration();
+      const snapped = Math.round(endMinRaw / dur) * dur;
       const startMin = timeToMin(preview.startTime);
-      const clamped = Math.max(startMin + 30, Math.min(20 * 60, snapped));
+      const clamped = Math.max(startMin + dur, Math.min(20 * 60, snapped));
       const next = minToTime(clamped);
       if (next !== this.editorEndTime()) {
         dragged = true;

@@ -524,9 +524,9 @@
           <span class="material-symbols-outlined">schedule</span>
           <select
             [value]="editorStartTime()"
-            (change)="editorStartTime.set($any($event.target).value)"
+            (change)="setEditorStartTime($any($event.target).value)"
           >
-            @for (h of EDITOR_HOURS; track h) {
+            @for (h of editorStartTimeOptions(); track h) {
               <option [value]="h">{{ h }}</option>
             }
           </select>
@@ -540,7 +540,7 @@
             [value]="editorEndTime()"
             (change)="editorEndTime.set($any($event.target).value)"
           >
-            @for (h of EDITOR_HOURS_END; track h) {
+            @for (h of editorEndTimeOptions(); track h) {
               <option [value]="h">{{ h }}</option>
             }
           </select>
@@ -553,7 +553,7 @@
       @for (dur of SESSION_DURATIONS; track dur) {
         <button
           [class.on]="editorSessionDuration() === dur"
-          (click)="editorSessionDuration.set(dur)"
+          (click)="setEditorSessionDuration(dur)"
         >
           @if (editorSessionDuration() === dur) {
             <span class="material-symbols-outlined">check</span>
