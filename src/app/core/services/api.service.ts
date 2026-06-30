@@ -3,6 +3,14 @@ import { SchedulingService } from './../../shared/services/scheduling.service';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AvailabilityModel } from '../../shared/models/availability.model';
+
+export interface AvailabilityPayload {
+  professionalServiceIds: number[];
+  startDate: string;
+  startTime: string;
+  endTime: string;
+  isRecurring: boolean;
+}
 import { Roles } from '../../shared/enums/roles.enum';
 import { AppointmentPayload } from '../../shared/models/appointment-payload.model';
 import { AppConstants } from '../../app-constants';
@@ -88,6 +96,29 @@ export class ApiService {
       {
         withCredentials: true,
       },
+    );
+  }
+
+  createAvailability(payload: AvailabilityPayload): Observable<AvailabilityModel> {
+    return this.http.post<AvailabilityModel>(
+      `${environment.apiUrl}/api/availability/create`,
+      payload,
+      { withCredentials: true },
+    );
+  }
+
+  updateAvailability(id: number, payload: AvailabilityPayload): Observable<AvailabilityModel> {
+    return this.http.put<AvailabilityModel>(
+      `${environment.apiUrl}/api/availability/${id}`,
+      payload,
+      { withCredentials: true },
+    );
+  }
+
+  deleteAvailability(id: number): Observable<void> {
+    return this.http.delete<void>(
+      `${environment.apiUrl}/api/availability/delete/${id}`,
+      { withCredentials: true },
     );
   }
 

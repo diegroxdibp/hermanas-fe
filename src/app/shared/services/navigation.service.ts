@@ -19,6 +19,7 @@ export class NavigationService {
     { name: 'Sobre', destination: Pages.ABOUT },
     { name: 'Contato', destination: Pages.CONTACT },
     { name: 'Agendar', destination: Pages.SCHEDULING },
+    { name: 'Disponibilidade', destination: Pages.AVAILABILITY },
   ];
   private routesWithAnchor = [`/${Pages.ATENDIMENTO}`, '/', '/contact'];
   readonly currentUrl: BehaviorSubject<string> = new BehaviorSubject('/');

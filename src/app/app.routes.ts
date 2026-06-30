@@ -157,7 +157,39 @@ export const routes: Routes = [
             (m) => m.SchedulingComponent,
           ),
       },
+
+      {
+        path: Pages.AVAILABILITY,
+        loadComponent: () =>
+          import('./pages/availability/availability.component').then(
+            (m) => m.AvailabilityComponent,
+          ),
+      },
     ],
+  },
+
+  {
+    path: Pages.INSTITUTIONAL,
+    loadComponent: () =>
+      import('./core/pages/legal/legal.component').then(
+        (m) => m.LegalPageComponent,
+      ),
+  },
+
+  {
+    path: Pages.POLITICA_PRIVACIDADE,
+    loadComponent: () =>
+      import('./core/pages/legal/legal.component').then(
+        (m) => m.LegalPageComponent,
+      ),
+  },
+
+  {
+    path: Pages.TERMOS_USO,
+    loadComponent: () =>
+      import('./core/pages/legal/legal.component').then(
+        (m) => m.LegalPageComponent,
+      ),
   },
 
   {

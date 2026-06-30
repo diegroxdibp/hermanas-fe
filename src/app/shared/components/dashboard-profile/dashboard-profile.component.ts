@@ -12,6 +12,7 @@ import { Genders } from '../../enums/genders.enum';
 import { UpdateProfilePayload } from '../../models/update-profile-payload.model';
 import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog.component';
 import { User } from '../../../auth/user.model';
+import {getEnumKeyByValue} from '../../utils/getEnumKeyByValue';
 
 @Component({
   selector: 'app-dashboard-profile',
@@ -124,7 +125,7 @@ export class DashboardProfileComponent implements OnInit {
       email: this.emailCtrl.value ?? '',
       birthDate: this.birthdateCtrl.value ?? '',
       phone,
-      gender: this.genderCtrl.value as Genders,
+      gender: getEnumKeyByValue(Genders, this.genderCtrl.value) as Genders,
       bio: this.formService.profileForm.get(FormControlsNames.BIO_PROFILE)?.value ?? '',
     };
 

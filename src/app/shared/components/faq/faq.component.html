@@ -1,6 +1,5 @@
 <section class="faq">
   <header class="faq__head">
-    <p class="faq__eyebrow">Perguntas frequentes</p>
     <h2 class="faq__title">Ficou com alguma dúvida?</h2>
   </header>
 
@@ -37,7 +36,26 @@
               class="faq__answer"
               [@expand]="openQuestion() === qKey(selected().topicName, i) ? 'expanded' : 'collapsed'"
             >
-              <p>{{ item.answer }}</p>
+              @if (item.answer.intro) {
+                <p>{{ item.answer.intro }}</p>
+              }
+              @if (item.answer.steps?.length) {
+                <ol class="faq__steps">
+                  @for (step of item.answer.steps!; track step) {
+                    <li>{{ step }}</li>
+                  }
+                </ol>
+              }
+              @if (item.answer.outro) {
+                <p>{{ item.answer.outro }}</p>
+              }
+              @if (item.answer.links?.length) {
+                <p class="faq__links">
+                  @for (link of item.answer.links!; track link.url) {
+                    <a class="faq__link" [routerLink]="link.url" [fragment]="link.fragment">{{ link.label }}</a>
+                  }
+                </p>
+              }
             </div>
           </li>
         }
@@ -85,7 +103,26 @@
                     class="faq__answer faq__answer--sm"
                     [@expand]="openQuestion() === qKey(topic.topicName, i) ? 'expanded' : 'collapsed'"
                   >
-                    <p>{{ item.answer }}</p>
+                    @if (item.answer.intro) {
+                      <p>{{ item.answer.intro }}</p>
+                    }
+                    @if (item.answer.steps?.length) {
+                      <ol class="faq__steps">
+                        @for (step of item.answer.steps!; track step) {
+                          <li>{{ step }}</li>
+                        }
+                      </ol>
+                    }
+                    @if (item.answer.outro) {
+                      <p>{{ item.answer.outro }}</p>
+                    }
+                    @if (item.answer.links?.length) {
+                      <p class="faq__links">
+                        @for (link of item.answer.links!; track link.url) {
+                          <a class="faq__link" [routerLink]="link.url" [fragment]="link.fragment">{{ link.label }}</a>
+                        }
+                      </p>
+                    }
                   </div>
                 </li>
               }
@@ -98,9 +135,9 @@
 
   <!-- ============ Contact prompt ============ -->
   <div class="faq__contact">
-    <span class="faq__contactIcon">
-      <img src="assets/images/hands1.svg" alt="" aria-hidden="true" />
-    </span>
+<!--    <span class="faq__contactIcon">-->
+<!--      <img ngSrc="assets/images/hands1.svg" alt="" aria-hidden="true" height="16" width="16"/>-->
+<!--    </span>-->
     <div class="faq__contactText">
       <p class="faq__contactTitle">Ainda com alguma dúvida?</p>
       <p class="faq__contactSub">Acolhemos a sua pergunta com o mesmo cuidado de uma consulta.</p>
