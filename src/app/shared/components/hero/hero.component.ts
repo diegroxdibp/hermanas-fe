@@ -1,124 +1,47 @@
-import {
-  Component,
-  ElementRef,
-  HostBinding,
-  HostListener,
-  ViewChild,
-} from '@angular/core';
-import { NavigationBarService } from '../../services/navigation-bar.service';
-import { AppConstants } from '../../../app-constants';
-import { NavbarBackground } from '../../enums/navbar-background.enum';
-import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { NavigationService } from '../../services/navigation.service';
+import { Pages } from '../../enums/pages.enum';
 
 @Component({
   selector: 'app-hero',
-  imports: [CommonModule],
+  standalone: true,
   templateUrl: './hero.component.html',
   styleUrl: './hero.component.scss',
-  standalone: true,
 })
-export class HeroComponent {
-  @HostBinding('style.height') get background(): string {
-    return this.getHeroHeight();
-  }
-  @ViewChild('heroImage') heroImage: ElementRef | undefined;
+export class HeroComponent implements OnInit, OnDestroy {
+  private readonly WORDS = ['acolhimento', 'escuta', 'vínculo', 'cuidado', 'presença', 'ressignificação'];
 
-  // Keep track of scroll position
-  scrollPosition = 0;
-  private lastScrollPosition = 0;
-  private animationFrame: number | null = null;
-  heroImageLoaded: boolean = false;
-  @HostListener('window:scroll')
-  onWindowScroll() {
-    if (!this.animationFrame) {
-      this.animationFrame = requestAnimationFrame(() => {
-        this.updateParallax();
-        this.animationFrame = null;
-      });
-    }
-  }
-  @ViewChild('typedText') typedText: ElementRef | undefined;
+  readonly typedText = signal('');
 
-  phrases = [
-    'Ressignificação',
-    'Saúde Relacional',
-    'Cuidado',
-    'Transformação',
-  ];
+  private wi = 0;
+  private ci = 0;
+  private deleting = false;
+  private timer: ReturnType<typeof setTimeout> | null = null;
 
-  phraseIndex = 0;
-  charIndex = 0;
-  isDeleting = false;
+  constructor(private readonly nav: NavigationService) {}
 
-  // 🔧 FIX: Use arrow function to preserve 'this' context
-  type = () => {
-    const currentPhrase = this.phrases[this.phraseIndex];
-    const currentText = currentPhrase.substring(0, this.charIndex);
-
-    if (this.typedText) {
-      this.typedText.nativeElement.textContent = currentText;
-
-      if (!this.isDeleting && this.charIndex < currentPhrase.length) {
-        // Typing forward
-        this.charIndex++;
-        setTimeout(this.type, 100);
-      } else if (this.isDeleting && this.charIndex > 0) {
-        // Deleting backward
-        this.charIndex--;
-        setTimeout(this.type, 60);
-      } else {
-        // Switching between typing and deleting
-        this.isDeleting = !this.isDeleting;
-        if (!this.isDeleting) {
-          // Move to next phrase
-          this.phraseIndex = (this.phraseIndex + 1) % this.phrases.length;
-        }
-        // Pause before next action
-        setTimeout(this.type, this.isDeleting ? 500 : 2000);
-      }
-    }
-  };
-  constructor(
-    private router: Router,
-    private navService: NavigationService,
-  ) {}
-
-  ngOnInit() {
-    this.updateParallax();
-    setTimeout(() => {
-      this.type();
-    }, 500);
+  ngOnInit(): void {
+    this.tick();
   }
 
-  imageLoaded() {
-    console.log('Loaded!');
-    this.heroImageLoaded = true;
+  ngOnDestroy(): void {
+    if (this.timer) clearTimeout(this.timer);
   }
 
-  getHeroHeight(): string {
-    if (
-      AppConstants.navigation.background === NavbarBackground.Transparent ||
-      this.router.url === '/'
-    )
-      return '100vh';
-    else return `calc(100vh - ${NavigationBarService.getNavbarHeight()}px)`;
+  navigateToScheduling(): void {
+    this.nav.navigateTo(Pages.SCHEDULING);
   }
 
-  private updateParallax() {
-    const scrollPosition = window.scrollY;
-    const image = document.querySelector('.hero-image') as HTMLElement;
-    if (image) {
-      const offset = scrollPosition * 0.5;
-      image.style.transform = `translate3d(0, ${offset}px, 0)`;
-    }
-    this.lastScrollPosition = scrollPosition;
-  }
+  private tick(): void {
+    const word = this.WORDS[this.wi];
+    this.typedText.set(word.slice(0, this.ci));
 
-  ngOnDestroy() {
-    if (this.animationFrame) {
-      cancelAnimationFrame(this.animationFrame);
-    }
+    let delay: number;
+    if (!this.deleting && this.ci < word.length)        { this.ci++;                                              delay = 95;   }
+    else if (!this.deleting && this.ci === word.length) { this.deleting = true;                                  delay = 1900; }
+    else if (this.deleting && this.ci > 0)              { this.ci--;                                              delay = 45;   }
+    else                                                { this.deleting = false; this.wi = (this.wi + 1) % this.WORDS.length; delay = 320; }
+
+    this.timer = setTimeout(() => this.tick(), delay);
   }
 }
