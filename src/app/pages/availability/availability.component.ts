@@ -818,7 +818,9 @@ export class AvailabilityComponent implements OnInit {
       const currentMin = this._yToSnappedMin(e.clientY - colRect.top, ROW_H);
       if (currentMin !== anchorMin) dragMoved = true;
       const lo = Math.max(8 * 60, Math.min(anchorMin, currentMin));
-      const hi = Math.min(20 * 60, Math.max(anchorMin + minDuration, currentMin));
+      const rawHi = Math.min(20 * 60, Math.max(lo + minDuration, currentMin));
+      const sessions = Math.max(1, Math.round((rawHi - lo) / minDuration));
+      const hi = Math.min(20 * 60, lo + sessions * minDuration);
       this.dragSelection.set({ colIndex, startTime: minToTime(lo), endTime: minToTime(hi) });
     };
 
@@ -841,6 +843,7 @@ export class AvailabilityComponent implements OnInit {
       this.editorFrequency.set('weekly');
       this.editorStartTime.set(sel.startTime);
       this.editorEndTime.set(sel.endTime);
+      this._snapTimeRange(this.editorSessionDuration());
     };
 
     hcell.addEventListener('pointermove', onMove);
@@ -1046,8 +1049,9 @@ export class AvailabilityComponent implements OnInit {
       const rect = this._resizeColEl.getBoundingClientRect();
       const endMinRaw = ((e.clientY - rect.top + 3) / this._resizeRowH + 8) * 60;
       const dur = this._resizeBlock.sessionDuration;
-      const snapped = Math.round(endMinRaw / dur) * dur;
       const startMin = timeToMin(this._resizeBlock.startTime);
+      const sessions = Math.max(1, Math.round((endMinRaw - startMin) / dur));
+      const snapped = startMin + sessions * dur;
       const floorMin = this.lastBookedEndMin(this._resizeBlock) ?? (startMin + dur);
       const clamped = Math.max(floorMin, Math.min(20 * 60, snapped));
       const next = minToTime(clamped);
@@ -1153,7 +1157,9 @@ export class AvailabilityComponent implements OnInit {
       const rect = this._resizeTopColEl.getBoundingClientRect();
       const startMinRaw = ((e.clientY - rect.top) / this._resizeTopRowH + 8) * 60;
       const dur = this._resizeTopBlock.sessionDuration;
-      const snapped = Math.round(startMinRaw / dur) * dur;
+      const endMin = timeToMin(this._resizeTopBlock.endTime);
+      const sessions = Math.max(1, Math.round((endMin - startMinRaw) / dur));
+      const snapped = endMin - sessions * dur;
       const ceilMin = this.firstBookedStartMin(this._resizeTopBlock)
         ?? (timeToMin(this._resizeTopBlock.endTime) - dur);
       const clamped = Math.max(8 * 60, Math.min(ceilMin, snapped));
@@ -1329,8 +1335,9 @@ export class AvailabilityComponent implements OnInit {
       const rect = colEl.getBoundingClientRect();
       const endMinRaw = ((e.clientY - rect.top + 3) / rowH + 8) * 60;
       const dur = this.editorSessionDuration();
-      const snapped = Math.round(endMinRaw / dur) * dur;
       const startMin = timeToMin(preview.startTime);
+      const sessions = Math.max(1, Math.round((endMinRaw - startMin) / dur));
+      const snapped = startMin + sessions * dur;
       const clamped = Math.max(startMin + dur, Math.min(20 * 60, snapped));
       const next = minToTime(clamped);
       if (next !== this.editorEndTime()) {
