@@ -706,7 +706,7 @@
         </div>
       </div>
     } @else {
-      <div class="field" style="margin-top: 14px;">
+      <div class="field date-field-wrap" style="margin-top: 14px;" (click)="edCalToggle($event)">
         <div class="field-inner">
           <span class="field-label">
             Data
@@ -714,16 +714,43 @@
               <span class="fixed-tag">fixo</span>
             }
           </span>
-          <input
-            #dateInput
-            class="field-value"
-            type="date"
-            lang="pt-BR"
-            [value]="editorDate()"
-            (change)="onEditorDateChange($any($event.target).value)"
-          />
+          <span class="field-value" [class.placeholder]="!editorDate()">
+            {{ editorDate() ? edCalFmtDate(editorDate()) : 'dd/mm/aaaa' }}
+          </span>
         </div>
-        <span class="material-symbols-outlined field-icon" (click)="dateInput.showPicker()">calendar_today</span>
+        <span class="material-symbols-outlined field-icon">calendar_today</span>
+
+        @if (edCalOpen()) {
+          <div class="ed-cal-popover" (click)="$event.stopPropagation()">
+            <div class="cal-header">
+              <button type="button" class="cal-nav" (click)="edCalPrevMonth()">
+                <span class="material-symbols-outlined">chevron_left</span>
+              </button>
+              <span class="cal-month-label">{{ edCalMonthLabel() }}</span>
+              <button type="button" class="cal-nav" (click)="edCalNextMonth()">
+                <span class="material-symbols-outlined">chevron_right</span>
+              </button>
+            </div>
+            <div class="cal-weekdays">
+              @for (wd of edCalWeekdays; track $index) {
+                <span class="cal-wd">{{ wd }}</span>
+              }
+            </div>
+            <div class="cal-grid">
+              @for (cell of edCalDays(); track cell.key) {
+                <button type="button"
+                  class="cal-day"
+                  [class.other-month]="!cell.inMonth"
+                  [class.today]="edCalIsToday(cell.date)"
+                  [class.selected]="editorDate() === cell.key"
+                  [disabled]="edCalIsPast(cell.date) || !cell.inMonth"
+                  (click)="edCalSelectDate(cell.key)">
+                  {{ cell.date.getDate() }}
+                </button>
+              }
+            </div>
+          </div>
+        }
       </div>
     }
   </div>

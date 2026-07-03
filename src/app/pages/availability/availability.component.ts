@@ -2,6 +2,7 @@ import { forkJoin, of } from 'rxjs';
 import { CommonModule, NgTemplateOutlet } from '@angular/common';
 import {
   Component,
+  HostListener,
   OnInit,
   computed,
   inject,
@@ -253,6 +254,37 @@ export class AvailabilityComponent implements OnInit {
   editorSessionDuration = signal<30 | 60 | 90>(60);
   editorLocal = signal<string>('Consultório · R. da Misericórdia 53');
 
+  // ─ Date picker calendar (editor)
+  readonly edCalWeekdays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+  edCalOpen = signal<boolean>(false);
+  edCalViewDate = signal<Date>(new Date());
+  readonly edCalMonthLabel = computed(() => {
+    const d = this.edCalViewDate();
+    return `${PT_MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+  });
+  readonly edCalDays = computed(() => {
+    const view = this.edCalViewDate();
+    const year = view.getFullYear();
+    const month = view.getMonth();
+    const offset = new Date(year, month, 1).getDay();
+    const days: Array<{ date: Date; inMonth: boolean; key: string }> = [];
+    for (let i = offset - 1; i >= 0; i--) {
+      const d = new Date(year, month, -i);
+      days.push({ date: d, inMonth: false, key: toKey(d) });
+    }
+    const total = new Date(year, month + 1, 0).getDate();
+    for (let i = 1; i <= total; i++) {
+      const d = new Date(year, month, i);
+      days.push({ date: d, inMonth: true, key: toKey(d) });
+    }
+    while (days.length < 42) {
+      const prev = days[days.length - 1].date;
+      const d = new Date(prev.getFullYear(), prev.getMonth(), prev.getDate() + 1);
+      days.push({ date: d, inMonth: false, key: toKey(d) });
+    }
+    return days;
+  });
+
   // ─ Mobile
   selectedDayIndex = signal<number>(this._todayColumnIndex());
   sheetOpen = signal<boolean>(false);
@@ -493,6 +525,52 @@ export class AvailabilityComponent implements OnInit {
     const target = new Date(dateStr + 'T00:00:00');
     const newStart = getWeekStart(target);
     this.animateToWeek(newStart, newStart > this.weekStart() ? 'left' : 'right');
+  }
+
+  @HostListener('document:click')
+  onDocClick(): void { this.edCalOpen.set(false); }
+
+  edCalToggle(event: MouseEvent): void {
+    event.stopPropagation();
+    const wasOpen = this.edCalOpen();
+    if (!wasOpen) {
+      const selected = this.editorDate();
+      if (selected) this.edCalViewDate.set(new Date(selected + 'T00:00:00'));
+    }
+    this.edCalOpen.set(!wasOpen);
+  }
+
+  edCalPrevMonth(): void {
+    const d = this.edCalViewDate();
+    this.edCalViewDate.set(new Date(d.getFullYear(), d.getMonth() - 1, 1));
+  }
+
+  edCalNextMonth(): void {
+    const d = this.edCalViewDate();
+    this.edCalViewDate.set(new Date(d.getFullYear(), d.getMonth() + 1, 1));
+  }
+
+  edCalSelectDate(key: string): void {
+    this.edCalOpen.set(false);
+    this.onEditorDateChange(key);
+  }
+
+  edCalIsPast(date: Date): boolean {
+    const t = new Date(); t.setHours(0, 0, 0, 0);
+    return date < t;
+  }
+
+  edCalIsToday(date: Date): boolean {
+    const t = new Date();
+    return date.getFullYear() === t.getFullYear() &&
+      date.getMonth() === t.getMonth() &&
+      date.getDate() === t.getDate();
+  }
+
+  edCalFmtDate(key: string): string {
+    if (!key) return '';
+    const [y, m, d] = key.split('-');
+    return `${d}/${m}/${y}`;
   }
 
   private animateToWeek(newStart: Date, dir: 'left' | 'right'): void {

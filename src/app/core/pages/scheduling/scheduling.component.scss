@@ -208,7 +208,7 @@
   border-radius: 8px;
   filter: var(--shadow-floating);
   padding: 16px;
-  z-index: 100;
+  z-index: 500;
   animation: popIn 120ms ease both;
 }
 
@@ -696,7 +696,7 @@
     overflow-y: auto;
     border-radius: 20px 20px 0 0;
     padding: 0 0 env(safe-area-inset-bottom, 20px);
-    z-index: 200;
+    z-index: 500;
     animation: slideUp var(--dur-base) var(--ease-care) both;
   }
 
