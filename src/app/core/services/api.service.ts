@@ -41,14 +41,6 @@ export class ApiService {
     );
   }
 
-  getClientUsers(): Observable<ProfessionalModel[]> {
-    return this.http.post<ProfessionalModel[]>(
-      environment.apiUrl + '/api/user/findByRole',
-      { role: Roles.USER },
-      { withCredentials: true },
-    );
-  }
-
   getAvailabilitites(): Observable<AvailabilityModel[]> {
     return this.http.get<AvailabilityModel[]>(
       environment.apiUrl + '/api/availability/getAll',
@@ -98,13 +90,6 @@ export class ApiService {
     );
   }
 
-  getProfessionalAppointments(professionalId: number): Observable<Appointment[]> {
-    return this.http.get<Appointment[]>(
-      `${environment.apiUrl}/api/appointments/professional/${professionalId}`,
-      { withCredentials: true },
-    );
-  }
-
   getUserAppointments(userEmail: string): Observable<Appointment[]> {
     return this.http.get<Appointment[]>(
       `${environment.apiUrl}/api/appointments/client/email/${userEmail}`,
@@ -133,13 +118,6 @@ export class ApiService {
   deleteAvailability(id: number): Observable<void> {
     return this.http.delete<void>(
       `${environment.apiUrl}/api/availability/delete/${id}`,
-      { withCredentials: true },
-    );
-  }
-
-  deleteAppointment(id: number): Observable<void> {
-    return this.http.delete<void>(
-      `${environment.apiUrl}/api/appointments/delete/${id}`,
       { withCredentials: true },
     );
   }

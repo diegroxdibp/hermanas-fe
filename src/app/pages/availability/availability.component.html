@@ -38,7 +38,9 @@
                 <span class="material-symbols-outlined">event_repeat</span>Semanal
               </span>
               <span class="lg">
-                <span class="material-symbols-outlined">push_pin</span>Data única
+                <span class="pin-badge">
+                  <span class="material-symbols-outlined">push_pin</span>
+                </span>Data única
               </span>
             </div>
           </div>
@@ -85,58 +87,25 @@
                       [class.resizing]="resizingBlockId() === block.id"
                       [class.moving-source]="isDraggingMove() && movingBlockId() === block.id"
                       [class.conflicted]="conflictedBlockIds().has(block.id)"
-                      [class.pinned]="hasBookings(block)"
-                      [class.full-booked]="bookedCount(block) > 0 && bookedCount(block) === blockSlotCount(block)"
-                      [class.dense]="blockIsDense(block)"
-                      [style.top.px]="resizingTopBlockId() === block.id
-                        ? blockResizeTopPx(block, resizeLiveStartTime())
-                        : blockTopPx(block)"
+                      [style.top.px]="blockTopPx(block)"
                       [style.height.px]="resizingBlockId() === block.id
                         ? blockResizeHeightPx(block, resizeLiveEndTime())
-                        : resizingTopBlockId() === block.id
-                        ? blockResizeTopHeightPx(block, resizeLiveStartTime())
                         : blockHeightPx(block)"
                       (pointerdown)="startMove($event, block, di)"
                       (click)="selectBlock($event, block)"
                     >
-                      @if (canResizeTop(block)) {
-                        <div class="b-resize-handle-top" (pointerdown)="startResizeTop($event, block)">
-                          <span class="grip"></span>
-                        </div>
-                      }
-                      <div class="b-bands">
-                        @for (slot of bookedSlotsForBlock(block); track slot.time; let si = $index) {
-                          <div
-                            class="b-band"
-                            [class.booked]="slot.booked"
-                            [class.free]="!slot.booked"
-                            [class.sel-slot]="slot.appointment && slot.appointment.id === selectedAppointment()?.id"
-                            [class.appt-presencial]="slot.appointment ? apptModalityLabel(slot.appointment) === 'presencial' : false"
-                            [class.appt-remoto]="slot.appointment ? apptModalityLabel(slot.appointment) === 'remoto' : false"
-                            (click)="slot.booked && slot.appointment ? selectSlot($event, slot.appointment) : null"
-                          >
-                            <div class="bd-row">
-                              <span class="bd-time">{{ slot.time }}</span>
-                              <span class="bd-rec" [class.unica]="slot.appointment ? !slot.appointment.isRecurring : !block.isRecurring">
-                                <span class="material-symbols-outlined">
-                                  {{ (slot.appointment ? slot.appointment.isRecurring : block.isRecurring) ? 'event_repeat' : 'push_pin' }}
-                                </span>
-                              </span>
-                            </div>
-                            @if (slot.booked && slot.appointment) {
-                              <span class="bd-svc">{{ slotServiceName(slot.appointment) }}</span>
-                              <span class="bd-name">{{ slotPatientFirstName(slot.appointment) }}</span>
-                            } @else {
-                              <span class="bd-name">livre</span>
-                            }
-                          </div>
-                        }
+                      <div class="b-top">
+                        <span class="b-time">
+                          {{ block.startTime }}–{{ resizingBlockId() === block.id ? resizeLiveEndTime() : block.endTime }}
+                        </span>
+                        <span class="b-badge">
+                          <span class="material-symbols-outlined">
+                            {{ block.isRecurring ? 'event_repeat' : 'push_pin' }}
+                          </span>
+                        </span>
                       </div>
-                      @if (resizingBlockId() === block.id && hasBookings(block) && lastBookedEndMin(block) !== null) {
-                        <div class="resize-floor" [style.height.px]="resizeFloorHeightPx(block, resizeLiveEndTime())">
-                          <span class="rf-lbl">mín.</span>
-                        </div>
-                      }
+                      <div class="b-svc">{{ blockServiceLabel(block) }}</div>
+                      <div class="b-slots">{{ blockSlotCount(block) }} sessões</div>
                       <div class="b-resize-handle" (pointerdown)="startResize($event, block)">
                         <span class="grip"></span>
                       </div>
@@ -166,7 +135,7 @@
                   }
                   @if (isMovingPreview() && previewMoveLiveCol() === di) {
                     <div
-                      class="block move-ghost preview-mv"
+                      class="block move-ghost"
                       [style.top.px]="previewTopPx(previewMoveLiveStart())"
                       [style.height.px]="previewHeightPx(previewMoveLiveStart(), previewMoveLiveEnd())"
                     >
@@ -191,26 +160,13 @@
                       class="block move-ghost"
                       [class.remoto]="mvBlk.modality === Modality.REMOTE"
                       [class.any]="mvBlk.modality === Modality.ANY"
-                      [class.conflict]="moveLiveConflict()"
                       [style.top.px]="previewTopPx(moveLiveStart())"
                       [style.height.px]="previewHeightPx(moveLiveStart(), moveLiveEnd())"
                     >
-                      <div class="b-bands">
-                        @for (time of ghostSlotTimes(); track time; let gi = $index) {
-                          <div class="b-band"
-                            [class.booked]="mvBlk.backendSlots[gi]?.isBooked"
-                            [class.free]="!mvBlk.backendSlots[gi]?.isBooked"
-                          >
-                            <div class="bd-row">
-                              <span class="bd-time">{{ time }}</span>
-                              <span class="bd-rec" [class.unica]="!mvBlk.isRecurring">
-                                <span class="material-symbols-outlined">{{ mvBlk.isRecurring ? 'event_repeat' : 'push_pin' }}</span>
-                              </span>
-                            </div>
-                            <span class="bd-name">{{ mvBlk.backendSlots[gi]?.isBooked ? 'reservado' : 'livre' }}</span>
-                          </div>
-                        }
+                      <div class="b-top">
+                        <span class="b-time">{{ moveLiveStart() }}–{{ moveLiveEnd() }}</span>
                       </div>
+                      <div class="b-svc">{{ blockServiceLabel(mvBlk) }}</div>
                     </div>
                   }
                 </div>
@@ -224,110 +180,38 @@
           </div>
         </div>
 
-        <!-- ─── Block editor / Appointment detail ─── -->
-        @if (selectedAppointment(); as appt) {
-          <aside class="block-editor appt-detail">
-            <div class="be-head" style="display:block">
-              <button class="be-back" (click)="clearSelectedAppointment()">
-                <span class="material-symbols-outlined">arrow_back</span>
-                Voltar ao bloco
-              </button>
-              <div class="be-title">Sessão reservada</div>
+        <!-- ─── Block editor ─── -->
+        <aside class="block-editor">
+          <div class="be-head">
+            <div>
+              <div class="be-title">{{ editorTitle() }}</div>
+              <div class="be-sub">{{ editorSubtitle() }}</div>
             </div>
-            <div class="be-body">
-              <div class="ad-patient">
-                <span [class]="'ad-av ' + patientAvatarClass(appt.clientId % 3)">{{ slotPatientInitials(appt) }}</span>
-                <div>
-                  <div class="pt-name">{{ slotPatientName(appt) }}</div>
-                  <div class="pt-sub">Paciente</div>
-                </div>
-              </div>
-              <div class="ad-rows">
-                <div class="ad-row">
-                  <span class="material-symbols-outlined">medical_services</span>
-                  <div><div class="ad-k">Serviço</div><div class="ad-v">{{ slotServiceName(appt) }}</div></div>
-                </div>
-                <div class="ad-row">
-                  <span class="material-symbols-outlined">schedule</span>
-                  <div><div class="ad-k">Horário</div><div class="ad-v">{{ apptDateLabel(appt) }} · {{ appt.startTime }}–{{ appt.endTime }}</div></div>
-                </div>
-                <div class="ad-row">
-                  <span class="material-symbols-outlined">{{ appt.isRecurring ? 'event_repeat' : 'push_pin' }}</span>
-                  <div><div class="ad-k">Recorrência</div><div class="ad-v">{{ appt.isRecurring ? 'Semanal' : 'Data única' }}</div></div>
-                </div>
-                <div class="ad-row">
-                  <span class="material-symbols-outlined">location_on</span>
-                  <div><div class="ad-k">Modalidade</div><div class="ad-v">
-                    @if (apptModalityLabel(appt)) {
-                      <span [class]="'ad-pill ' + apptModalityLabel(appt)">{{ apptModalityDisplay(appt) }}</span>
-                    } @else {
-                      {{ apptModalityDisplay(appt) }}
-                    }
-                  </div></div>
-                </div>
-                @if (appt.clientEmail) {
-                  <div class="ad-row">
-                    <span class="material-symbols-outlined">mail</span>
-                    <div><div class="ad-k">Contacto</div><div class="ad-v">{{ appt.clientEmail }}</div></div>
-                  </div>
-                }
-              </div>
-            </div>
-            <div class="be-actions">
-              <div class="ad-actions">
-                <button class="btn-resched" (click)="rescheduleAppointment()">
-                  <span class="material-symbols-outlined">edit_calendar</span>
-                  Reagendar sessão
-                </button>
-                <button class="btn-cancel" (click)="cancelAppointment(appt)">
-                  <span class="material-symbols-outlined">close</span>
-                  Cancelar sessão
-                </button>
-              </div>
-            </div>
-          </aside>
-        } @else {
-          <aside class="block-editor">
-            <div class="be-head">
-              <div>
-                <div class="be-title">{{ editorTitle() }}</div>
-                <div class="be-sub">{{ editorSubtitle() }}</div>
-              </div>
-              <span class="be-chip">
-                <span class="material-symbols-outlined">
-                  {{ editorFrequency() === 'weekly' ? 'event_repeat' : 'push_pin' }}
-                </span>
-                {{ editorFrequency() === 'weekly' ? 'Semanal' : 'Única' }}
+            <span class="be-chip">
+              <span class="material-symbols-outlined">
+                {{ editorFrequency() === 'weekly' ? 'event_repeat' : 'push_pin' }}
               </span>
-            </div>
+              {{ editorFrequency() === 'weekly' ? 'Semanal' : 'Única' }}
+            </span>
+          </div>
 
-            <div class="be-body">
-              <ng-container [ngTemplateOutlet]="formSections"></ng-container>
-            </div>
+          <div class="be-body">
+            <ng-container [ngTemplateOutlet]="formSections"></ng-container>
+          </div>
 
-            <div class="be-actions">
-              <button class="btn-add" (click)="saveBlock()">
-                <span class="material-symbols-outlined">check</span>
-                Guardar disponibilidade
+          <div class="be-actions">
+            <button class="btn-add" (click)="saveBlock()">
+              <span class="material-symbols-outlined">check</span>
+              Guardar disponibilidade
+            </button>
+            @if (selectedBlockId() !== null) {
+              <button class="btn-remove" (click)="removeBlock()">
+                <span class="material-symbols-outlined">delete</span>
+                Remover bloco
               </button>
-              @if (selectedBlockId() !== null) {
-                @if (selectedBlock() && hasBookings(selectedBlock()!)) {
-                  <div class="remove-guard">
-                    <span class="material-symbols-outlined">event_busy</span>
-                    <div class="rg-text">
-                      <strong>Este bloco não pode ser removido.</strong> Tem {{ bookedCount(selectedBlock()!) }} sessão(ões) reservada(s) — cancele ou reagende essas sessões primeiro.
-                    </div>
-                  </div>
-                } @else {
-                  <button class="btn-remove" (click)="removeBlock()">
-                    <span class="material-symbols-outlined">delete</span>
-                    Remover bloco
-                  </button>
-                }
-              }
-            </div>
-          </aside>
-        }
+            }
+          </div>
+        </aside>
 
       </div>
     </div>
@@ -404,33 +288,40 @@
               [class.unica]="!block.isRecurring"
               [class.resizing]="resizingBlockId() === block.id"
               [class.conflicted]="conflictedBlockIds().has(block.id)"
-              [class.pinned]="hasBookings(block)"
-              [class.full-booked]="bookedCount(block) > 0 && bookedCount(block) === blockSlotCount(block)"
               [style.top.px]="blockTopPx(block, MOB_ROW_H)"
               [style.height.px]="resizingBlockId() === block.id
                 ? blockResizeHeightPx(block, resizeLiveEndTime(), MOB_ROW_H)
                 : blockHeightPx(block, MOB_ROW_H)"
               (click)="selectBlock($event, block)"
             >
-              <div class="mb-bands">
-                @for (slot of bookedSlotsForBlock(block); track slot.time) {
-                  <div class="mb-band" [class.booked]="slot.booked" [class.free]="!slot.booked" [class.sel-slot]="slot.appointment && slot.appointment.id === selectedAppointment()?.id" [class.appt-presencial]="slot.appointment ? apptModalityLabel(slot.appointment) === 'presencial' : false" [class.appt-remoto]="slot.appointment ? apptModalityLabel(slot.appointment) === 'remoto' : false">
-                    <div class="bd-row">
-                      <span class="bd-time">{{ slot.time }}</span>
-                      <span class="bd-rec" [class.unica]="slot.appointment ? !slot.appointment.isRecurring : !block.isRecurring">
-                        <span class="material-symbols-outlined">
-                          {{ (slot.appointment ? slot.appointment.isRecurring : block.isRecurring) ? 'event_repeat' : 'push_pin' }}
-                        </span>
-                      </span>
-                    </div>
-                    @if (slot.booked && slot.appointment) {
-                      <span class="bd-svc">{{ slotServiceName(slot.appointment) }}</span>
-                      <span class="bd-name">{{ slotPatientFirstName(slot.appointment) }}</span>
-                    } @else {
-                      <span class="bd-name">livre</span>
-                    }
-                  </div>
+              <div class="mb-top">
+                <span class="mb-time">
+                  {{ block.startTime }} – {{ resizingBlockId() === block.id ? resizeLiveEndTime() : block.endTime }}
+                </span>
+                <span class="mb-badge">
+                  <span class="material-symbols-outlined">
+                    {{ block.isRecurring ? 'event_repeat' : 'push_pin' }}
+                  </span>
+                </span>
+              </div>
+              <div class="mb-svc">{{ blockServiceLabel(block) }}</div>
+              <div class="mb-meta">
+                @if (block.modality !== Modality.REMOTE && block.local) {
+                  <span>
+                    <span class="material-symbols-outlined">location_on</span>
+                    Consultório
+                  </span>
                 }
+                @if (block.modality === Modality.REMOTE) {
+                  <span>
+                    <span class="material-symbols-outlined">videocam</span>
+                    Remoto
+                  </span>
+                }
+                <span>
+                  <span class="material-symbols-outlined">grid_view</span>
+                  {{ blockSlotCount(block) }} sessões
+                </span>
               </div>
               <div class="b-resize-handle" (pointerdown)="startResize($event, block, MOB_ROW_H)">
                 <span class="grip"></span>
@@ -480,14 +371,6 @@
             <ng-container [ngTemplateOutlet]="formSections"></ng-container>
           </div>
           <div class="sh-foot">
-            @if (selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)) {
-              <div class="remove-guard" style="margin-bottom:10px">
-                <span class="material-symbols-outlined">event_busy</span>
-                <div class="rg-text">
-                  <strong>Não pode ser removido</strong> enquanto tiver sessões reservadas.
-                </div>
-              </div>
-            }
             <button class="btn-add" (click)="saveBlock()">
               <span class="material-symbols-outlined">check</span>
               Guardar disponibilidade
@@ -502,73 +385,6 @@
 <!-- ─── Shared form template (desktop editor + mobile sheet) ─── -->
 <ng-template #formSections>
 
-  <!-- Reservas notice -->
-  @if (selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)) {
-    <div class="book-notice">
-      <span class="material-symbols-outlined">event_available</span>
-      <div class="bn-text">
-        <strong>{{ bookedCount(selectedBlock()!) }} sessão(ões) reservada(s)</strong> neste bloco. Para as proteger, alguns campos ficam fixos. Pode estender o horário e adicionar serviços livremente.
-      </div>
-    </div>
-  }
-
-  <!-- Sessões geradas (only when editing an existing block) -->
-  @if (selectedBlockId() !== null && selectedBlock()) {
-    <div class="be-section slots-section">
-      <div class="ss-head">
-        <label class="control-label" style="margin:0">Sessões geradas</label>
-        <span [class]="'ss-count' + (bookedCount(selectedBlock()!) === 0 ? ' none' : '')">
-          @if (bookedCount(selectedBlock()!) === 0) {
-            {{ blockSlotCount(selectedBlock()!) }} livres
-          } @else {
-            {{ bookedCount(selectedBlock()!) }} de {{ blockSlotCount(selectedBlock()!) }} reservadas
-          }
-        </span>
-      </div>
-      <div class="slot-list">
-        @for (slot of bookedSlotsForBlock(selectedBlock()!); track slot.time; let si = $index) {
-          <div [class]="'slot-row ' + (slot.booked ? 'booked' : 'free')"
-               (click)="slot.booked && slot.appointment ? selectSlot($event, slot.appointment) : null"
-               [style.cursor]="slot.booked && slot.appointment ? 'pointer' : 'default'">
-            @if (slot.booked && slot.appointment) {
-              <span [class]="'s-av ' + patientAvatarClass(si)">{{ slotPatientInitials(slot.appointment) }}</span>
-            } @else {
-              <span class="s-dot"></span>
-            }
-            <span class="s-time">{{ slot.time }}</span>
-            <div class="s-body">
-              @if (slot.booked && slot.appointment) {
-                <div class="s-name">{{ slotPatientName(slot.appointment) }}</div>
-                <div class="s-meta">
-                  {{ slotServiceName(slot.appointment) }} · {{ selectedBlock()!.sessionDuration }} min
-                  <span class="rec">
-                    <span class="material-symbols-outlined">{{ slot.appointment.isRecurring ? 'event_repeat' : 'push_pin' }}</span>
-                    {{ slot.appointment.isRecurring ? 'semanal' : 'única' }}
-                  </span>
-                </div>
-              } @else {
-                <div class="s-name">Livre</div>
-                <div class="s-meta">
-                  <span class="rec">
-                    <span class="material-symbols-outlined">{{ selectedBlock()!.isRecurring ? 'event_repeat' : 'push_pin' }}</span>
-                    {{ selectedBlock()!.isRecurring ? 'semanal' : 'única' }}
-                  </span>
-                </div>
-              }
-            </div>
-            @if (slot.booked && slot.appointment) {
-              <span class="s-chev"><span class="material-symbols-outlined">chevron_right</span></span>
-            } @else {
-              <button class="s-rm" (click)="removeSlot($event, selectedBlock()!, si)" title="Remover horário">
-                <span class="material-symbols-outlined">close</span>
-              </button>
-            }
-          </div>
-        }
-      </div>
-    </div>
-  }
-
   <!-- Serviço -->
   <div class="be-section">
     <label class="control-label">
@@ -576,48 +392,24 @@
     </label>
     <div class="chips">
       @for (svc of services(); track svc.id) {
-        @if (selectedBlockId() !== null && selectedBlock() && bookedSvcIds(selectedBlock()!).has(svc.id)) {
-          <button class="chip booked-svc">
-            {{ serviceDisplayName(svc.name) }}<span class="bdot"></span>
-          </button>
-        } @else {
-          <button
-            class="chip"
-            [class.on]="selectedServiceIds().has(svc.id)"
-            (click)="toggleService(svc.id)"
-          >
-            <span class="material-symbols-outlined">check</span>
-            {{ serviceDisplayName(svc.name) }}
-          </button>
-        }
+        <button
+          class="chip"
+          [class.on]="selectedServiceIds().has(svc.id)"
+          (click)="toggleService(svc.id)"
+        >
+          <span class="material-symbols-outlined">check</span>
+          {{ serviceDisplayName(svc.name) }}
+        </button>
       }
     </div>
-    @if (selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)) {
-      <div class="hint">
-        <span class="material-symbols-outlined">info</span>
-        Serviços com reservas (•) não podem ser removidos.
-      </div>
-    }
   </div>
 
   <!-- Modalidade -->
-  <div class="be-section" [class.fixed]="selectedBlockId() !== null && selectedBlock() && bookedModalityFixed(selectedBlock()!)">
+  <div class="be-section">
     <label class="control-label">
       Modalidade <span class="req">*</span>
-      @if (selectedBlockId() !== null && selectedBlock() && bookedModalityFixed(selectedBlock()!)) {
-        <span class="fixed-tag">fixo</span>
-      }
     </label>
     <div class="seg">
-      <button
-        [class.on]="editorModality() === Modality.ANY"
-        (click)="editorModality.set(Modality.ANY)"
-      >
-        @if (editorModality() === Modality.ANY) {
-          <span class="material-symbols-outlined">check</span>
-        }
-        Qualquer
-      </button>
       <button
         [class.on]="editorModality() === Modality.LOCAL"
         class="presencial"
@@ -638,6 +430,15 @@
         }
         Remoto
       </button>
+      <button
+        [class.on]="editorModality() === Modality.ANY"
+        (click)="editorModality.set(Modality.ANY)"
+      >
+        @if (editorModality() === Modality.ANY) {
+          <span class="material-symbols-outlined">check</span>
+        }
+        Qualquer
+      </button>
     </div>
     @if (editorModality() !== Modality.REMOTE) {
       <div class="field" style="margin-top: 12px;">
@@ -657,13 +458,8 @@
   </div>
 
   <!-- Frequência -->
-  <div class="be-section" [class.fixed]="selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)">
-    <label class="control-label">
-      Frequência
-      @if (selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)) {
-        <span class="fixed-tag">fixo</span>
-      }
-    </label>
+  <div class="be-section">
+    <label class="control-label">Frequência</label>
     <div class="seg">
       <button
         [class.on]="editorFrequency() === 'once'"
@@ -687,12 +483,7 @@
 
     @if (editorFrequency() === 'weekly') {
       <div style="margin-top: 14px;">
-        <label class="control-label">
-          Dias da semana
-          @if (selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)) {
-            <span class="fixed-tag">fixo</span>
-          }
-        </label>
+        <label class="control-label">Dias da semana</label>
         <div class="weekdays">
           @for (wd of WEEKDAYS; track wd; let i = $index) {
             <button
@@ -706,51 +497,19 @@
         </div>
       </div>
     } @else {
-      <div class="field date-field-wrap" style="margin-top: 14px;" (click)="edCalToggle($event)">
+      <div class="field" style="margin-top: 14px;">
         <div class="field-inner">
-          <span class="field-label">
-            Data
-            @if (selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)) {
-              <span class="fixed-tag">fixo</span>
-            }
-          </span>
-          <span class="field-value" [class.placeholder]="!editorDate()">
-            {{ editorDate() ? edCalFmtDate(editorDate()) : 'dd/mm/aaaa' }}
-          </span>
+          <span class="field-label">Data</span>
+          <input
+            #dateInput
+            class="field-value"
+            type="date"
+            lang="pt-BR"
+            [value]="editorDate()"
+            (change)="onEditorDateChange($any($event.target).value)"
+          />
         </div>
-        <span class="material-symbols-outlined field-icon">calendar_today</span>
-
-        @if (edCalOpen()) {
-          <div class="ed-cal-popover" (click)="$event.stopPropagation()">
-            <div class="cal-header">
-              <button type="button" class="cal-nav" (click)="edCalPrevMonth()">
-                <span class="material-symbols-outlined">chevron_left</span>
-              </button>
-              <span class="cal-month-label">{{ edCalMonthLabel() }}</span>
-              <button type="button" class="cal-nav" (click)="edCalNextMonth()">
-                <span class="material-symbols-outlined">chevron_right</span>
-              </button>
-            </div>
-            <div class="cal-weekdays">
-              @for (wd of edCalWeekdays; track $index) {
-                <span class="cal-wd">{{ wd }}</span>
-              }
-            </div>
-            <div class="cal-grid">
-              @for (cell of edCalDays(); track cell.key) {
-                <button type="button"
-                  class="cal-day"
-                  [class.other-month]="!cell.inMonth"
-                  [class.today]="edCalIsToday(cell.date)"
-                  [class.selected]="editorDate() === cell.key"
-                  [disabled]="edCalIsPast(cell.date) || !cell.inMonth"
-                  (click)="edCalSelectDate(cell.key)">
-                  {{ cell.date.getDate() }}
-                </button>
-              }
-            </div>
-          </div>
-        }
+        <span class="material-symbols-outlined field-icon" (click)="dateInput.showPicker()">calendar_today</span>
       </div>
     }
   </div>
@@ -759,13 +518,8 @@
   <div class="be-section">
     <label class="control-label">Intervalo de horas</label>
     <div class="time-row">
-      <div class="time-field" [class.fixed]="selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)">
-        <span class="field-label">
-          Início
-          @if (selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)) {
-            <span class="fixed-tag">fixo</span>
-          }
-        </span>
+      <div class="time-field">
+        <span class="field-label">Início</span>
         <div class="time-value">
           <span class="material-symbols-outlined">schedule</span>
           <select
@@ -794,13 +548,8 @@
       </div>
     </div>
 
-    <label class="control-label" style="margin-top: 14px;" [class.fixed]="selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)">
-      Duração de cada sessão
-      @if (selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)) {
-        <span class="fixed-tag">fixo</span>
-      }
-    </label>
-    <div class="seg" [class.fixed]="selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)">
+    <label class="control-label" style="margin-top: 14px;">Duração de cada sessão</label>
+    <div class="seg">
       @for (dur of SESSION_DURATIONS; track dur) {
         <button
           [class.on]="editorSessionDuration() === dur"
@@ -813,14 +562,8 @@
         </button>
       }
     </div>
-    @if (selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)) {
-      <div class="hint">
-        <span class="material-symbols-outlined">info</span>
-        A duração só muda quando não há sessões reservadas.
-      </div>
-    }
 
-    @if (generatedSlots().length > 0 && !(selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!))) {
+    @if (generatedSlots().length > 0) {
       <div class="hint">
         <span class="material-symbols-outlined">info</span>
         Gera {{ generatedSlots().length }} sessões agendáveis:
