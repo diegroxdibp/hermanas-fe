@@ -145,10 +145,11 @@ export class SchedulingComponent implements OnDestroy {
   get filteredSlots(): AvailabilityModel[] {
     const day = this.selectedDay;
     if (!day) return [];
-    return this.schedulingService.filterAvailabilityForDay(
+    const slots = this.schedulingService.filterAvailabilityForDay(
       this.schedulingService.availability(),
       parseDate(day),
     );
+    return slots.filter(s => !s.isBooked).sort((a, b) => a.startTime.localeCompare(b.startTime));
   }
 
   serviceName(name: string): string {

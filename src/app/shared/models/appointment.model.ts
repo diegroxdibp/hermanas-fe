@@ -15,4 +15,6 @@ export interface Appointment {
   endTime: string;
   isRecurring: boolean;
   dayOfWeek: DayOfWeek;
+  clientName?: string;
+  clientEmail?: string;
 }

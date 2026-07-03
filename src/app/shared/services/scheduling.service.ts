@@ -85,31 +85,21 @@ export class SchedulingService {
   }
 
   getAppointmentPayload(): AppointmentPayload {
+    const fc = this.schedulingForm.controls;
+    const rawModality = fc[SchedulingFormControls.SELECTED_MODALITY].value as string;
+    const MODALITY_MAP: Record<string, string> = {
+      'Qualquer': 'ANY',
+      'Presencial': 'LOCAL',
+      'Remoto': 'REMOTE',
+    };
     const payload = {
-      availabilityId:
-        this.schedulingForm.controls[
-          SchedulingFormControls.SELECTED_AVAILABILITY
-        ].value?.id,
-      professionalServiceId:
-        this.schedulingForm.controls[SchedulingFormControls.SELECTED_SERVICE]
-          .value?.id,
-      appointmentDate:
-        this.schedulingForm.controls[SchedulingFormControls.SELECTED_DAY].value,
-      startTime:
-        this.schedulingForm.controls[
-          SchedulingFormControls.SELECTED_AVAILABILITY
-        ].value?.startTime,
-      endTime:
-        this.schedulingForm.controls[
-          SchedulingFormControls.SELECTED_AVAILABILITY
-        ].value?.endTime,
-      isRecurring:
-        this.schedulingForm.controls[
-          SchedulingFormControls.SELECTED_AVAILABILITY
-        ].value?.isRecurring,
-      modality:
-        this.schedulingForm.controls[SchedulingFormControls.SELECTED_MODALITY]
-          .value,
+      availabilityId: fc[SchedulingFormControls.SELECTED_AVAILABILITY].value?.id,
+      professionalServiceId: fc[SchedulingFormControls.SELECTED_SERVICE].value?.id,
+      appointmentDate: fc[SchedulingFormControls.SELECTED_DAY].value,
+      startTime: fc[SchedulingFormControls.SELECTED_AVAILABILITY].value?.startTime,
+      endTime: fc[SchedulingFormControls.SELECTED_AVAILABILITY].value?.endTime,
+      isRecurring: fc[SchedulingFormControls.SELECTED_AVAILABILITY].value?.isRecurring,
+      modality: MODALITY_MAP[rawModality] ?? rawModality,
     } as AppointmentPayload;
     return payload;
   }
@@ -124,6 +114,8 @@ export class SchedulingService {
     maxDate.setHours(23, 59, 59, 999);
 
     for (const availability of availabilities) {
+      if (availability.isBooked) continue;
+
       const timeSlot = `${availability.startTime} - ${availability.endTime}`;
 
       if (availability.isRecurring && availability.dayOfWeek) {

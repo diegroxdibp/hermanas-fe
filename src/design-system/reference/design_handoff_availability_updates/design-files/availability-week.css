@@ -1,0 +1,222 @@
+/* ===========================================================
+   Therapist availability — merged B+A
+   Weekly calendar (aligned grid) + "Quando"-style block editor
+   Reuses control classes from availability-styles.css
+   =========================================================== */
+
+/* Two-column layout: calendar | block editor */
+.av .merge-layout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 28px;
+  align-items: start;
+}
+
+/* ─── Calendar ────────────────────────────────────────────
+   The gutter and every day column share ONE set of row tracks:
+   each hour is a 52px box with a top border. Because the time
+   labels live INSIDE their own hour box (no transform), the
+   gutter lines line up exactly with the day-column lines.
+   ───────────────────────────────────────────────────────── */
+.av .cal {
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: #fff;
+}
+
+/* Header row: corner + 7 day heads */
+.av .cal-head {
+  display: grid;
+  grid-template-columns: 64px repeat(7, 1fr);
+  background: var(--color-surface-tint);
+  border-bottom: 1px solid var(--color-border);
+}
+.av .cal-head .corner { border-right: 1px solid var(--color-border-soft); }
+.av .cal-head .dh {
+  text-align: center;
+  padding: 10px 6px;
+  border-left: 1px solid var(--color-border-soft);
+}
+.av .cal-head .dh:first-of-type { border-left: none; }
+.av .cal-head .dh .dow {
+  font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+  color: var(--color-muted); font-weight: 700;
+}
+.av .cal-head .dh .dn {
+  font-family: var(--font-serif); font-size: 18px; line-height: 1.1;
+  color: var(--color-primary-blue); margin-top: 2px;
+}
+.av .cal-head .dh.today .dn { color: var(--color-primary-purple); }
+
+/* Body: gutter + 7 day columns, all the same height */
+.av .cal-body {
+  display: grid;
+  grid-template-columns: 64px repeat(7, 1fr);
+}
+.av .cal-gutter { }
+.av .cal-gutter .tcell {
+  height: 52px;
+  border-top: 1px solid var(--color-border-soft);
+  text-align: right;
+  padding: 3px 8px 0 0;
+  font-size: 11px; color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+.av .cal-gutter .tcell:first-child { border-top: none; }
+
+.av .daycol {
+  position: relative;
+  border-left: 1px solid var(--color-border-soft);
+}
+.av .daycol .hcell {
+  height: 52px;
+  border-top: 1px solid var(--color-border-soft);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.av .daycol .hcell:first-child { border-top: none; }
+.av .daycol .hcell:hover { background: rgba(142,127,174,0.06); }
+
+/* Availability block, absolutely placed over the hour cells */
+.av .block {
+  position: absolute; left: 4px; right: 4px;
+  border-radius: var(--radius-sm);
+  padding: 7px 9px;
+  background: var(--color-primary-purple); color: #fff;
+  font-size: 11px; line-height: 1.25;
+  overflow: hidden;
+  z-index: 2;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.14);
+  cursor: pointer;
+  border: 1.5px solid transparent;
+}
+.av .block.remoto { background: var(--color-secondary-green); }
+.av .block.any { background: var(--color-secondary-cyan); color: var(--color-primary-blue); }
+.av .block.selected { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--color-primary-blue); }
+
+.av .block .b-top {
+  display: flex; align-items: center; justify-content: space-between; gap: 4px;
+}
+.av .block .b-time { font-weight: 700; font-variant-numeric: tabular-nums; }
+.av .block .b-badge {
+  display: inline-grid; place-items: center;
+  flex-shrink: 0;
+}
+/* Recurring: low-key glyph */
+.av .block .b-badge .material-symbols-outlined { font-size: 14px; opacity: 0.85; }
+/* Single-date: filled pin inside a white chip — pops on any modality colour */
+.av .block.unica .b-badge {
+  width: 19px; height: 19px; border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+}
+.av .block.unica .b-badge .material-symbols-outlined {
+  font-size: 12px; opacity: 1;
+  color: var(--color-primary-blue);
+  font-variation-settings: 'FILL' 1, 'wght' 500;
+}
+.av .block .b-svc {
+  opacity: 0.92; font-size: 10.5px; margin-top: 2px;
+  white-space: nowrap; text-overflow: ellipsis; overflow: hidden;
+}
+.av .block .b-slots { opacity: 0.8; font-size: 10px; margin-top: 2px; }
+
+/* Legend: modality colours + recurrence icons */
+.av .cal-toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.av .cal-toolbar .wk-nav { display: flex; align-items: center; gap: 8px; }
+.av .cal-toolbar .wk-nav button {
+  width: 34px; height: 34px; border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border); background: #fff;
+  display: grid; place-items: center; color: var(--fg-1);
+}
+.av .cal-toolbar .wk-nav .wk-label {
+  font-family: var(--font-serif); font-style: italic; font-size: 18px;
+  color: var(--color-primary-blue); padding: 0 8px;
+}
+.av .cal-toolbar .wk-nav .today-btn {
+  width: auto; padding: 0 14px; font-weight: 600; font-size: 13px;
+}
+.av .legend { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.av .legend .lg { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-muted); }
+.av .legend .lg .sw { width: 12px; height: 12px; border-radius: 3px; }
+.av .legend .lg .sw.presencial { background: var(--color-primary-purple); }
+.av .legend .lg .sw.remoto { background: var(--color-secondary-green); }
+.av .legend .lg .sw.any { background: var(--color-secondary-cyan); }
+.av .legend .lg .material-symbols-outlined { font-size: 15px; color: var(--color-secondary-indigo); }
+.av .legend .lg .pin-badge {
+  width: 17px; height: 17px; border-radius: 999px;
+  background: var(--color-primary-blue);
+  display: inline-grid; place-items: center;
+}
+.av .legend .lg .pin-badge .material-symbols-outlined {
+  font-size: 11px; color: #fff; font-variation-settings: 'FILL' 1;
+}
+.av .legend .lg-sep { width: 1px; height: 16px; background: var(--color-border); }
+
+.av .cal-hint {
+  margin-top: 14px;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--color-muted); font-style: italic;
+}
+.av .cal-hint .material-symbols-outlined { font-size: 17px; color: var(--color-secondary-cyan); }
+
+/* ─── Block editor (the lateral "Quando"-style column) ─── */
+.av .block-editor {
+  background: #fff;
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-xl);
+  filter: var(--shadow-card);
+  position: sticky; top: 0;
+  overflow: hidden;
+}
+.av .block-editor .be-head {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--color-border-soft);
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+}
+.av .block-editor .be-head .be-title {
+  font-family: var(--font-serif); font-style: italic; font-weight: 400;
+  font-size: 22px; color: var(--fg-1); line-height: 1.15;
+}
+.av .block-editor .be-head .be-sub {
+  font-size: 12.5px; color: var(--color-muted); margin-top: 4px;
+}
+.av .block-editor .be-head .be-chip {
+  flex-shrink: 0;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+  padding: 5px 10px; border-radius: var(--radius-pill);
+  background: rgba(142,127,174,0.16); color: var(--color-primary-purple);
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.av .block-editor .be-head .be-chip .material-symbols-outlined { font-size: 14px; }
+.av .block-editor .be-body { padding: 22px 24px; }
+.av .block-editor .be-section { margin-bottom: 22px; }
+.av .block-editor .be-section:last-of-type { margin-bottom: 0; }
+
+.av .block-editor .be-actions {
+  padding: 18px 24px;
+  border-top: 1px solid var(--color-border-soft);
+  background: var(--color-surface-tint);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.av .block-editor .be-actions .btn-remove {
+  background: #fff; color: var(--color-primary-purple);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 11px; font-weight: 600; font-size: 12px;
+  letter-spacing: 1px; text-transform: uppercase;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  transition: border-color 0.2s var(--ease-care), color 0.2s var(--ease-care);
+}
+.av .block-editor .be-actions .btn-remove:hover { border-color: var(--color-primary-purple); }
+.av .block-editor .be-actions .btn-remove .material-symbols-outlined { font-size: 16px; }
+
+/* Compact time row inside the narrow editor */
+.av .block-editor .time-row { gap: 8px; }
+.av .block-editor .time-field { padding: 9px 12px; }
+.av .block-editor .time-field .time-value span { font-size: 15px; }

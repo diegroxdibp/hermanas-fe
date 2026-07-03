@@ -1,0 +1,197 @@
+/* ===========================================================
+   Therapist availability — mobile (Teams-style)
+   Day/week calendar + FAB → bottom-sheet create menu
+   Reuses control classes from availability-styles.css
+   =========================================================== */
+
+.av.av-mob, .av .mob {
+  width: 100%; height: 100%;
+  background: #fff;
+  color: var(--fg-1);
+  font-family: var(--font-sans);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Top bar */
+.mob .m-top {
+  flex-shrink: 0;
+  padding: 16px 18px 10px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.mob .m-top .m-title {
+  font-family: var(--font-serif); font-style: italic;
+  font-size: 24px; color: var(--fg-1); line-height: 1.1;
+}
+.mob .m-top .m-title small {
+  display: block; font-family: var(--font-sans); font-style: normal;
+  font-size: 12px; color: var(--color-muted); margin-top: 2px;
+}
+.mob .m-top .m-actions { display: flex; gap: 8px; align-items: center; }
+.mob .m-icon {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--color-surface-tint); border: none;
+  display: grid; place-items: center; color: var(--fg-1);
+}
+.mob .m-icon .material-symbols-outlined { font-size: 21px; }
+.mob .m-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--color-secondary-cyan); color: var(--color-primary-blue);
+  display: grid; place-items: center; font-weight: 700; font-size: 13px;
+}
+
+/* Week strip */
+.mob .m-strip {
+  flex-shrink: 0;
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px;
+  padding: 6px 10px 12px;
+  border-bottom: 1px solid var(--color-border-soft);
+}
+.mob .m-day {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  padding: 6px 0; border-radius: var(--radius-md);
+  cursor: pointer; border: none; background: transparent;
+}
+.mob .m-day .wd {
+  font-size: 10px; letter-spacing: 0.5px; text-transform: uppercase;
+  color: var(--color-muted); font-weight: 700;
+}
+.mob .m-day .dn {
+  font-size: 15px; font-weight: 600;
+  width: 32px; height: 32px;
+  display: grid; place-items: center; border-radius: 50%;
+  font-variant-numeric: tabular-nums;
+}
+.mob .m-day.sel .dn { background: var(--color-primary-blue); color: #fff; }
+.mob .m-day.sel .wd { color: var(--color-primary-purple); }
+.mob .m-day .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--color-primary-purple); }
+.mob .m-day .dot.hidden { background: transparent; }
+
+/* Day agenda timeline */
+.mob .m-agenda { flex: 1; overflow-y: auto; position: relative; }
+.mob .m-daylabel {
+  padding: 14px 18px 8px;
+  font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--color-secondary-indigo); font-style: italic; font-weight: 700;
+}
+.mob .m-tl { position: relative; padding: 0 14px 110px 60px; }
+.mob .m-hour {
+  height: 46px;
+  border-top: 1px solid var(--color-border-soft);
+  position: relative;
+}
+.mob .m-hour:first-child { border-top: none; }
+.mob .m-hour .lbl {
+  position: absolute; left: -46px; top: -8px;
+  width: 38px; text-align: right;
+  font-size: 11px; color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+.mob .m-block {
+  position: absolute; left: 60px; right: 14px;
+  border-radius: var(--radius-md);
+  padding: 9px 12px;
+  background: var(--color-primary-purple); color: #fff;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.14);
+  z-index: 2;
+  overflow: hidden;
+}
+.mob .m-block.remoto { background: var(--color-secondary-green); }
+.mob .m-block.any { background: var(--color-secondary-cyan); color: var(--color-primary-blue); }
+.mob .m-block .mb-top {
+  display: flex; align-items: center; justify-content: space-between; gap: 6px;
+}
+.mob .m-block .mb-time { font-weight: 700; font-size: 13px; font-variant-numeric: tabular-nums; }
+.mob .m-block .mb-badge { display: inline-grid; place-items: center; }
+.mob .m-block .mb-badge .material-symbols-outlined { font-size: 14px; opacity: 0.85; }
+.mob .m-block.unica .mb-badge {
+  width: 19px; height: 19px; border-radius: 999px; background: #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+}
+.mob .m-block.unica .mb-badge .material-symbols-outlined {
+  font-size: 12px; opacity: 1; color: var(--color-primary-blue);
+  font-variation-settings: 'FILL' 1, 'wght' 500;
+}
+.mob .m-block .mb-svc { font-size: 12px; margin-top: 3px; opacity: 0.95; }
+.mob .m-block .mb-meta { font-size: 11px; margin-top: 3px; opacity: 0.82; display: flex; gap: 10px; }
+.mob .m-block .mb-meta span { display: inline-flex; align-items: center; gap: 3px; }
+.mob .m-block .mb-meta .material-symbols-outlined { font-size: 12px; }
+
+/* FAB */
+.mob .m-fab {
+  position: absolute; right: 18px; bottom: 92px;
+  width: 58px; height: 58px; border-radius: 19px;
+  background: var(--color-primary-blue); color: #fff;
+  border: none; display: grid; place-items: center;
+  box-shadow: 0 10px 24px rgba(34,50,110,0.38);
+  z-index: 5;
+}
+.mob .m-fab .material-symbols-outlined { font-size: 28px; }
+
+/* Bottom nav (Teams-like) */
+.mob .m-nav {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 74px;
+  background: #fff; border-top: 1px solid var(--color-border-soft);
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  padding-bottom: 10px;
+  z-index: 4;
+}
+.mob .m-nav a {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px; text-decoration: none;
+  font-size: 10px; font-weight: 600; color: var(--color-muted);
+}
+.mob .m-nav a.active { color: var(--color-primary-blue); }
+.mob .m-nav a .material-symbols-outlined { font-size: 22px; }
+
+/* ─── Bottom sheet (create) ─── */
+.mob .m-scrim {
+  position: absolute; inset: 0;
+  background: rgba(34,50,110,0.40);
+  z-index: 10;
+}
+.mob .m-sheet {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  max-height: 90%;
+  background: #fff;
+  border-radius: 24px 24px 0 0;
+  display: flex; flex-direction: column;
+  box-shadow: 0 -10px 34px rgba(0,0,0,0.22);
+  overflow: hidden;
+  z-index: 11;
+}
+.mob .m-sheet .handle {
+  width: 42px; height: 4px; border-radius: 2px;
+  background: var(--color-border);
+  margin: 10px auto 2px;
+  flex-shrink: 0;
+}
+.mob .m-sheet .sh-head {
+  padding: 8px 22px 14px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--color-border-soft);
+  flex-shrink: 0;
+}
+.mob .m-sheet .sh-head h3 {
+  font-family: var(--font-serif); font-style: italic; font-weight: 400;
+  font-size: 21px;
+}
+.mob .m-sheet .sh-head .sh-close {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: none; background: var(--color-surface-tint);
+  display: grid; place-items: center; color: var(--fg-1);
+}
+.mob .m-sheet .sh-body { padding: 18px 22px; overflow-y: auto; }
+.mob .m-sheet .sh-section { margin-bottom: 20px; }
+.mob .m-sheet .sh-foot {
+  padding: 14px 22px 18px;
+  border-top: 1px solid var(--color-border-soft);
+  background: var(--color-surface-tint);
+  flex-shrink: 0;
+}
+/* tighten reused controls inside the narrow sheet */
+.mob .m-sheet .time-field { padding: 9px 12px; }
+.mob .m-sheet .time-field .time-value span { font-size: 15px; }
+.mob .m-sheet .seg button { padding: 9px 10px; font-size: 12.5px; }
