@@ -1,19 +1,38 @@
-<div class="content">
-  <div class="type-container">
-    <h1 class="care">Care é</h1>
-    <div class="wrapper">
-      <h1 #typedText class="typed-text"></h1>
-      <span class="cursor"></span>
+<section class="hero">
+
+  <!-- Portrait: transparent cut-out anchored right -->
+  <div class="portrait">
+    <div class="portrait-halo" aria-hidden="true"></div>
+    <img
+      class="hero-photo reveal"
+      [class.loaded]="heroImageLoaded"
+      (load)="heroImageLoaded = true"
+      src="assets/images/care-hero-cut.png"
+      alt="Pessoa em um momento de acolhimento"
+    />
+  </div>
+
+  <!-- Content: absolutely positioned overlay, matching original placement -->
+  <div class="h-content">
+    <div class="h-stack">
+
+      <h1 class="h-title reveal d1">
+        <span>Care é</span>
+        <span class="h-word typed">{{ typedText() }}<span class="h-cursor" aria-hidden="true"></span></span>
+      </h1>
+
+      <p class="h-sub reveal d2">
+        Uma clínica ampliada de cuidado em saúde mental, relacional, física e social.
+      </p>
+
+      <div class="h-cta reveal d3">
+        <button class="btn-primary" (click)="navigateToScheduling()">
+          Agendar um atendimento
+          <span class="material-symbols-outlined">arrow_forward</span>
+        </button>
+      </div>
+
     </div>
   </div>
-</div>
-<picture class="hero-container">
-  <img
-    #heroImage
-    (load)="heroImageLoaded = true"
-    [ngClass]="{ loaded: heroImageLoaded }"
-    class="hero-image"
-    src="assets/images/self-hug.jpg"
-    alt="Imagem ilustrativa de fundo."
-  />
-</picture>
+
+</section>

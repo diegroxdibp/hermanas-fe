@@ -2,185 +2,223 @@
 @use "../../../../assets/styles/palette.scss" as palette;
 
 :host {
-  display: flex;
-  max-height: 100vh;
-  min-height: 420px;
+  display: block;
   width: 100%;
+  font-family: var(--font-sans);
+}
+
+// ─── Hero — Layout A: Full-bleed ─────────────────────────────────────────────
+
+.hero {
+  // Reset global section rule (max-width, padding, flex-direction)
+  max-width: none;
+  padding: 0;
+  flex-direction: row;
+
+  position: relative;
+  width: 100%;
+  height: 100vh;
   overflow: hidden;
-  justify-content: end;
-  background-color: red;
-
-  .content {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    color: white;
-    // margin-top: 8em;
-    margin-top: 10em;
-    gap: 2em;
-    z-index: 5;
-
-    h2 {
-      width: 100%;
-      color: palette.$primaryColorBlue;
-      font-family: Mondo;
-      font-size: 20px;
-      line-height: 1.4;
-      letter-spacing: 7px;
-      font-style: italic;
-      margin: 0;
-      text-align: center;
-      background-color: #ffffffb2;
-      padding: 8px;
-    }
-
-    h1,
-    h2 {
-      -webkit-user-select: none;
-      /* Safari */
-      -moz-user-select: none;
-      /* Firefox */
-      -ms-user-select: none;
-      /* IE10+/Edge */
-      user-select: none;
-      /* Standard */
-    }
-  }
-
-  picture {
-    width: 100%;
-    /* Set the desired container width */
-    overflow: hidden;
-    /* Ensures content doesn't overflow */
-    position: relative;
-    // -webkit-mask-image: linear-gradient(to right, rgba(0, 0, 0, 0) 20%, rgba(0, 0, 0, 0.9) 100%);
-    // mask-image: linear-gradient(to right, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, 0.8) 60%);
-    // -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    // background-image: url(/assets/images/hero-placeholder.jpg);
-    background-size: cover;
-    background-position: 50% 30%;
-
-    &:before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      animation: pulse 2.5s infinite;
-    }
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: 50% 30%;
-      // Add some extra height to allow for parallax movement
-      min-height: 120%; // Adjust this value based on how much parallax you want
-      will-change: transform; // Performance optimization
-      opacity: 0;
-    }
-  }
-
-  // @media (min-width: breakpoint.$breakpoint-lg) {
-  //   .content {
-  //     margin-right: 10%;
-  //     gap: 1em;
-  //     z-index: 5;
-  //     width: 100%;
-  //     align-items: end;
-  //     margin-right: 5%;
-  //     h1 {
-  //       font-size: 100px;
-  //       letter-spacing: 15px;
-  //     }
-
-  //     h2 {
-  //       font-size: 30px;
-  //       letter-spacing: 10px;
-  //       text-align: right;
-  //       background-color: unset;
-  //       padding: 0;
-  //     }
-  //   }
-  // }
+  display: flex;
+  align-items: center;
+  background: linear-gradient(180deg, #f5f4f9 0%, #ecebf3 100%);
 }
 
-.loaded {
-  opacity: 1 !important;
+// ─── Portrait (right 64%, cut-out stands on the wall) ────────────────────────
+
+.portrait {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 64%;
+  pointer-events: none;
+}
+
+.portrait-halo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    58% 56% at 64% 40%,
+    rgba(255, 255, 255, 0.85) 0%,
+    rgba(255, 255, 255, 0.45) 38%,
+    rgba(255, 255, 255, 0) 70%
+  );
+}
+
+.hero-photo {
+  display: block;
+  position: absolute;
+  height: 119%;
+  bottom: -7%;
+  right: 2%;
+  width: auto;
+  max-width: none;
+  object-fit: contain;
+  object-position: bottom right;
+  z-index: 1;
+  filter: drop-shadow(16px 22px 30px rgba(34, 50, 110, 0.18));
+  opacity: 0;
   transition: opacity 200ms ease-in-out;
+
+  &.loaded { opacity: 1; }
 }
 
-@keyframes pulse {
-  0% {
-    background-color: rgba(255, 255, 255, 0);
-  }
+// ─── Content (flex child, left side) ─────────────────────────────────────────
 
-  50% {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-
-  100% {
-    background-color: rgba(255, 255, 255, 0);
-  }
+.h-content {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  max-width: 1340px;
+  margin: 0 auto;
+  padding: 0 clamp(24px, 5vw, 64px);
 }
 
-/* Typing container */
-.type-container {
-  font-size: 32px;
-  font-weight: bold;
+.h-stack {
+  max-width: 480px;
+}
+
+// ─── Headline ─────────────────────────────────────────────────────────────────
+
+.h-title {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  min-height: 1.2em; // Prevents layout shift
-  margin-left: 24px;
-  align-items: baseline;
+  align-items: flex-start;
+  gap: 2px;
+  margin: 0;
+  line-height: 1.02;
+  color: var(--color-primary-blue);
+  font-weight: 700;
+  font-size: clamp(38px, 5vw, 66px);
+  letter-spacing: 0.5px;
+  max-width: 12ch;
+  user-select: none;
+}
 
-  .wrapper {
-    display: flex;
-  }
+.h-word {
+  color: palette.$primaryColorPurple;
+  display: block;
 
-  .care {
-    margin-right: 16px;
-  }
-
-  .typed-text {
-    color: palette.$primaryColorPurple;
-  }
-
-  .care,
-  .typed-text {
-    font-weight: 700;
-
-    @media (min-width: breakpoint.$breakpoint-md) {
-      font-size: 62px;
-    }
-  }
-
-  /* 🔁 Blinking cursor */
-  .cursor {
-    display: inline-block;
-    width: 2px;
-    height: 1.5em;
-    background-color: palette.$primaryColorPurple;
-    margin-left: 5px;
-    animation: blink 0.7s infinite;
-  }
-
-  @media (min-width: breakpoint.$breakpoint-sm) {
-    margin-left: 100px;
-
+  &.typed {
+    display: inline-flex;
+    align-items: baseline;
+    min-height: 1.04em;
+    white-space: nowrap;
   }
 }
 
-/* ✨ Blink animation */
-@keyframes blink {
+.h-cursor {
+  display: inline-block;
+  width: 3px;
+  height: 0.78em;
+  margin-left: 6px;
+  align-self: center;
+  background: palette.$primaryColorPurple;
+  transform: translateY(0.04em);
+  animation: ccblink 0.8s steps(1) infinite;
+}
 
-  0%,
-  100% {
-    opacity: 1;
+@keyframes ccblink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+// ─── Sub & CTA ────────────────────────────────────────────────────────────────
+
+.h-sub {
+  max-width: 30ch;
+  margin: 22px 0 0;
+  text-align: left;
+  font-size: clamp(17px, 1.35vw, 21px);
+  line-height: 1.6;
+  color: var(--color-primary-blue);
+  font-weight: 400;
+}
+
+.h-cta {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin-top: 30px;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  border: none;
+  background: var(--color-primary-blue);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 17px;
+  font-weight: 600;
+  padding: 14px 30px;
+  border-radius: var(--radius-lg);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: transform var(--dur-fast) ease, background var(--dur-fast) ease;
+
+  .material-symbols-outlined { font-size: 20px; }
+
+  &:hover {
+    transform: translateY(-2px);
+    background: var(--color-secondary-indigo);
+  }
+}
+
+// ─── Entrance animations ──────────────────────────────────────────────────────
+
+.reveal      { animation: fadeUp 1s var(--ease-care) both; }
+.reveal.d1   { animation-delay: 0.08s; }
+.reveal.d2   { animation-delay: 0.16s; }
+.reveal.d3   { animation-delay: 0.24s; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: none; }
+}
+
+// ─── Mobile ───────────────────────────────────────────────────────────────────
+
+@media (max-width: 880px) {
+  .hero {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: auto;
+    min-height: unset;
+    max-width: none;
   }
 
-  50% {
-    opacity: 0;
+  .portrait {
+    position: relative;
+    top: unset; right: unset; bottom: unset;
+    width: 100%;
+    height: 56vh;
+    min-height: 320px;
+    max-height: 440px;
+    overflow: hidden;
+
+    img {
+      bottom: unset;
+    }
   }
+
+  .hero-photo { height: 118%; }
+
+  .h-content { padding: 26px 22px; }
+  .h-stack   { max-width: 100%; }
+
+  .h-title { font-size: clamp(34px, 11vw, 46px); max-width: 100%; }
+  .h-sub   { max-width: 100%; font-size: 17px; }
+  .h-cta   { gap: 16px; margin-top: 24px; }
+
+  .btn-primary { width: 100%; justify-content: center; }
+}
+
+@media (max-width: 480px) {
+  .h-cta { flex-direction: column; align-items: stretch; }
 }
