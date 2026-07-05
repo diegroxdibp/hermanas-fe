@@ -5,12 +5,14 @@
     <div class="portrait-halo" aria-hidden="true"></div>
     <img
       class="hero-photo reveal"
+      [class.loaded]="heroImageLoaded"
+      (load)="heroImageLoaded = true"
       src="assets/images/care-hero-cut.png"
       alt="Pessoa em um momento de acolhimento"
     />
   </div>
 
-  <!-- Content -->
+  <!-- Content: absolutely positioned overlay, matching original placement -->
   <div class="h-content">
     <div class="h-stack">
 
@@ -34,4 +36,3 @@
   </div>
 
 </section>
-

@@ -1,27 +1,30 @@
+@use "../../../../assets/styles/breakpoints.scss" as breakpoint;
+@use "../../../../assets/styles/palette.scss" as palette;
+
 :host {
   display: block;
   width: 100%;
   font-family: var(--font-sans);
 }
 
-// ─── Hero fullbleed ───────────────────────────────────────────────────────────
+// ─── Hero — Layout A: Full-bleed ─────────────────────────────────────────────
 
 .hero {
-  // Reset global `section` rule that applies flex-direction:column, max-width, and padding
-  flex-direction: row;
+  // Reset global section rule (max-width, padding, flex-direction)
   max-width: none;
   padding: 0;
+  flex-direction: row;
 
   position: relative;
   width: 100%;
-  height: 100dvh;
+  height: 100vh;
   overflow: hidden;
   display: flex;
   align-items: center;
   background: linear-gradient(180deg, #f5f4f9 0%, #ecebf3 100%);
 }
 
-// ─── Portrait ─────────────────────────────────────────────────────────────────
+// ─── Portrait (right 64%, cut-out stands on the wall) ────────────────────────
 
 .portrait {
   position: absolute;
@@ -36,6 +39,7 @@
   position: absolute;
   inset: 0;
   z-index: 0;
+  pointer-events: none;
   background: radial-gradient(
     58% 56% at 64% 40%,
     rgba(255, 255, 255, 0.85) 0%,
@@ -44,28 +48,31 @@
   );
 }
 
-// Nose crop preset hardcoded from CROP_MAP.nose (crop-h 198%, bottom -50%, rx -30%, person-x 2%)
 .hero-photo {
   display: block;
   position: absolute;
-  height: 198%;
-  bottom: -50%;
-  right: -28%; // calc(2% + (−30%))
+  height: 119%;
+  bottom: -7%;
+  right: 2%;
   width: auto;
   max-width: none;
   object-fit: contain;
   object-position: bottom right;
   z-index: 1;
   filter: drop-shadow(16px 22px 30px rgba(34, 50, 110, 0.18));
+  opacity: 0;
+  transition: opacity 200ms ease-in-out;
+
+  &.loaded { opacity: 1; }
 }
 
-// ─── Content ──────────────────────────────────────────────────────────────────
+// ─── Content (flex child, left side) ─────────────────────────────────────────
 
 .h-content {
   position: relative;
   z-index: 3;
   width: 100%;
-  max-width: var(--col-lg);
+  max-width: 1340px;
   margin: 0 auto;
   padding: 0 clamp(24px, 5vw, 64px);
 }
@@ -88,16 +95,18 @@
   font-size: clamp(38px, 5vw, 66px);
   letter-spacing: 0.5px;
   max-width: 12ch;
+  user-select: none;
 }
 
 .h-word {
-  color: var(--color-primary-purple);
+  color: palette.$primaryColorPurple;
   display: block;
 
   &.typed {
     display: inline-flex;
     align-items: baseline;
     min-height: 1.04em;
+    white-space: nowrap;
   }
 }
 
@@ -107,7 +116,7 @@
   height: 0.78em;
   margin-left: 6px;
   align-self: center;
-  background: var(--color-primary-purple);
+  background: palette.$primaryColorPurple;
   transform: translateY(0.04em);
   animation: ccblink 0.8s steps(1) infinite;
 }
@@ -176,48 +185,38 @@
 
 @media (max-width: 880px) {
   .hero {
-    display: block;
-    height: 100dvh;
-    padding-bottom: 0;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: auto;
+    min-height: unset;
+    max-width: none;
   }
 
   .portrait {
     position: relative;
-    inset: unset;
+    top: unset; right: unset; bottom: unset;
     width: 100%;
-    height: 54dvh;
+    height: 56vh;
     min-height: 320px;
+    max-height: 440px;
+    overflow: hidden;
+
+    img {
+      bottom: unset;
+    }
   }
 
-  .hero-photo {
-    height: 118%;
-    bottom: -7%;
-    right: 0;
-  }
+  .hero-photo { height: 118%; }
 
-  .h-content { padding: 26px 22px 40px; }
+  .h-content { padding: 26px 22px; }
   .h-stack   { max-width: 100%; }
 
-  .h-title {
-    font-size: clamp(34px, 11vw, 46px);
-    max-width: 100%;
-  }
+  .h-title { font-size: clamp(34px, 11vw, 46px); max-width: 100%; }
+  .h-sub   { max-width: 100%; font-size: 17px; }
+  .h-cta   { gap: 16px; margin-top: 24px; }
 
-  .h-sub {
-    max-width: 100%;
-    font-size: 17px;
-  }
-
-  .h-cta {
-    gap: 16px;
-    margin-top: 24px;
-  }
-
-  .btn-primary {
-    width: 100%;
-    justify-content: center;
-  }
+  .btn-primary { width: 100%; justify-content: center; }
 }
 
 @media (max-width: 480px) {
