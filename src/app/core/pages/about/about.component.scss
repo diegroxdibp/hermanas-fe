@@ -12,6 +12,7 @@
   .first {
     padding: 0 !important;
     max-width: none;
+    gap: 2em;
 
     .about-intro {
       max-width: variables.$main-column-max-width-md;
@@ -149,7 +150,8 @@
     gap: 3em;
 
     .first {
-      padding: 0px;
+      padding: 0;
+      gap: 3em;
     }
 
 
