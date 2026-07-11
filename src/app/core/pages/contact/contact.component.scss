@@ -1,3 +1,5 @@
+@use "assets/styles/breakpoints.scss" as breakpoint;
+
 :host {
   display: flex;
   flex: 1;
@@ -10,7 +12,11 @@
   background: var(--color-surface-tint);
   display: flex;
   justify-content: center;
-  padding: 48px 24px 64px;
+  padding: 24px 16px 40px;
+
+  @media (min-width: breakpoint.$breakpoint-sm) {
+    padding: 48px 24px 64px;
+  }
 }
 
 .contact-card {
@@ -19,8 +25,12 @@
   background: var(--color-white);
   border-radius: var(--radius-xl);
   filter: drop-shadow(0 10px 28px rgba(33, 51, 110, 0.20));
-  padding: 36px 40px 40px;
+  padding: 24px 20px 28px;
   align-self: flex-start;
+
+  @media (min-width: breakpoint.$breakpoint-sm) {
+    padding: 36px 40px 40px;
+  }
 }
 
 .card-head {
@@ -165,9 +175,4 @@ textarea.field-input {
 
     &:hover { color: var(--fg-accent); }
   }
-}
-
-@media (max-width: 720px) {
-  .section { padding: 24px 16px 40px; }
-  .contact-card { padding: 24px 20px 28px; }
 }

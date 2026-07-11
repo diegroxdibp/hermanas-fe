@@ -14,28 +14,42 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 48px 20px 32px;
+  padding: 24px 20px;
+
+  @media (min-width: breakpoint.$breakpoint-xs) {
+    padding: 48px 20px 32px;
+  }
 }
 
 form {
   width: 100%;
   max-width: 580px;
   background: #fff;
-  border-radius: 16px;
-  padding: 32px;
+  border-radius: 14px;
+  padding: 22px;
   filter: var(--shadow-card);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
   box-sizing: border-box;
+
+  @media (min-width: breakpoint.$breakpoint-xs) {
+    border-radius: 16px;
+    padding: 32px;
+    gap: 16px;
+  }
 }
 
 .form-header {
   margin-bottom: 4px;
 
   h2 {
-    font-size: 22px !important;
+    font-size: 20px !important;
     margin: 0 0 4px !important;
+
+    @media (min-width: breakpoint.$breakpoint-xs) {
+      font-size: 22px !important;
+    }
   }
 
   .form-subhead {
@@ -116,17 +130,29 @@ form {
 
 .two-col {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 16px;
+
+  @media (min-width: breakpoint.$breakpoint-xs) {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 .phone-row {
   display: flex;
+  flex-direction: column;
   gap: 12px;
   align-items: flex-start;
 
-  .country-field { flex: 1; }
-  .phone-field { flex: 1; }
+  .country-field { flex: 1; width: 100%; }
+  .phone-field { flex: 1; width: 100%; }
+
+  @media (min-width: breakpoint.$breakpoint-xs) {
+    flex-direction: row;
+
+    .country-field,
+    .phone-field { width: auto; }
+  }
 }
 
 .phone-input-wrap {
@@ -214,25 +240,3 @@ form {
   &:hover { opacity: 0.88; }
 }
 
-@media (max-width: breakpoint.$breakpoint-xs) {
-  .page { padding: 24px 20px; }
-
-  form {
-    padding: 22px;
-    border-radius: 14px;
-    gap: 14px;
-  }
-
-  .two-col {
-    grid-template-columns: 1fr;
-  }
-
-  .phone-row {
-    flex-direction: column;
-
-    .country-field,
-    .phone-field { width: 100%; }
-  }
-
-  .form-header h2 { font-size: 20px !important; }
-}

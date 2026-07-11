@@ -147,23 +147,23 @@ input[type="text"] {
 }
 
 .cfg-input-group {
-  width: 480px;
-  @media (max-width: breakpoint.$breakpoint-md) {
-    width: 100%;
-    max-width: 480px;
+  width: 100%;
+  max-width: 480px;
+  @media (min-width: breakpoint.$breakpoint-md) {
+    width: 480px;
   }
 
   &.sm {
-    width: 388px;
-    @media (max-width: breakpoint.$breakpoint-md) {
-      width: 100%;
+    width: 100%;
+    @media (min-width: breakpoint.$breakpoint-md) {
+      width: 388px;
     }
   }
 
   &.lg {
-    width: 580px;
-    @media (max-width: breakpoint.$breakpoint-md) {
-      width: 100%;
+    width: 100%;
+    @media (min-width: breakpoint.$breakpoint-md) {
+      width: 580px;
     }
   }
 }

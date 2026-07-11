@@ -1,4 +1,5 @@
 /* Dashboard Page — uses design-system tokens from colors_and_type.css */
+@use "assets/styles/breakpoints.scss" as breakpoint;
 
 :host {
   display: flex;
@@ -18,11 +19,12 @@
   background: var(--color-surface-tint);
   font-family: var(--font-sans);
   color: var(--fg-1);
-  overflow: hidden;
+  overflow: visible;
+  min-height: 100dvh;
 
-  @media (max-width: 1029px) {
-    overflow: visible;
-    min-height: 100dvh;
+  @media (min-width: breakpoint.$breakpoint-md) {
+    overflow: hidden;
+    min-height: auto;
   }
 }
 
@@ -32,14 +34,16 @@
 .body {
   display: flex;
   flex: 1;
-  overflow: hidden;
+  overflow: visible;
+  flex-direction: column;
+  padding-bottom: 64px;
 
-  @media (max-width: 1029px) { overflow: visible; }
-
-  @media (max-width: 767px) {
-    flex-direction: column;
-    padding-bottom: 64px;
+  @media (min-width: breakpoint.$breakpoint-sm) {
+    flex-direction: row;
+    padding-bottom: 0;
   }
+
+  @media (min-width: breakpoint.$breakpoint-md) { overflow: hidden; }
 }
 
 /* ═══════════════════════════════════════════════
@@ -50,13 +54,13 @@
   flex-shrink: 0;
   background: var(--color-white);
   border-right: 1px solid var(--color-border-soft);
-  display: flex;
+  display: none;
   flex-direction: column;
   padding: 28px 0;
   overflow-y: auto;
   gap: 4px;
 
-  @media (max-width: 767px) { display: none; }
+  @media (min-width: breakpoint.$breakpoint-sm) { display: flex; }
 }
 
 .group-label {
@@ -130,26 +134,26 @@
 ═══════════════════════════════════════════════ */
 .main {
   flex: 1;
-  overflow-y: auto;
+  overflow-y: visible;
   display: flex;
   flex-direction: column;
 
-  @media (max-width: 1029px) { overflow: visible; }
+  @media (min-width: breakpoint.$breakpoint-md) { overflow-y: auto; }
 }
 
 .container {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  padding: 36px 48px;
-  max-width: 900px;
+  gap: 20px;
+  padding: 20px 16px;
+  max-width: none;
   width: 100%;
   margin: 0 auto;
 
-  @media (max-width: 1029px) {
-    padding: 20px 16px;
-    gap: 20px;
-    max-width: none;
+  @media (min-width: breakpoint.$breakpoint-md) {
+    padding: 36px 48px;
+    gap: 24px;
+    max-width: 900px;
   }
 }
 
@@ -165,7 +169,7 @@
 }
 
 .greeting {
-  font-size: 26px;
+  font-size: 22px;
   font-weight: var(--fw-bold);
   color: var(--fg-1);
   line-height: var(--lh-snug);
@@ -173,7 +177,7 @@
   .comma { font-style: normal; }
   em { font-style: italic; font-weight: var(--fw-bold); }
 
-  @media (max-width: 1029px) { font-size: 22px; }
+  @media (min-width: breakpoint.$breakpoint-md) { font-size: 26px; }
 }
 
 .date-line {
@@ -214,10 +218,10 @@
   gap: 12px;
 
   h2 {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: var(--fw-bold);
 
-    @media (max-width: 1029px) { font-size: 18px; }
+    @media (min-width: breakpoint.$breakpoint-md) { font-size: 20px; }
   }
 }
 
@@ -258,32 +262,33 @@
 ═══════════════════════════════════════════════ */
 .hero-card {
   display: flex;
+  flex-direction: column;
   align-items: stretch;
   background: var(--color-white);
   border-radius: var(--radius-lg);
   filter: var(--shadow-card);
   overflow: hidden;
 
-  @media (max-width: 1029px) { flex-direction: column; }
+  @media (min-width: breakpoint.$breakpoint-md) { flex-direction: row; }
 }
 
 .date-block {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 12px;
   background: var(--color-primary-blue);
   color: var(--color-white);
-  padding: 24px 28px;
-  min-width: 100px;
+  padding: 16px 20px;
+  min-width: 0;
   text-align: center;
 
-  @media (max-width: 1029px) {
-    flex-direction: row;
-    padding: 16px 20px;
-    gap: 12px;
-    min-width: 0;
+  @media (min-width: breakpoint.$breakpoint-md) {
+    flex-direction: column;
+    padding: 24px 28px;
+    gap: 2px;
+    min-width: 100px;
   }
 
   .day-of-week {
@@ -295,11 +300,11 @@
   }
 
   .num {
-    font-size: 48px;
+    font-size: 36px;
     font-weight: var(--fw-black);
     line-height: 1;
 
-    @media (max-width: 1029px) { font-size: 36px; }
+    @media (min-width: breakpoint.$breakpoint-md) { font-size: 48px; }
   }
 
   .mon {
@@ -318,12 +323,12 @@
 
 .info {
   flex: 1;
-  padding: 24px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;
 
-  @media (max-width: 1029px) { padding: 16px; }
+  @media (min-width: breakpoint.$breakpoint-md) { padding: 24px; }
 
   h3 { font-size: 18px; }
 
@@ -355,17 +360,18 @@
 
 .actions {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: center;
   gap: 8px;
-  padding: 20px 24px;
-  border-left: 1px solid var(--color-border-soft);
+  padding: 14px 16px;
+  border-left: none;
+  border-top: 1px solid var(--color-border-soft);
 
-  @media (max-width: 1029px) {
-    flex-direction: row;
-    border-left: none;
-    border-top: 1px solid var(--color-border-soft);
-    padding: 14px 16px;
+  @media (min-width: breakpoint.$breakpoint-md) {
+    flex-direction: column;
+    border-left: 1px solid var(--color-border-soft);
+    border-top: none;
+    padding: 20px 24px;
   }
 }
 
@@ -445,15 +451,15 @@
 .row {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 14px 20px;
+  gap: 12px;
+  padding: 12px 16px;
   border-bottom: 1px solid var(--color-border-soft);
   transition: background var(--dur-fast);
 
   &:last-child { border-bottom: none; }
   &:hover { background: var(--color-surface-tint); }
 
-  @media (max-width: 1029px) { padding: 12px 16px; gap: 12px; }
+  @media (min-width: breakpoint.$breakpoint-md) { padding: 14px 20px; gap: 16px; }
 }
 
 .when {
@@ -543,7 +549,7 @@
    Mobile bottom nav
 ═══════════════════════════════════════════════ */
 .bottombar {
-  display: none;
+  display: flex;
   position: fixed;
   bottom: 0;
   left: 0;
@@ -554,7 +560,7 @@
   z-index: 200;
   box-shadow: 0 -2px 12px rgba(34, 50, 110, 0.08);
 
-  @media (max-width: 767px) { display: flex; }
+  @media (min-width: breakpoint.$breakpoint-sm) { display: none; }
 
   a {
     flex: 1;

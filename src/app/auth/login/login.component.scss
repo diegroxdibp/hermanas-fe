@@ -21,24 +21,37 @@ form {
   width: 100%;
   max-width: 420px;
   background: #fff;
-  border-radius: 16px;
-  padding: 36px;
+  border-radius: 14px;
+  padding: 22px;
   filter: var(--shadow-card);
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+
+  @media (min-width: breakpoint.$breakpoint-xs) {
+    border-radius: 16px;
+    padding: 36px;
+  }
 }
 
 h1 {
-  font-size: 28px !important;
+  font-size: 24px !important;
   margin: 0 0 6px !important;
+
+  @media (min-width: breakpoint.$breakpoint-xs) {
+    font-size: 28px !important;
+  }
 }
 
 .subtitle {
-  font-size: 15px !important;
+  font-size: 14px !important;
   line-height: 1.5 !important;
   text-align: left !important;
   margin: 0 0 24px !important;
+
+  @media (min-width: breakpoint.$breakpoint-xs) {
+    font-size: 15px !important;
+  }
 }
 
 .field {
@@ -164,11 +177,15 @@ h1 {
   gap: 4px;
   margin-top: 22px;
   font-family: typography.$sourceSans;
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1;
   color: palette.$primaryColorBlue;
   font-weight: 400;
   text-align: center;
+
+  @media (min-width: breakpoint.$breakpoint-xs) {
+    font-size: 15px;
+  }
 
   a {
     line-height: 1;
@@ -176,15 +193,4 @@ h1 {
     font-weight: 700;
     cursor: pointer;
   }
-}
-
-@media (max-width: breakpoint.$breakpoint-xs) {
-  form {
-    padding: 22px;
-    border-radius: 14px;
-  }
-
-  h1 { font-size: 24px !important; }
-  .subtitle { font-size: 14px !important; }
-  .switch-link { font-size: 14px; }
 }

@@ -249,32 +249,35 @@ section {
 // body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 .cfg-input-group {
-  @media (max-width: breakpoint.$breakpoint-md) {
-    width: 100%;
-    max-width: 480px;
+  width: 100%;
+  max-width: 480px;
+
+  @media (min-width: breakpoint.$breakpoint-md) {
+    width: auto;
+    max-width: none;
   }
 
   &.sm {
-    width: 388px;
+    width: 100%;
 
-    @media (max-width: breakpoint.$breakpoint-md) {
-      width: 100%;
+    @media (min-width: breakpoint.$breakpoint-md) {
+      width: 388px;
     }
   }
 
   &.md2 {
-    width: 503px;
+    width: 100%;
 
-    @media (max-width: breakpoint.$breakpoint-md) {
-      width: 100%;
+    @media (min-width: breakpoint.$breakpoint-md) {
+      width: 503px;
     }
   }
 
   &.lg {
-    width: 580px;
+    width: 100%;
 
-    @media (max-width: breakpoint.$breakpoint-md) {
-      width: 100%;
+    @media (min-width: breakpoint.$breakpoint-md) {
+      width: 580px;
     }
   }
 }

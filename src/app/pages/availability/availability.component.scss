@@ -3,6 +3,7 @@
    Translates: availability-styles.css + availability-week.css
                + availability-mobile.css → CARE design tokens
    =========================================================== */
+@use "assets/styles/breakpoints.scss" as breakpoint;
 
 // ─── Host ────────────────────────────────────────────────────────────────────
 
@@ -35,7 +36,11 @@
 // ─── Panel header ────────────────────────────────────────────────────────────
 
 .panel-head {
-  padding: 36px 40px 0;
+  padding: 20px 18px 0;
+
+  @media (min-width: breakpoint.$breakpoint-sm) {
+    padding: 36px 40px 0;
+  }
 
   .kicker {
     font-size: 12px;
@@ -51,11 +56,15 @@
     font-family: var(--font-serif);
     font-style: italic;
     font-weight: 400;
-    font-size: 34px;
+    font-size: 26px;
     letter-spacing: -0.5px;
     line-height: 1.1;
     color: var(--color-primary-blue);
     margin-bottom: 6px;
+
+    @media (min-width: breakpoint.$breakpoint-sm) {
+      font-size: 34px;
+    }
   }
 
   .sub {
@@ -1361,12 +1370,3 @@
   }
 }
 
-// ─── Responsive ──────────────────────────────────────────────────────────────
-
-@media (max-width: 767px) {
-  .panel-head {
-    padding: 20px 18px 0;
-
-    h1 { font-size: 26px; }
-  }
-}

@@ -7,11 +7,11 @@
   flex-direction: column;
   width: 100%;
   flex-grow: 1;
-  padding: 28px 40px 48px;
+  padding: 20px 20px 40px;
   box-sizing: border-box;
 
-  @media (max-width: breakpoint.$breakpoint-sm) {
-    padding: 20px 20px 40px;
+  @media (min-width: breakpoint.$breakpoint-sm) {
+    padding: 28px 40px 48px;
   }
 }
 
@@ -24,11 +24,11 @@
   margin-bottom: 24px;
 
   h1 {
-    font-size: 28px !important;
+    font-size: 22px !important;
     margin: 0 0 4px !important;
 
-    @media (max-width: breakpoint.$breakpoint-sm) {
-      font-size: 22px !important;
+    @media (min-width: breakpoint.$breakpoint-sm) {
+      font-size: 28px !important;
     }
   }
 }
@@ -46,22 +46,22 @@
 // ── Avatar row ──────────────────────────────────────────────
 .avatar-row {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 24px;
+  gap: 12px;
   padding: 20px 0 28px;
   border-bottom: 1px solid var(--color-surface-tint);
   margin-bottom: 28px;
 
-  @media (max-width: breakpoint.$breakpoint-xs) {
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
+  @media (min-width: breakpoint.$breakpoint-xs) {
+    flex-direction: row;
+    gap: 24px;
   }
 }
 
 .avatar-circle {
-  width: 112px;
-  height: 112px;
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
   background: var(--color-surface-tint);
   border: 2px solid var(--color-border-soft);
@@ -73,9 +73,9 @@
   flex-shrink: 0;
   cursor: pointer;
 
-  @media (max-width: breakpoint.$breakpoint-xs) {
-    width: 96px;
-    height: 96px;
+  @media (min-width: breakpoint.$breakpoint-xs) {
+    width: 112px;
+    height: 112px;
   }
 }
 
@@ -88,13 +88,13 @@
 
 .avatar-initials {
   font-family: typography.$sourceSans;
-  font-size: 34px;
+  font-size: 28px;
   font-weight: 700;
   color: palette.$primaryColorBlue;
   line-height: 1;
 
-  @media (max-width: breakpoint.$breakpoint-xs) {
-    font-size: 28px;
+  @media (min-width: breakpoint.$breakpoint-xs) {
+    font-size: 34px;
   }
 }
 
@@ -130,9 +130,10 @@
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
+  justify-content: center;
 
-  @media (max-width: breakpoint.$breakpoint-xs) {
-    justify-content: center;
+  @media (min-width: breakpoint.$breakpoint-xs) {
+    justify-content: flex-start;
   }
 
   .hint {
@@ -183,11 +184,11 @@
 // ── Form grid ────────────────────────────────────────────────
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 20px 24px;
 
-  @media (max-width: breakpoint.$breakpoint-xs) {
-    grid-template-columns: 1fr;
+  @media (min-width: breakpoint.$breakpoint-xs) {
+    grid-template-columns: 1fr 1fr;
   }
 }
 
@@ -264,18 +265,19 @@
 
 .phone-row {
   display: flex;
+  flex-direction: column;
   gap: 12px;
 
-  @media (max-width: breakpoint.$breakpoint-xs) {
-    flex-direction: column;
+  @media (min-width: breakpoint.$breakpoint-xs) {
+    flex-direction: row;
   }
 
   .country-select {
-    width: 200px;
+    width: 100%;
     flex-shrink: 0;
 
-    @media (max-width: breakpoint.$breakpoint-xs) {
-      width: 100%;
+    @media (min-width: breakpoint.$breakpoint-xs) {
+      width: 200px;
     }
   }
 }
@@ -317,7 +319,8 @@
 // ── Save bar ─────────────────────────────────────────────────
 .save-bar {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
   justify-content: flex-end;
   gap: 12px;
   margin-top: 32px;
@@ -325,9 +328,9 @@
   border-top: 1px solid var(--color-surface-tint);
   flex-wrap: wrap;
 
-  @media (max-width: breakpoint.$breakpoint-xs) {
-    flex-direction: column;
-    align-items: stretch;
+  @media (min-width: breakpoint.$breakpoint-xs) {
+    flex-direction: row;
+    align-items: center;
   }
 }
 
@@ -348,10 +351,11 @@
 
 .save-btns {
   display: flex;
+  flex-direction: column-reverse;
   gap: 12px;
 
-  @media (max-width: breakpoint.$breakpoint-xs) {
-    flex-direction: column-reverse;
+  @media (min-width: breakpoint.$breakpoint-xs) {
+    flex-direction: row;
   }
 }
 
@@ -409,13 +413,14 @@
 
 .danger-row {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 24px;
 
-  @media (max-width: breakpoint.$breakpoint-xs) {
-    flex-direction: column;
-    align-items: flex-start;
+  @media (min-width: breakpoint.$breakpoint-xs) {
+    flex-direction: row;
+    align-items: center;
   }
 
   .danger-title {
@@ -447,7 +452,9 @@
     color: #fff;
   }
 
-  @media (max-width: breakpoint.$breakpoint-xs) {
-    width: 100%;
+  width: 100%;
+
+  @media (min-width: breakpoint.$breakpoint-xs) {
+    width: auto;
   }
 }

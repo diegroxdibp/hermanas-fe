@@ -20,29 +20,6 @@
                 justify-content: center;
                 align-items: center;
                 margin: 1em 0;
-
-                .pillars-title {
-                    margin-bottom: 2em;
-                    margin-bottom: 1em;
-                }
-
-                .pillars-list {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 1.5em;
-
-                    li {
-                        display: block;
-                        width: 100%;
-                        text-align: center;
-                        line-height: normal;
-
-                        span {
-                            font-family: Inter;
-                            font-size: 24px;
-                        }
-                    }
-                }
             }
         }
     }

@@ -21,24 +21,37 @@ form {
   width: 100%;
   max-width: 460px;
   background: #fff;
-  border-radius: 16px;
-  padding: 36px;
+  border-radius: 14px;
+  padding: 22px;
   filter: var(--shadow-card);
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+
+  @media (min-width: breakpoint.$breakpoint-xs) {
+    border-radius: 16px;
+    padding: 36px;
+  }
 }
 
 h1 {
-  font-size: 28px !important;
+  font-size: 24px !important;
   margin: 0 0 6px !important;
+
+  @media (min-width: breakpoint.$breakpoint-xs) {
+    font-size: 28px !important;
+  }
 }
 
 .subtitle {
-  font-size: 15px !important;
+  font-size: 14px !important;
   line-height: 1.5 !important;
   text-align: left !important;
   margin: 0 0 24px !important;
+
+  @media (min-width: breakpoint.$breakpoint-xs) {
+    font-size: 15px !important;
+  }
 }
 
 .field {
@@ -235,12 +248,3 @@ h1 {
   }
 }
 
-@media (max-width: breakpoint.$breakpoint-xs) {
-  form {
-    padding: 22px;
-    border-radius: 14px;
-  }
-
-  h1 { font-size: 24px !important; }
-  .subtitle { font-size: 14px !important; }
-}
