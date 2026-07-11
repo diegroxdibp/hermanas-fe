@@ -229,9 +229,29 @@
           <small>Disponibilidades · {{ weekRangeLabel() }}</small>
         </div>
         <div class="m-actions">
-          <button class="m-icon">
-            <span class="material-symbols-outlined">calendar_view_week</span>
-          </button>
+          <div class="m-icon-wrap">
+            <button
+              class="m-icon"
+              [class.active]="mobileWeekNavOpen()"
+              [attr.aria-expanded]="mobileWeekNavOpen()"
+              aria-label="Navegação semanal"
+              (click)="mobileWeekNavOpen.set(!mobileWeekNavOpen())"
+            >
+              <span class="material-symbols-outlined">calendar_view_week</span>
+            </button>
+            @if (mobileWeekNavOpen()) {
+              <div class="m-week-pop">
+                <button class="wp-arrow" (click)="prevWeek()">
+                  <span class="material-symbols-outlined">chevron_left</span>
+                </button>
+                <button class="wp-today" (click)="goToToday(); mobileWeekNavOpen.set(false)">Hoje</button>
+                <span class="wp-label">{{ weekLabel() }}</span>
+                <button class="wp-arrow" (click)="nextWeek()">
+                  <span class="material-symbols-outlined">chevron_right</span>
+                </button>
+              </div>
+            }
+          </div>
           <div class="m-avatar">{{ userInitials() }}</div>
         </div>
       </div>
@@ -255,7 +275,7 @@
       <div class="m-agenda">
         <div class="m-daylabel">{{ mobileDayLabel() }}</div>
         <div class="m-tl">
-          @for (h of HOURS; track h; let first = $first) {
+          @for (h of MOB_HOURS; track h; let first = $first) {
             <div class="m-hour" [class.first]="first">
               <span class="lbl">{{ h }}</span>
             </div>
@@ -335,26 +355,6 @@
       <button class="m-fab" aria-label="Nova disponibilidade" (click)="openSheet()">
         <span class="material-symbols-outlined">add</span>
       </button>
-
-      <!-- Bottom nav -->
-      <nav class="m-nav">
-        <a>
-          <span class="material-symbols-outlined">home</span>
-          <span>Início</span>
-        </a>
-        <a class="active">
-          <span class="material-symbols-outlined">calendar_month</span>
-          <span>Agenda</span>
-        </a>
-        <a>
-          <span class="material-symbols-outlined">forum</span>
-          <span>Mensagens</span>
-        </a>
-        <a>
-          <span class="material-symbols-outlined">person</span>
-          <span>Conta</span>
-        </a>
-      </nav>
 
       <!-- Bottom sheet -->
       @if (sheetOpen()) {

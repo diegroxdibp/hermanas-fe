@@ -11,9 +11,13 @@
       <ul>
         <li *ngFor="let navigationItem of navigationService.navigationItems">
           <a
-            (click)="navigateTo(navigationItem.destination)"
             class="menu-item"
+            tabindex="0"
             [class.active]="isActive(navigationItem.destination)"
+            [attr.aria-current]="isActive(navigationItem.destination) ? 'page' : null"
+            (click)="navigateTo(navigationItem.destination)"
+            (keydown.enter)="navigateTo(navigationItem.destination)"
+            (keydown.space)="$event.preventDefault(); navigateTo(navigationItem.destination)"
             >{{ navigationItem.name }}</a
           >
         </li>

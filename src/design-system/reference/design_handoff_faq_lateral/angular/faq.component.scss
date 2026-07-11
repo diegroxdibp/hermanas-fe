@@ -277,18 +277,15 @@ $font: 'Source Sans 3', 'Source Sans', system-ui, sans-serif;
   border-radius: $radius-xl;
   padding: 26px 30px;
   margin-top: 36px;
-
-  // mobile: stack + center
   flex-direction: column;
   text-align: center;
-  padding: 26px 22px;
-  margin-top: 26px;
 
   @media (min-width: 768px) {
     flex-direction: row;
     text-align: left;
     padding: 26px 30px;
-    margin-top: 36px;
+    margin-top: 48px;
+    margin-bottom: 40px;
   }
 }
 

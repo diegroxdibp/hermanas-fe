@@ -63,6 +63,13 @@
             color: palette.$primaryColorPurple;
           }
 
+          &:focus-visible {
+            outline: 3px solid palette.$primaryColorPurple;
+            outline-offset: 4px;
+            border-radius: 4px;
+            color: palette.$primaryColorPurple;
+          }
+
           &.active::after {
             content: '';
             display: block;

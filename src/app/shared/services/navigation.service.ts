@@ -15,12 +15,11 @@ export class NavigationService {
   snackbarService = inject(SnackbarService);
   Pages = Pages;
   navigationItems: NavigationItem[] = [
-    { name: 'Home', destination: Pages.HOME },
-    { name: 'Sobre', destination: Pages.ABOUT },
-    { name: 'Contato', destination: Pages.CONTACT },
-    { name: 'Disponibilidade', destination: Pages.AVAILABILITY },
-    { name: 'Agendar', destination: Pages.SCHEDULING },
-    { name: 'Disponibilidade', destination: Pages.AVAILABILITY },
+    { name: 'Home',            destination: Pages.HOME,         icon: 'home' },
+    { name: 'Sobre',           destination: Pages.ABOUT,        icon: 'info' },
+    { name: 'Contato',         destination: Pages.CONTACT,      icon: 'mail' },
+    { name: 'Disponibilidade', destination: Pages.AVAILABILITY, icon: 'calendar_month' },
+    { name: 'Agendar',         destination: Pages.SCHEDULING,   icon: 'calendar_today' },
   ];
   private routesWithAnchor = [`/${Pages.ATENDIMENTO}`, '/', '/contact'];
   readonly currentUrl: BehaviorSubject<string> = new BehaviorSubject('/');

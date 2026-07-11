@@ -53,12 +53,6 @@ export class MobileMenuSheetComponent {
   readonly userName = computed(() => this.user()?.name ?? '');
   readonly userEmail = computed(() => this.user()?.email ?? '');
 
-  readonly publicRows: NavRow[] = [
-    { label: 'Home',    icon: 'home',           page: Pages.HOME },
-    { label: 'Sobre',   icon: 'info',           page: Pages.ABOUT },
-    { label: 'Contato', icon: 'mail',           page: Pages.CONTACT },
-    { label: 'Agendar', icon: 'calendar_today', page: Pages.SCHEDULING },
-  ];
 
   readonly userRows: NavRow[] = [
     {

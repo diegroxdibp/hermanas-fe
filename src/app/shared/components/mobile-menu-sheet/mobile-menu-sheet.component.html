@@ -21,10 +21,16 @@
   </div>
 }
 
-@for (row of publicRows; track row.label; let i = $index) {
-  <a class="row" [style.--row-delay.s]="0.12 + i * 0.04" (click)="go(row.page)">
-    <span class="material-symbols-outlined icon">{{ row.icon }}</span>
-    <span class="label">{{ row.label }}</span>
+@for (item of navigationService.navigationItems; track item.destination; let i = $index) {
+  <a
+    class="row"
+    [style.--row-delay.s]="0.12 + i * 0.04"
+    tabindex="0"
+    (click)="go(item.destination)"
+    (keydown.enter)="go(item.destination)"
+    (keydown.space)="$event.preventDefault(); go(item.destination)">
+    <span class="material-symbols-outlined icon">{{ item.icon }}</span>
+    <span class="label">{{ item.name }}</span>
     <span class="material-symbols-outlined chev">chevron_right</span>
   </a>
 }
@@ -32,11 +38,14 @@
 @if (navbarService.showUserMenu()) {
   @for (row of userRows; track row.label; let i = $index) {
     <a class="row"
-       [style.--row-delay.s]="0.12 + (publicRows.length + i) * 0.04"
+       [style.--row-delay.s]="0.12 + (navigationService.navigationItems.length + i) * 0.04"
+       tabindex="0"
        [attr.aria-label]="row.ariaLabel && notificationService.unreadCount() > 0
          ? row.ariaLabel + ', ' + notificationService.unreadCount() + ' não lidas'
          : null"
-       (click)="go(row.page)">
+       (click)="go(row.page)"
+       (keydown.enter)="go(row.page)"
+       (keydown.space)="$event.preventDefault(); go(row.page)">
       <span class="material-symbols-outlined icon">{{ row.icon }}</span>
       <span class="label">{{ row.label }}</span>
       @if (row.showBadge && notificationService.unreadCount() > 0) {
@@ -46,14 +55,26 @@
     </a>
   }
 
-  <a class="row row-danger" [style.--row-delay.s]="0.12 + (publicRows.length + userRows.length) * 0.04" (click)="logout()">
+  <a
+    class="row row-danger"
+    [style.--row-delay.s]="0.12 + (navigationService.navigationItems.length + userRows.length) * 0.04"
+    tabindex="0"
+    (click)="logout()"
+    (keydown.enter)="logout()"
+    (keydown.space)="$event.preventDefault(); logout()">
     <span class="material-symbols-outlined icon">logout</span>
     <span class="label">Terminar sessão</span>
   </a>
 }
 
 @if (navbarService.showAuthLinks()) {
-  <a class="row" [style.--row-delay.s]="0.12 + publicRows.length * 0.04" (click)="signIn()">
+  <a
+    class="row"
+    [style.--row-delay.s]="0.12 + navigationService.navigationItems.length * 0.04"
+    tabindex="0"
+    (click)="signIn()"
+    (keydown.enter)="signIn()"
+    (keydown.space)="$event.preventDefault(); signIn()">
     <span class="material-symbols-outlined icon">login</span>
     <span class="label">Entrar</span>
     <span class="material-symbols-outlined chev">chevron_right</span>

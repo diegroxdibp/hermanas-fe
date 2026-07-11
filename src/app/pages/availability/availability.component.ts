@@ -36,6 +36,11 @@ const HOURS = [
   '14:00','15:00','16:00','17:00','18:00','19:00',
 ];
 const HOURS_END = [...HOURS, '20:00'];
+const MOB_HOURS = [
+  '08:00','09:00','10:00','11:00','12:00','13:00',
+  '14:00','15:00','16:00','17:00','18:00','19:00',
+  '20:00','21:00','22:00','23:00',
+];
 const EDITOR_HOURS = [
   '08:00','08:30','09:00','09:30','10:00','10:30',
   '11:00','11:30','12:00','12:30','13:00','13:30',
@@ -44,7 +49,7 @@ const EDITOR_HOURS = [
 ];
 const EDITOR_HOURS_END = [...EDITOR_HOURS, '20:00'];
 const ROW_H = 52;
-const MOB_ROW_H = 46;
+const MOB_ROW_H = 80;
 const COL_TO_DOW: DayOfWeek[] = [
   DayOfWeek.MONDAY,
   DayOfWeek.TUESDAY,
@@ -162,6 +167,7 @@ export class AvailabilityComponent implements OnInit {
   // ─ Expose to template
   readonly HOURS = HOURS;
   readonly HOURS_END = HOURS_END;
+  readonly MOB_HOURS = MOB_HOURS;
   readonly EDITOR_HOURS = EDITOR_HOURS;
   readonly EDITOR_HOURS_END = EDITOR_HOURS_END;
   readonly ROW_H = ROW_H;
@@ -232,6 +238,7 @@ export class AvailabilityComponent implements OnInit {
   // ─ Mobile
   selectedDayIndex = signal<number>(this._todayColumnIndex());
   sheetOpen = signal<boolean>(false);
+  mobileWeekNavOpen = signal<boolean>(false);
 
   // ─ Drag-select
   dragSelection = signal<DragSelection | null>(null);
@@ -1103,8 +1110,8 @@ export class AvailabilityComponent implements OnInit {
         isRecurring: a.isRecurring,
         weekdays: a.isRecurring ? [dow] : [],
         startDate: a.isRecurring ? undefined : a.startDate,
-        startTime: a.startTime,
-        endTime: a.endTime,
+        startTime: a.startTime.slice(0, 5),
+        endTime: a.endTime.slice(0, 5),
         sessionDuration: 60 as const,
       };
     });
@@ -1114,8 +1121,8 @@ export class AvailabilityComponent implements OnInit {
     const dow = BACKEND_DOW_MAP[res.dayOfWeek as unknown as string] ?? DayOfWeek.MONDAY;
     return {
       backendId: res.id,
-      startTime: res.startTime,
-      endTime: res.endTime,
+      startTime: res.startTime.slice(0, 5),
+      endTime: res.endTime.slice(0, 5),
       startDate: res.isRecurring ? undefined : res.startDate,
       weekdays: res.isRecurring ? [dow] : [],
     };
