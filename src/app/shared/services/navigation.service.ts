@@ -23,6 +23,7 @@ export class NavigationService {
   ];
   private routesWithAnchor = [`/${Pages.ATENDIMENTO}`, '/', '/contact'];
   readonly currentUrl: BehaviorSubject<string> = new BehaviorSubject('/');
+  private previousBaseUrl: string | null = null;
 
   // Emits whenever a link to a section on Home is clicked, even if the
   // Router treats it as a same-URL no-op (e.g. already on '/#faq' and the
@@ -35,10 +36,16 @@ export class NavigationService {
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
+        const cleanUrl = event.url.split(/[?#]/)[0];
+        const isSamePageNavigation = cleanUrl === this.previousBaseUrl;
+        this.previousBaseUrl = cleanUrl;
         this.currentUrl.next(event.url);
 
-        // Only scroll to top if it's NOT a routesWithAnchor
-        if (this.isRouteWithAnchor(event.url)) {
+        // Only scroll to top if it's NOT a routesWithAnchor, and it's not
+        // just a #fragment changing while already on that same page (e.g.
+        // clicking the footer FAQ link while already on Home) — that case
+        // should scroll smoothly from wherever the user already is instead.
+        if (this.isRouteWithAnchor(event.url) && !isSamePageNavigation) {
           setTimeout(() => {
             this.viewportScroller.scrollToPosition([0, 0]);
           }, 50);
@@ -55,15 +62,21 @@ export class NavigationService {
 
   navigateTo(page: Pages, fragment?: string): void {
     this.snackbarService.closeSnackbar();
+
+    if (fragment && this.router.url.split(/[?#]/)[0] === `/${page}`) {
+      // Already on the target page — scroll directly, without touching the
+      // URL. Changing the hash here would make the browser natively (and
+      // instantly) jump to the matching element itself, racing ahead of our
+      // own smooth scroll animation.
+      this.scrollToSectionRequested.next(fragment);
+      return;
+    }
+
     if (fragment) {
       // Read by HomeComponent on (re)creation, for navigation from another route.
       this.pendingSection = fragment;
     }
     this.router.navigate([page], fragment ? { fragment } : undefined);
-    if (fragment) {
-      // Also fire directly, for when HomeComponent is already mounted.
-      this.scrollToSectionRequested.next(fragment);
-    }
   }
 
   /** Reads and clears the section requested via navigateTo(), if any. */
