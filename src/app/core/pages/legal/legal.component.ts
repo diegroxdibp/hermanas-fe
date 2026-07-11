@@ -3,6 +3,9 @@ import { Router, RouterLink, NavigationEnd } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { Pages } from '../../../shared/enums/pages.enum';
+import { smoothScrollToElement } from '../../../shared/utils/smooth-scroll-to-element';
+
+const FIXED_HEADER_HEIGHT = 70;
 
 @Component({
   selector: 'app-legal',
@@ -44,7 +47,10 @@ export class LegalPageComponent implements AfterViewInit, OnDestroy {
     if (sectionId) {
       const id = sectionId;
       setTimeout(() => {
-        this.document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const element = this.document.getElementById(id);
+        if (element) {
+          smoothScrollToElement(element, FIXED_HEADER_HEIGHT, 1000);
+        }
       }, 80);
     }
   }

@@ -1,5 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute } from '@angular/router';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { HeroComponent } from '../../../shared/components/hero/hero.component';
 import { MarqueeTrackComponent } from '../../../shared/components/marquee-track/marquee-track.component';
@@ -9,6 +11,9 @@ import { AppConstants } from '../../../app-constants';
 import { NavigationService } from '../../../shared/services/navigation.service';
 import { FaqComponent } from '../../../shared/components/faq/faq.component';
 import { ServicesListComponent } from '../../../shared/components/services-list/services-list.component';
+import { smoothScrollToElement } from '../../../shared/utils/smooth-scroll-to-element';
+
+const FIXED_HEADER_HEIGHT = 70;
 
 @Component({
   selector: 'app-home',
@@ -27,6 +32,8 @@ import { ServicesListComponent } from '../../../shared/components/services-list/
 })
 export class HomeComponent {
   readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly destroyRef = inject(DestroyRef);
   AppConstants = AppConstants;
 
   ngAfterViewInit() {
@@ -38,10 +45,22 @@ export class HomeComponent {
       '/contact': 'contact',
     };
 
-    const sectionId = routeSectionMap[url];
+    // Arriving fresh from another route (e.g. footer FAQ link, or a direct
+    // link to '/#faq').
+    const sectionId =
+      routeSectionMap[url] ??
+      this.navigationService.consumePendingSection() ??
+      this.route.snapshot.fragment;
     if (sectionId) {
       this.intelligentScroll(sectionId);
     }
+
+    // A section link clicked while HomeComponent is already mounted (so the
+    // block above doesn't re-run) — e.g. the URL is already '/#faq' and the
+    // footer FAQ link is clicked again.
+    this.navigationService.scrollToSectionRequested
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((sectionId) => this.intelligentScroll(sectionId));
   }
 
   private intelligentScroll(sectionId: string) {
@@ -73,10 +92,7 @@ export class HomeComponent {
       if (element) {
         // Element found - wait a bit more for layout to settle, then scroll
         setTimeout(() => {
-          element.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-          });
+          smoothScrollToElement(element, FIXED_HEADER_HEIGHT, 1000);
         }, 200);
       } else if (attempts < maxAttempts) {
         attempts++;

@@ -7,6 +7,7 @@
   background: var(--color-white);
   box-sizing: border-box;
   padding: 32px 22px 30px;
+  scroll-margin-top: 70px; // clears the fixed header exactly, no gap of the previous section showing above it
 
   @media (min-width: breakpoint.$breakpoint-sm) {
     padding: 48px 52px 44px;
@@ -333,12 +334,14 @@
   text-align: center;
   padding: 26px 22px;
   margin-top: 26px;
+  gap: 1.5em;
 
   @media (min-width: breakpoint.$breakpoint-sm) {
     flex-direction: row;
     text-align: left;
     padding: 26px 30px;
     margin-top: 36px;
+    gap: 0;
   }
 }
 

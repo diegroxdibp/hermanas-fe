@@ -3,7 +3,7 @@ import { NavigationEnd, Router } from '@angular/router';
 import { Pages } from '../enums/pages.enum';
 import { NavigationItem } from '../models/navigation-item.model';
 import { ViewportScroller } from '@angular/common';
-import { BehaviorSubject, filter } from 'rxjs';
+import { BehaviorSubject, filter, Subject } from 'rxjs';
 import { SnackbarService } from './snackbar.service';
 
 @Injectable({
@@ -23,6 +23,13 @@ export class NavigationService {
   ];
   private routesWithAnchor = [`/${Pages.ATENDIMENTO}`, '/', '/contact'];
   readonly currentUrl: BehaviorSubject<string> = new BehaviorSubject('/');
+
+  // Emits whenever a link to a section on Home is clicked, even if the
+  // Router treats it as a same-URL no-op (e.g. already on '/#faq' and the
+  // FAQ link is clicked again). HomeComponent listens for this directly
+  // instead of relying on the Router's fragment navigation completing.
+  readonly scrollToSectionRequested = new Subject<string>();
+  private pendingSection: string | null = null;
 
   constructor() {
     this.router.events
@@ -46,8 +53,23 @@ export class NavigationService {
     );
   }
 
-  navigateTo(page: Pages): void {
+  navigateTo(page: Pages, fragment?: string): void {
     this.snackbarService.closeSnackbar();
-    this.router.navigate([page]);
+    if (fragment) {
+      // Read by HomeComponent on (re)creation, for navigation from another route.
+      this.pendingSection = fragment;
+    }
+    this.router.navigate([page], fragment ? { fragment } : undefined);
+    if (fragment) {
+      // Also fire directly, for when HomeComponent is already mounted.
+      this.scrollToSectionRequested.next(fragment);
+    }
+  }
+
+  /** Reads and clears the section requested via navigateTo(), if any. */
+  consumePendingSection(): string | null {
+    const section = this.pendingSection;
+    this.pendingSection = null;
+    return section;
   }
 }

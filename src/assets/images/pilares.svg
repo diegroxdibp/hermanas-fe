@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 583 388" width="583" height="388" role="img" aria-label="Clínica Ampliada: cuidado centrado na pessoa, abordagem integral, modelo biopsicossocial, trabalho interdisciplinar">
+  <defs>
+    
+  </defs>
+
+  
+  <path fill="#8E7FAE" d="M108 30 H274 V186 H108 A78 78 0 0 1 30 108 A78 78 0 0 1 108 30 Z"></path>
+  
+  <path fill="#42458E" d="M292 30 H459 A78 78 0 0 1 537 108 A78 78 0 0 1 459 186 H292 Z"></path>
+  
+  <path fill="#56B093" d="M108 204 H274 V360 H108 A78 78 0 0 1 30 282 A78 78 0 0 1 108 204 Z"></path>
+  
+  <path fill="#CCAED0" d="M292 204 H459 A78 78 0 0 1 537 282 A78 78 0 0 1 459 360 H292 Z"></path>
+
+  
+  <circle cx="283" cy="195" r="83" fill="#FFFFFF"></circle>
+  <circle cx="283" cy="195" r="73" fill="#22326E"></circle>
+
+  
+  <g fill="#FFFFFF" font-family="&#39;Source Sans 3&#39;, &#39;Source Sans Pro&#39;, &#39;Segoe UI&#39;, Arial, sans-serif" font-weight="700" font-size="17" text-anchor="middle" letter-spacing="0.5">
+    <text x="150" y="92">CUIDADO</text>
+    <text x="150" y="114">CENTRADO</text>
+    <text x="150" y="136">NA PESSOA</text>
+
+    <text x="428" y="103">ABORDAGEM</text>
+    <text x="428" y="125">INTEGRAL</text>
+
+    <text x="147" y="277">MODELO</text>
+    <text x="147" y="299">BIOPSICOSSOCIAL</text>
+
+    <text x="430" y="277">TRABALHO</text>
+    <text x="430" y="299">INTERDISCIPLINAR</text>
+
+    <text x="283" y="190">CLÍNICA</text>
+    <text x="283" y="212">AMPLIADA</text>
+  </g>
+</svg>

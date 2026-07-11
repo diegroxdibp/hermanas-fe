@@ -15,7 +15,7 @@ export class FooterComponent {
   private readonly navigationService = inject(NavigationService);
   readonly Pages = Pages;
 
-  navigateTo(page: Pages): void {
-    this.navigationService.navigateTo(page);
+  navigateTo(page: Pages, fragment?: string): void {
+    this.navigationService.navigateTo(page, fragment);
   }
 }
