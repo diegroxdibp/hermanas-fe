@@ -8,6 +8,8 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
 import { Modality } from '../../shared/enums/modality.enum';
 import { isModalityCompatible, normalizeModality, toBackendModality } from '../../shared/utils/modality-compatibility.util';
 import { DayOfWeek } from '../../shared/enums/day-of-week.enum';
@@ -187,6 +189,7 @@ export class AvailabilityComponent implements OnInit {
   private readonly schedulingService = inject(SchedulingService);
   readonly screenSize = inject(ScreenSizeService);
   private readonly sessionService = inject(SessionService);
+  private readonly dialog = inject(MatDialog);
 
   // ─ Expose to template
   readonly HOURS = HOURS;
@@ -1029,20 +1032,36 @@ export class AvailabilityComponent implements OnInit {
     if (id === null) return;
     const block = this.blocks().find(b => b.id === id);
     if (block && this.hasBookings(block)) return;
-    this.blocks.update(bs => bs.filter(b => b.id !== id));
-    this._invalidateSchedulingCache();
-    this.resetEditor();
-    this.closeSheet();
 
-    if (block && block.backendSlots.length > 0) {
-      const deleteOps = block.backendSlots.map(s => this.apiService.deleteAvailability(s.backendId));
-      forkJoin(deleteOps).subscribe({
-        error: (e) => {
-          console.error('deleteAvailability error', e);
-          if (block) this.blocks.update(bs => [...bs, block]);
-        },
-      });
-    }
+    this.confirmDelete(() => {
+      this.blocks.update(bs => bs.filter(b => b.id !== id));
+      this._invalidateSchedulingCache();
+      this.resetEditor();
+      this.closeSheet();
+
+      if (block && block.backendSlots.length > 0) {
+        const deleteOps = block.backendSlots.map(s => this.apiService.deleteAvailability(s.backendId));
+        forkJoin(deleteOps).subscribe({
+          error: (e) => {
+            console.error('deleteAvailability error', e);
+            if (block) this.blocks.update(bs => [...bs, block]);
+          },
+        });
+      }
+    });
+  }
+
+  private confirmDelete(onConfirm: () => void): void {
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      width: '440px',
+      panelClass: 'care-dialog',
+      data: {
+        message: 'Deseja realmente excluir este(s) horário(s)? Essa ação não poderá ser desfeita.',
+      },
+    });
+    ref.afterClosed().subscribe(confirmed => {
+      if (confirmed) onConfirm();
+    });
   }
 
   // ─ Private helpers ──────────────────────────────────────────────────────────
@@ -1757,6 +1776,10 @@ export class AvailabilityComponent implements OnInit {
   }
 
   cancelAppointment(appt: Appointment): void {
+    this.confirmDelete(() => this._doCancelAppointment(appt));
+  }
+
+  private _doCancelAppointment(appt: Appointment): void {
     this.apiService.deleteAppointment(appt.id).subscribe({
       next: () => {
         this.appointments.update(list => list.filter(a => a.id !== appt.id));
@@ -1780,6 +1803,10 @@ export class AvailabilityComponent implements OnInit {
     const slot = block.backendSlots[slotIndex];
     if (!slot || slot.isBooked) return;
 
+    this.confirmDelete(() => this._doRemoveSlot(block, slotIndex, slot));
+  }
+
+  private _doRemoveSlot(block: TherapistBlock, slotIndex: number, slot: BackendSlot): void {
     this.apiService.deleteAvailability(slot.backendId).subscribe({
       next: () => {
         this._invalidateSchedulingCache();

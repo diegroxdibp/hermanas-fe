@@ -15,7 +15,7 @@ export class AboutComponent implements OnInit {
   bio: Bio = {
     name: 'Luane Souza Bastos',
     title: 'Psicoterapeuta corporal Reichiana',
-    image: 'assets/images/luane.jpeg',
+    image: 'assets/images/about_luane.jpeg',
     description: [
       'Sou Luane Souza Bastos e trago um olhar para o corpo desde a infância quando o amor pela dança deu-se início. Contudo, foi na formação em psicologia que reencontro o corpo quando conheço o trabalho de Wilhelm Reich na psicanálise e, sobretudo, o trabalho psicoterapêutico para além da linguagem verbal.',
       'A partir do trabalho reichiano segui minha jornada profissional entre formações, atendimentos clínicos, workshops, supervisões até os grupos de movimento que desenvolvi na prefeitura do Rio de Janeiro.',

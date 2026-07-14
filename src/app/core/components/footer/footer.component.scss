@@ -31,8 +31,8 @@
   align-items: start;
 
   @media (min-width: breakpoint.$breakpoint-md) {
-    grid-template-columns: 1.5fr 1fr 1fr 1.3fr;
-    gap: 48px;
+    display: flex;
+    justify-content: space-evenly;
   }
 }
 
