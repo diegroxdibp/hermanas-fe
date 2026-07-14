@@ -724,6 +724,7 @@
     border-color: transparent;
 
     @media (min-width: breakpoint.$breakpoint-xs) {
+      background: #fff;
       border-color: var(--color-secondary-green);
       color: var(--color-secondary-green);
     }

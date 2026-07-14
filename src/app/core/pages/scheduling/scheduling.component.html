@@ -188,7 +188,7 @@
                       <button type="button"
                         class="mod-btn"
                         [class.selected]="slotModality() === m"
-                        [disabled]="confirmedSlotId() === slot.id"
+                        [disabled]="confirmedSlotId() === slot.id || !isModalityAllowed(m, slot)"
                         (click)="slotModality.set(m)">
                         @if (slotModality() === m) {
                           <span class="material-symbols-outlined mod-check">check</span>

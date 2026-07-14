@@ -19,6 +19,7 @@ import { Professional } from '../../../shared/models/get-professional-by-service
 import { ProfessionalService } from '../../../shared/models/professional-service.model';
 import { emptyAvailabilityConfiguration } from '../../../shared/models/input-configuration-objects/availability-configuration-object';
 import { parseDate, formatTime } from '../../../shared/utils/date-helper.util';
+import { getAllowedModalities } from '../../../shared/utils/modality-compatibility.util';
 
 const PT_MONTHS = [
   'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
@@ -142,6 +143,14 @@ export class SchedulingComponent implements OnDestroy {
     return this.schedulingService.schedulingForm.controls[SchedulingFormControls.SELECTED_DAY].value;
   }
 
+  allowedModalitiesFor(slot: AvailabilityModel): Modality[] {
+    return getAllowedModalities(slot.modality);
+  }
+
+  isModalityAllowed(m: Modality, slot: AvailabilityModel): boolean {
+    return this.allowedModalitiesFor(slot).includes(m);
+  }
+
   get filteredSlots(): AvailabilityModel[] {
     const day = this.selectedDay;
     if (!day) return [];
@@ -149,7 +158,9 @@ export class SchedulingComponent implements OnDestroy {
       this.schedulingService.availability(),
       parseDate(day),
     );
-    return slots.filter(s => !s.isBooked).sort((a, b) => a.startTime.localeCompare(b.startTime));
+    return slots
+      .filter(s => !s.isBooked || this.confirmedSlotId() === s.id)
+      .sort((a, b) => a.startTime.localeCompare(b.startTime));
   }
 
   serviceName(name: string): string {
@@ -230,6 +241,9 @@ export class SchedulingComponent implements OnDestroy {
     this.apiService.setAppointment(this.schedulingService.getAppointmentPayload()).subscribe({
       next: () => {
         this.confirmedSlotId.set(slot.id);
+        this.schedulingService.availability.update(list =>
+          list.map(a => a.id === slot.id ? { ...a, isBooked: true } : a),
+        );
         const date = this.fmtDate(this.selectedDay);
         this.showToast(
           `Sessão agendada · ${slot.professionalName} · ${date} · ${this.fmtTime(slot.startTime)} · ${modality}.`

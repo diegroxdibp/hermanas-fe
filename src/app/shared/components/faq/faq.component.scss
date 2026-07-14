@@ -334,6 +334,7 @@
   text-align: center;
   padding: 26px 22px;
   margin-top: 26px;
+  margin-bottom: 26px;
   gap: 1.5em;
 
   @media (min-width: breakpoint.$breakpoint-sm) {
@@ -341,6 +342,7 @@
     text-align: left;
     padding: 26px 30px;
     margin-top: 36px;
+    margin-bottom: 36pxWH;
     gap: 0;
   }
 }

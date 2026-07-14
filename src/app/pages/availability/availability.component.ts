@@ -9,6 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { Modality } from '../../shared/enums/modality.enum';
+import { isModalityCompatible, normalizeModality, toBackendModality } from '../../shared/utils/modality-compatibility.util';
 import { DayOfWeek } from '../../shared/enums/day-of-week.enum';
 import { ProfessionalService } from '../../shared/models/professional-service.model';
 import { ApiService, AvailabilityPayload } from '../../core/services/api.service';
@@ -768,7 +769,7 @@ export class AvailabilityComponent implements OnInit {
           const slotStart = slotTimes[i] ?? s.slotTime;
           const slotEnd = minToTime(timeToMin(slotStart) + dur);
           return this.apiService.updateAvailability(s.backendId,
-            this.buildSlotPayload(block.services, block.isRecurring, newDate, slotStart, slotEnd),
+            this.buildSlotPayload(block.services, block.modality, block.isRecurring, newDate, slotStart, slotEnd),
           );
         });
         forkJoin(updateOps).subscribe({
@@ -914,6 +915,18 @@ export class AvailabilityComponent implements OnInit {
       set.add(id);
     }
     this.selectedServiceIds.set(set);
+  }
+
+  isServiceEligible(svc: ProfessionalService): boolean {
+    return isModalityCompatible(svc.modality, this.editorModality());
+  }
+
+  setEditorModality(m: Modality): void {
+    this.editorModality.set(m);
+    const eligibleIds = new Set(
+      this.services().filter(s => isModalityCompatible(s.modality, m)).map(s => s.id),
+    );
+    this.selectedServiceIds.update(ids => new Set([...ids].filter(id => eligibleIds.has(id))));
   }
 
   setEditorSessionDuration(dur: 30 | 60 | 90): void {
@@ -1103,7 +1116,7 @@ export class AvailabilityComponent implements OnInit {
           const newSlotTimes = generateSlots(b.endTime, newEnd, dur);
           const createOps = newSlotTimes.map(t =>
             this.apiService.createAvailability(this.buildSlotPayload(
-              b.services, b.isRecurring, date, t, minToTime(timeToMin(t) + dur),
+              b.services, b.modality, b.isRecurring, date, t, minToTime(timeToMin(t) + dur),
             ))
           );
           forkJoin(createOps).subscribe({
@@ -1212,7 +1225,7 @@ export class AvailabilityComponent implements OnInit {
           const newSlotTimes = generateSlots(newStart, b.startTime, dur);
           const createOps = newSlotTimes.map(t =>
             this.apiService.createAvailability(this.buildSlotPayload(
-              b.services, b.isRecurring, date, t, minToTime(timeToMin(t) + dur),
+              b.services, b.modality, b.isRecurring, date, t, minToTime(timeToMin(t) + dur),
             ))
           );
           forkJoin(createOps).subscribe({
@@ -1397,7 +1410,7 @@ export class AvailabilityComponent implements OnInit {
 
     const createOps = slotTimes.map(t =>
       this.apiService.createAvailability(
-        this.buildSlotPayload(services, isRecurring, date, t, minToTime(timeToMin(t) + dur)),
+        this.buildSlotPayload(services, this.editorModality(), isRecurring, date, t, minToTime(timeToMin(t) + dur)),
       )
     );
 
@@ -1420,6 +1433,7 @@ export class AvailabilityComponent implements OnInit {
 
   private buildSlotPayload(
     services: ProfessionalService[],
+    modality: Modality,
     isRecurring: boolean,
     date: string,
     slotStart: string,
@@ -1431,6 +1445,7 @@ export class AvailabilityComponent implements OnInit {
       startTime: slotStart,
       endTime: slotEnd,
       isRecurring,
+      modality: toBackendModality(modality),
     };
   }
 
@@ -1465,7 +1480,8 @@ export class AvailabilityComponent implements OnInit {
         const last = group[group.length - 1];
         const sameDay = av.isRecurring === last.isRecurring &&
           (av.isRecurring ? av.dayOfWeek === last.dayOfWeek : av.startDate === last.startDate);
-        if (sameDay && av.startTime === last.endTime && this._sameServiceSet(av.services, last.services)) {
+        const sameModality = normalizeModality(av.modality) === normalizeModality(last.modality);
+        if (sameDay && sameModality && av.startTime === last.endTime && this._sameServiceSet(av.services, last.services)) {
           group.push(av);
         } else {
           flush();
@@ -1489,7 +1505,7 @@ export class AvailabilityComponent implements OnInit {
       id: ++this._nextId,
       backendSlots: avails.map(a => ({ slotTime: stripSec(a.startTime), backendId: a.id, isBooked: a.isBooked })),
       services: first.services,
-      modality: this.deriveModality(first.services),
+      modality: first.modality ? normalizeModality(first.modality) : this.deriveModality(first.services),
       isRecurring: first.isRecurring,
       weekdays: first.isRecurring ? [dow] : [],
       startDate: first.isRecurring ? undefined : first.startDate,
@@ -1518,7 +1534,7 @@ export class AvailabilityComponent implements OnInit {
 
     const updateOps = existing.backendSlots.map(s =>
       this.apiService.updateAvailability(s.backendId, this.buildSlotPayload(
-        updated.services, updated.isRecurring, date, s.slotTime, minToTime(timeToMin(s.slotTime) + dur),
+        updated.services, updated.modality, updated.isRecurring, date, s.slotTime, minToTime(timeToMin(s.slotTime) + dur),
       ))
     );
     if (updateOps.length > 0) {
@@ -1533,7 +1549,7 @@ export class AvailabilityComponent implements OnInit {
       const newSlotTimes = generateSlots(existing.endTime, updated.endTime, dur);
       const createOps = newSlotTimes.map(t =>
         this.apiService.createAvailability(this.buildSlotPayload(
-          updated.services, updated.isRecurring, date, t, minToTime(timeToMin(t) + dur),
+          updated.services, updated.modality, updated.isRecurring, date, t, minToTime(timeToMin(t) + dur),
         ))
       );
       forkJoin(createOps).subscribe({
@@ -1562,7 +1578,7 @@ export class AvailabilityComponent implements OnInit {
         if (slotTimes.length === 0) return;
         const createOps = slotTimes.map(t =>
           this.apiService.createAvailability(this.buildSlotPayload(
-            updated.services, updated.isRecurring, date, t, minToTime(timeToMin(t) + dur),
+            updated.services, updated.modality, updated.isRecurring, date, t, minToTime(timeToMin(t) + dur),
           ))
         );
         forkJoin(createOps).subscribe({

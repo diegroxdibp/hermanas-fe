@@ -238,6 +238,16 @@
       width: 16px;
     }
   }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+
+    &:hover {
+      border-color: var(--color-border);
+      background: #fff;
+    }
+  }
 }
 
 // Weekday chips (round)

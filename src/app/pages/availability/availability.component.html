@@ -584,6 +584,7 @@
           <button
             class="chip"
             [class.on]="selectedServiceIds().has(svc.id)"
+            [disabled]="!isServiceEligible(svc)"
             (click)="toggleService(svc.id)"
           >
             <span class="material-symbols-outlined">check</span>
@@ -611,7 +612,7 @@
     <div class="seg">
       <button
         [class.on]="editorModality() === Modality.ANY"
-        (click)="editorModality.set(Modality.ANY)"
+        (click)="setEditorModality(Modality.ANY)"
       >
         @if (editorModality() === Modality.ANY) {
           <span class="material-symbols-outlined">check</span>
@@ -621,7 +622,7 @@
       <button
         [class.on]="editorModality() === Modality.LOCAL"
         class="presencial"
-        (click)="editorModality.set(Modality.LOCAL)"
+        (click)="setEditorModality(Modality.LOCAL)"
       >
         @if (editorModality() === Modality.LOCAL) {
           <span class="material-symbols-outlined">check</span>
@@ -631,7 +632,7 @@
       <button
         [class.on]="editorModality() === Modality.REMOTE"
         class="remoto"
-        (click)="editorModality.set(Modality.REMOTE)"
+        (click)="setEditorModality(Modality.REMOTE)"
       >
         @if (editorModality() === Modality.REMOTE) {
           <span class="material-symbols-outlined">check</span>

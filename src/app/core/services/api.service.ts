@@ -10,6 +10,7 @@ export interface AvailabilityPayload {
   startTime: string;
   endTime: string;
   isRecurring: boolean;
+  modality: string;
 }
 import { Roles } from '../../shared/enums/roles.enum';
 import { AppointmentPayload } from '../../shared/models/appointment-payload.model';
