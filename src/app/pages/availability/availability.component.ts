@@ -1,6 +1,8 @@
+import { forkJoin, of } from 'rxjs';
 import { CommonModule, NgTemplateOutlet } from '@angular/common';
 import {
   Component,
+  HostListener,
   OnInit,
   computed,
   inject,
@@ -11,9 +13,13 @@ import { DayOfWeek } from '../../shared/enums/day-of-week.enum';
 import { ProfessionalService } from '../../shared/models/professional-service.model';
 import { ApiService, AvailabilityPayload } from '../../core/services/api.service';
 import { AvailabilityModel } from '../../shared/models/availability.model';
+import { Appointment } from '../../shared/models/appointment.model';
 import { ScreenSizeService } from '../../shared/services/screen-size.service';
 import { SessionService } from '../../shared/services/session.service';
 import { SnackbarService } from '../../shared/services/snackbar.service';
+import { SchedulingService } from '../../shared/services/scheduling.service';
+import { SchedulingSteps } from '../../shared/enums/scheduling-steps.enum';
+import { SchedulingFormControls } from '../../shared/enums/scheduling-form-controls.enum';
 import { ProfessionalSessionService } from '../../shared/enums/professional-session-service.enum';
 
 // ─── Module-level constants ───────────────────────────────────────────────────
@@ -73,6 +79,10 @@ function getWeekStart(d: Date): Date {
   return day;
 }
 
+function stripSec(t: string): string {
+  return t && t.length > 5 ? t.slice(0, 5) : t;
+}
+
 function timeToMin(t: string): number {
   const [h, m] = t.split(':').map(Number);
   return h * 60 + m;
@@ -122,9 +132,21 @@ interface PreviewBlock {
   modality: Modality;
 }
 
+interface SlotInfo {
+  time: string;
+  booked: boolean;
+  appointment?: Appointment;
+}
+
+interface BackendSlot {
+  slotTime: string;
+  backendId: number;
+  isBooked: boolean;
+}
+
 interface TherapistBlock {
   id: number;
-  backendId: number | null;
+  backendSlots: BackendSlot[];
   services: ProfessionalService[];
   modality: Modality;
   isRecurring: boolean;
@@ -161,6 +183,7 @@ export class AvailabilityComponent implements OnInit {
   // ─ Services
   private readonly apiService = inject(ApiService);
   private readonly snackbarService = inject(SnackbarService);
+  private readonly schedulingService = inject(SchedulingService);
   readonly screenSize = inject(ScreenSizeService);
   private readonly sessionService = inject(SessionService);
 
@@ -217,16 +240,18 @@ export class AvailabilityComponent implements OnInit {
 
   // ─ Data
   services = signal<ProfessionalService[]>([]);
+  appointments = signal<Appointment[]>([]);
 
   private _nextId = 0;
 
   blocks = signal<TherapistBlock[]>([]);
 
   selectedBlockId = signal<number | null>(null);
+  selectedAppointment = signal<Appointment | null>(null);
 
   // ─ Editor state
   selectedServiceIds = signal<Set<number>>(new Set());
-  editorModality = signal<Modality>(Modality.LOCAL);
+  editorModality = signal<Modality>(Modality.ANY);
   editorFrequency = signal<'once' | 'weekly'>('weekly');
   selectedWeekdays = signal<Set<DayOfWeek>>(new Set());
   editorDate = signal<string>('');
@@ -234,6 +259,37 @@ export class AvailabilityComponent implements OnInit {
   editorEndTime = signal<string>('13:00');
   editorSessionDuration = signal<30 | 60 | 90>(60);
   editorLocal = signal<string>('Consultório · R. da Misericórdia 53');
+
+  // ─ Date picker calendar (editor)
+  readonly edCalWeekdays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+  edCalOpen = signal<boolean>(false);
+  edCalViewDate = signal<Date>(new Date());
+  readonly edCalMonthLabel = computed(() => {
+    const d = this.edCalViewDate();
+    return `${PT_MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+  });
+  readonly edCalDays = computed(() => {
+    const view = this.edCalViewDate();
+    const year = view.getFullYear();
+    const month = view.getMonth();
+    const offset = new Date(year, month, 1).getDay();
+    const days: Array<{ date: Date; inMonth: boolean; key: string }> = [];
+    for (let i = offset - 1; i >= 0; i--) {
+      const d = new Date(year, month, -i);
+      days.push({ date: d, inMonth: false, key: toKey(d) });
+    }
+    const total = new Date(year, month + 1, 0).getDate();
+    for (let i = 1; i <= total; i++) {
+      const d = new Date(year, month, i);
+      days.push({ date: d, inMonth: true, key: toKey(d) });
+    }
+    while (days.length < 42) {
+      const prev = days[days.length - 1].date;
+      const d = new Date(prev.getFullYear(), prev.getMonth(), prev.getDate() + 1);
+      days.push({ date: d, inMonth: false, key: toKey(d) });
+    }
+    return days;
+  });
 
   // ─ Mobile
   selectedDayIndex = signal<number>(this._todayColumnIndex());
@@ -249,19 +305,34 @@ export class AvailabilityComponent implements OnInit {
   moveLiveStart = signal<string>('');
   moveLiveEnd = signal<string>('');
   moveLiveCol = signal<number>(0);
+  moveLiveConflict = signal<boolean>(false);
 
   readonly movingBlock = computed(() => {
     const id = this.movingBlockId();
     return id !== null ? (this.blocks().find(b => b.id === id) ?? null) : null;
   });
 
-  // ─ Resize
+  readonly ghostSlotTimes = computed(() => {
+    const block = this.movingBlock();
+    if (!block) return [];
+    return generateSlots(this.moveLiveStart(), this.moveLiveEnd(), block.sessionDuration);
+  });
+
+  // ─ Resize (bottom)
   resizingBlockId = signal<number | null>(null);
   resizeLiveEndTime = signal<string>('');
   private _resizeBlock: TherapistBlock | null = null;
   private _resizeColEl: HTMLElement | null = null;
   private _resizeRowH = ROW_H;
   private _resizeDragged = false;
+
+  // ─ Resize (top)
+  resizingTopBlockId = signal<number | null>(null);
+  resizeLiveStartTime = signal<string>('');
+  private _resizeTopBlock: TherapistBlock | null = null;
+  private _resizeTopColEl: HTMLElement | null = null;
+  private _resizeTopRowH = ROW_H;
+  private _resizeTopDragged = false;
 
   // ─ Preview move
   isMovingPreview = signal<boolean>(false);
@@ -401,7 +472,30 @@ export class AvailabilityComponent implements OnInit {
     const userId = this.sessionService.user()?.id;
     if (userId) {
       this.apiService.getAvailabilitiesByProfessionalId(userId).subscribe({
-        next: (avails) => this.blocks.set(this.mapAvailabilities(avails)),
+        next: (avails) => this.blocks.set(this.groupAvailabilitiesIntoBlocks(avails)),
+        error: () => {},
+      });
+      this.apiService.getProfessionalAppointments(userId).subscribe({
+        next: (appts) => {
+          this.appointments.set(appts.map(a => ({
+            ...a,
+            startTime: stripSec(a.startTime),
+            endTime: stripSec(a.endTime),
+          })));
+          this.apiService.getClientUsers().subscribe({
+            next: (clients) => {
+              const nameMap = new Map(clients.map(c => [c.id, c.name]));
+              this.appointments.update(list =>
+                list.map(a => ({
+                  ...a,
+                  clientName: nameMap.get(a.clientId) ?? a.clientName,
+                  clientEmail: clients.find(c => c.id === a.clientId)?.email ?? a.clientEmail,
+                }))
+              );
+            },
+            error: () => {},
+          });
+        },
         error: () => {},
       });
     }
@@ -438,6 +532,52 @@ export class AvailabilityComponent implements OnInit {
     const target = new Date(dateStr + 'T00:00:00');
     const newStart = getWeekStart(target);
     this.animateToWeek(newStart, newStart > this.weekStart() ? 'left' : 'right');
+  }
+
+  @HostListener('document:click')
+  onDocClick(): void { this.edCalOpen.set(false); }
+
+  edCalToggle(event: MouseEvent): void {
+    event.stopPropagation();
+    const wasOpen = this.edCalOpen();
+    if (!wasOpen) {
+      const selected = this.editorDate();
+      if (selected) this.edCalViewDate.set(new Date(selected + 'T00:00:00'));
+    }
+    this.edCalOpen.set(!wasOpen);
+  }
+
+  edCalPrevMonth(): void {
+    const d = this.edCalViewDate();
+    this.edCalViewDate.set(new Date(d.getFullYear(), d.getMonth() - 1, 1));
+  }
+
+  edCalNextMonth(): void {
+    const d = this.edCalViewDate();
+    this.edCalViewDate.set(new Date(d.getFullYear(), d.getMonth() + 1, 1));
+  }
+
+  edCalSelectDate(key: string): void {
+    this.edCalOpen.set(false);
+    this.onEditorDateChange(key);
+  }
+
+  edCalIsPast(date: Date): boolean {
+    const t = new Date(); t.setHours(0, 0, 0, 0);
+    return date < t;
+  }
+
+  edCalIsToday(date: Date): boolean {
+    const t = new Date();
+    return date.getFullYear() === t.getFullYear() &&
+      date.getMonth() === t.getMonth() &&
+      date.getDate() === t.getDate();
+  }
+
+  edCalFmtDate(key: string): string {
+    if (!key) return '';
+    const [y, m, d] = key.split('-');
+    return `${d}/${m}/${y}`;
   }
 
   private animateToWeek(newStart: Date, dir: 'left' | 'right'): void {
@@ -516,6 +656,7 @@ export class AvailabilityComponent implements OnInit {
   selectBlock(event: Event, block: TherapistBlock): void {
     event.stopPropagation();
     this.selectedBlockId.set(block.id);
+    this.selectedAppointment.set(null);
     this.loadBlockIntoEditor(block);
   }
 
@@ -533,6 +674,8 @@ export class AvailabilityComponent implements OnInit {
 
   startMove(event: PointerEvent, block: TherapistBlock, colIndex: number): void {
     if ((event.target as HTMLElement).closest('.b-resize-handle')) return;
+    if ((event.target as HTMLElement).closest('.b-resize-handle-top')) return;
+    if (this.hasBookings(block)) { this.selectBlock(event, block); return; }
 
     const blockEl = event.currentTarget as HTMLElement;
     const daycol = blockEl.parentElement as HTMLElement;
@@ -575,6 +718,9 @@ export class AvailabilityComponent implements OnInit {
       this.moveLiveCol.set(newCol);
       this.moveLiveStart.set(minToTime(clampedStart));
       this.moveLiveEnd.set(minToTime(clampedStart + durationMin));
+      this.moveLiveConflict.set(
+        this._hasMoveConflict(block.id, newCol, minToTime(clampedStart), minToTime(clampedStart + durationMin))
+      );
     };
 
     const onUp = () => {
@@ -585,32 +731,56 @@ export class AvailabilityComponent implements OnInit {
       const newCol = this.moveLiveCol();
       const newStart = this.moveLiveStart();
       const newEnd = this.moveLiveEnd();
+      const hasConflict = this.moveLiveConflict();
 
       this.movingBlockId.set(null);
       this.isDraggingMove.set(false);
+      this.moveLiveConflict.set(false);
 
       if (!moved) return;
 
       document.addEventListener('click', e => e.stopPropagation(), { once: true, capture: true });
 
+      if (hasConflict) return;
+
       if (newStart === block.startTime && newEnd === block.endTime && newCol === colIndex) return;
 
       const newWeekday = COL_TO_DOW[newCol];
-      const updated: TherapistBlock = { ...block, startTime: newStart, endTime: newEnd, weekdays: [newWeekday] };
+      // For non-recurring blocks the new date is the actual calendar date of the target column.
+      // dateForWeekday() derives that date from the current week view for both types.
+      const newDate = this.dateForWeekday(newWeekday);
+      const updated: TherapistBlock = {
+        ...block,
+        startTime: newStart,
+        endTime: newEnd,
+        weekdays: block.isRecurring ? [newWeekday] : [],
+        startDate: block.isRecurring ? block.startDate : newDate,
+      };
       this.blocks.update(bs => bs.map(b => b.id === block.id ? updated : b));
+      this._invalidateSchedulingCache();
 
-      if (block.backendId !== null) {
-        const startDate = block.isRecurring
-          ? this.dateForWeekday(newWeekday)
-          : (block.startDate ?? '');
-        const payload: AvailabilityPayload = {
-          professionalServiceIds: block.services.map(s => s.id),
-          startDate,
-          startTime: newStart,
-          endTime: newEnd,
-          isRecurring: block.isRecurring,
-        };
-        this.apiService.updateAvailability(block.backendId, payload).subscribe({
+      if (block.backendSlots.length > 0) {
+        const dur = block.sessionDuration;
+        const slotTimes = generateSlots(newStart, newEnd, dur);
+        // UPDATE each existing slot record in place (duration is preserved during a move,
+        // so slot count never changes). Avoids delete+create race conditions.
+        const updateOps = block.backendSlots.map((s, i) => {
+          const slotStart = slotTimes[i] ?? s.slotTime;
+          const slotEnd = minToTime(timeToMin(slotStart) + dur);
+          return this.apiService.updateAvailability(s.backendId,
+            this.buildSlotPayload(block.services, block.isRecurring, newDate, slotStart, slotEnd),
+          );
+        });
+        forkJoin(updateOps).subscribe({
+          next: (results) => {
+            const newSlots: BackendSlot[] = block.backendSlots.map((s, i) => ({
+              ...s,
+              slotTime: slotTimes[i] ?? s.slotTime,
+            }));
+            this.blocks.update(bs => bs.map(b =>
+              b.id === block.id ? { ...b, backendSlots: newSlots } : b,
+            ));
+          },
           error: () => this.blocks.update(bs => bs.map(b => b.id === block.id ? block : b)),
         });
       }
@@ -619,6 +789,16 @@ export class AvailabilityComponent implements OnInit {
     blockEl.addEventListener('pointermove', onMove);
     blockEl.addEventListener('pointerup', onUp);
     blockEl.addEventListener('pointercancel', onUp);
+  }
+
+  private _hasMoveConflict(excludeId: number, colIndex: number, startTime: string, endTime: string): boolean {
+    const startMin = timeToMin(startTime);
+    const endMin = timeToMin(endTime);
+    return this.blocksForColumn(colIndex).some(b =>
+      b.id !== excludeId &&
+      startMin < timeToMin(b.endTime) &&
+      timeToMin(b.startTime) < endMin,
+    );
   }
 
   startDragSelect(event: PointerEvent, colIndex: number): void {
@@ -645,7 +825,9 @@ export class AvailabilityComponent implements OnInit {
       const currentMin = this._yToSnappedMin(e.clientY - colRect.top, ROW_H);
       if (currentMin !== anchorMin) dragMoved = true;
       const lo = Math.max(8 * 60, Math.min(anchorMin, currentMin));
-      const hi = Math.min(20 * 60, Math.max(anchorMin + minDuration, currentMin));
+      const rawHi = Math.min(20 * 60, Math.max(lo + minDuration, currentMin));
+      const sessions = Math.max(1, Math.round((rawHi - lo) / minDuration));
+      const hi = Math.min(20 * 60, lo + sessions * minDuration);
       this.dragSelection.set({ colIndex, startTime: minToTime(lo), endTime: minToTime(hi) });
     };
 
@@ -668,6 +850,7 @@ export class AvailabilityComponent implements OnInit {
       this.editorFrequency.set('weekly');
       this.editorStartTime.set(sel.startTime);
       this.editorEndTime.set(sel.endTime);
+      this._snapTimeRange(this.editorSessionDuration());
     };
 
     hcell.addEventListener('pointermove', onMove);
@@ -711,8 +894,9 @@ export class AvailabilityComponent implements OnInit {
 
   resetEditor(): void {
     this.selectedBlockId.set(null);
+    this.selectedAppointment.set(null);
     this.selectedServiceIds.set(new Set());
-    this.editorModality.set(Modality.LOCAL);
+    this.editorModality.set(Modality.ANY);
     this.editorFrequency.set('weekly');
     this.selectedWeekdays.set(new Set());
     this.editorDate.set('');
@@ -733,6 +917,8 @@ export class AvailabilityComponent implements OnInit {
   }
 
   setEditorSessionDuration(dur: 30 | 60 | 90): void {
+    const sel = this.selectedBlock();
+    if (sel && this.hasBookings(sel)) return;
     this.editorSessionDuration.set(dur);
     this._snapTimeRange(dur);
   }
@@ -771,17 +957,12 @@ export class AvailabilityComponent implements OnInit {
 
     if (existingId !== null) {
       const existing = this.blocks().find(b => b.id === existingId);
-      if (!existing || existing.backendId === null) return;
+      if (!existing || existing.backendSlots.length === 0) return;
 
-      // When converting a recurring block to once, use editorDate as the startDate
-      // (recurring blocks have no startDate of their own)
       const effectiveStartDate = !isRecurring
         ? (existing.startDate ?? this.editorDate())
         : existing.startDate;
 
-      const payload = this.buildPayload(
-        selectedSvcs, isRecurring, existing.weekdays[0], effectiveStartDate,
-      );
       const updated: TherapistBlock = {
         ...existing,
         services: selectedSvcs,
@@ -795,16 +976,21 @@ export class AvailabilityComponent implements OnInit {
         local: this.editorModality() !== Modality.REMOTE ? this.editorLocal() : undefined,
       };
 
+      if (!this.validateHonorsBookings(updated)) {
+        this.snackbarService.openSnackBar({
+          message: 'Esta alteração deixaria sessão(ões) reservada(s) sem disponibilidade. Ajuste mantendo as sessões marcadas.',
+        });
+        return;
+      }
+
       this.blocks.update(bs => bs.map(b => b.id === existingId ? updated : b));
-      this.apiService.updateAvailability(existing.backendId, payload).subscribe({
-        next: (res) => this.blocks.update(bs => bs.map(b =>
-          b.id === existingId ? { ...updated, ...this.extractBlockFields(res) } : b,
-        )),
-        error: (e) => {
-          console.error('updateAvailability error', e);
-          this.blocks.update(bs => bs.map(b => b.id === existingId ? existing : b));
-        },
-      });
+      this._invalidateSchedulingCache();
+
+      if (this.hasBookings(existing)) {
+        this._syncBookedBlock(existing, updated, existingId);
+      } else {
+        this._deleteAndRecreateBlock(existing, updated, existingId);
+      }
     } else {
       if (this.previewBlocks().some(p => p.hasConflict)) {
         this.snackbarService.openSnackBar({
@@ -813,6 +999,7 @@ export class AvailabilityComponent implements OnInit {
         return;
       }
 
+      this._invalidateSchedulingCache();
       if (isRecurring) {
         [...this.selectedWeekdays()].forEach(wd => this.createSingleBlock(selectedSvcs, true, wd));
         this.resetEditor();
@@ -828,12 +1015,15 @@ export class AvailabilityComponent implements OnInit {
     const id = this.selectedBlockId();
     if (id === null) return;
     const block = this.blocks().find(b => b.id === id);
+    if (block && this.hasBookings(block)) return;
     this.blocks.update(bs => bs.filter(b => b.id !== id));
+    this._invalidateSchedulingCache();
     this.resetEditor();
     this.closeSheet();
 
-    if (block?.backendId != null) {
-      this.apiService.deleteAvailability(block.backendId).subscribe({
+    if (block && block.backendSlots.length > 0) {
+      const deleteOps = block.backendSlots.map(s => this.apiService.deleteAvailability(s.backendId));
+      forkJoin(deleteOps).subscribe({
         error: (e) => {
           console.error('deleteAvailability error', e);
           if (block) this.blocks.update(bs => [...bs, block]);
@@ -866,9 +1056,11 @@ export class AvailabilityComponent implements OnInit {
       const rect = this._resizeColEl.getBoundingClientRect();
       const endMinRaw = ((e.clientY - rect.top + 3) / this._resizeRowH + 8) * 60;
       const dur = this._resizeBlock.sessionDuration;
-      const snapped = Math.round(endMinRaw / dur) * dur;
       const startMin = timeToMin(this._resizeBlock.startTime);
-      const clamped = Math.max(startMin + dur, Math.min(20 * 60, snapped));
+      const sessions = Math.max(1, Math.round((endMinRaw - startMin) / dur));
+      const snapped = startMin + sessions * dur;
+      const floorMin = this.lastBookedEndMin(this._resizeBlock) ?? (startMin + dur);
+      const clamped = Math.max(floorMin, Math.min(20 * 60, snapped));
       const next = minToTime(clamped);
       if (next !== this.resizeLiveEndTime()) {
         this._resizeDragged = true;
@@ -899,20 +1091,159 @@ export class AvailabilityComponent implements OnInit {
       this.blocks.update(bs => bs.map(bl => bl.id === b.id ? updated : bl));
       if (this.selectedBlockId() === b.id) this.editorEndTime.set(newEnd);
 
-      if (b.backendId !== null) {
-        const startDate = b.isRecurring && b.weekdays[0]
+      if (b.backendSlots.length > 0) {
+        const dur = b.sessionDuration;
+        const oldEndMin = timeToMin(b.endTime);
+        const newEndMin = timeToMin(newEnd);
+        const date = b.isRecurring && b.weekdays[0]
           ? this.dateForWeekday(b.weekdays[0])
           : (b.startDate ?? '');
-        const payload: AvailabilityPayload = {
-          professionalServiceIds: b.services.map(s => s.id),
-          startDate,
-          startTime: b.startTime,
-          endTime: newEnd,
-          isRecurring: b.isRecurring,
-        };
-        this.apiService.updateAvailability(b.backendId, payload).subscribe({
-          error: () => this.blocks.update(bs => bs.map(bl => bl.id === b.id ? b : bl)),
-        });
+
+        if (newEndMin > oldEndMin) {
+          const newSlotTimes = generateSlots(b.endTime, newEnd, dur);
+          const createOps = newSlotTimes.map(t =>
+            this.apiService.createAvailability(this.buildSlotPayload(
+              b.services, b.isRecurring, date, t, minToTime(timeToMin(t) + dur),
+            ))
+          );
+          forkJoin(createOps).subscribe({
+            next: (results) => {
+              const newSlots: BackendSlot[] = results.map((res, i) => ({
+                slotTime: newSlotTimes[i], backendId: res.id, isBooked: false,
+              }));
+              this.blocks.update(bs => bs.map(bl =>
+                bl.id === b.id ? { ...bl, backendSlots: [...bl.backendSlots, ...newSlots] } : bl,
+              ));
+              this._invalidateSchedulingCache();
+            },
+            error: () => this.blocks.update(bs => bs.map(bl => bl.id === b.id ? b : bl)),
+          });
+        } else if (newEndMin < oldEndMin) {
+          const targetCount = generateSlots(b.startTime, newEnd, dur).length;
+          const slotsToRemove = b.backendSlots.slice(targetCount);
+          if (slotsToRemove.length > 0) {
+            const deleteOps = slotsToRemove.map(s => this.apiService.deleteAvailability(s.backendId));
+            forkJoin(deleteOps).subscribe({
+              next: () => {
+                this.blocks.update(bs => bs.map(bl =>
+                  bl.id === b.id ? { ...bl, backendSlots: bl.backendSlots.slice(0, targetCount) } : bl,
+                ));
+                this._invalidateSchedulingCache();
+              },
+              error: () => this.blocks.update(bs => bs.map(bl => bl.id === b.id ? b : bl)),
+            });
+          }
+        }
+      }
+    };
+
+    handle.addEventListener('pointermove', onMove);
+    handle.addEventListener('pointerup', onUp);
+    handle.addEventListener('pointercancel', onUp);
+  }
+
+  startResizeTop(event: PointerEvent, block: TherapistBlock, rowH = ROW_H): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const handle = event.currentTarget as HTMLElement;
+    const colEl = (handle.closest('.daycol') ?? handle.closest('.m-tl')) as HTMLElement | null;
+    if (!colEl) return;
+
+    this._resizeTopBlock = block;
+    this._resizeTopColEl = colEl;
+    this._resizeTopRowH = rowH;
+    this._resizeTopDragged = false;
+    this.resizingTopBlockId.set(block.id);
+    this.resizeLiveStartTime.set(block.startTime);
+
+    handle.setPointerCapture(event.pointerId);
+
+    const onMove = (e: PointerEvent) => {
+      if (!this._resizeTopBlock || !this._resizeTopColEl) return;
+      const rect = this._resizeTopColEl.getBoundingClientRect();
+      const startMinRaw = ((e.clientY - rect.top) / this._resizeTopRowH + 8) * 60;
+      const dur = this._resizeTopBlock.sessionDuration;
+      const endMin = timeToMin(this._resizeTopBlock.endTime);
+      const sessions = Math.max(1, Math.round((endMin - startMinRaw) / dur));
+      const snapped = endMin - sessions * dur;
+      const ceilMin = this.firstBookedStartMin(this._resizeTopBlock)
+        ?? (timeToMin(this._resizeTopBlock.endTime) - dur);
+      const clamped = Math.max(8 * 60, Math.min(ceilMin, snapped));
+      const next = minToTime(clamped);
+      if (next !== this.resizeLiveStartTime()) {
+        this._resizeTopDragged = true;
+        this.resizeLiveStartTime.set(next);
+      }
+    };
+
+    const onUp = () => {
+      handle.removeEventListener('pointermove', onMove);
+      handle.removeEventListener('pointerup', onUp);
+      handle.removeEventListener('pointercancel', onUp);
+
+      const b = this._resizeTopBlock;
+      const newStart = this.resizeLiveStartTime();
+      const dragged = this._resizeTopDragged;
+
+      this.resizingTopBlockId.set(null);
+      this._resizeTopBlock = null;
+      this._resizeTopColEl = null;
+      this._resizeTopDragged = false;
+
+      if (!b || !dragged || newStart === b.startTime) return;
+
+      document.addEventListener('click', e => e.stopPropagation(), { once: true, capture: true });
+
+      const updated = { ...b, startTime: newStart };
+      this.blocks.update(bs => bs.map(bl => bl.id === b.id ? updated : bl));
+      if (this.selectedBlockId() === b.id) this.editorStartTime.set(newStart);
+
+      if (b.backendSlots.length > 0) {
+        const dur = b.sessionDuration;
+        const oldStartMin = timeToMin(b.startTime);
+        const newStartMin = timeToMin(newStart);
+        const date = b.isRecurring && b.weekdays[0]
+          ? this.dateForWeekday(b.weekdays[0])
+          : (b.startDate ?? '');
+
+        if (newStartMin < oldStartMin) {
+          // Expanding upward: prepend new free slots
+          const newSlotTimes = generateSlots(newStart, b.startTime, dur);
+          const createOps = newSlotTimes.map(t =>
+            this.apiService.createAvailability(this.buildSlotPayload(
+              b.services, b.isRecurring, date, t, minToTime(timeToMin(t) + dur),
+            ))
+          );
+          forkJoin(createOps).subscribe({
+            next: (results) => {
+              const newSlots: BackendSlot[] = results.map((res, i) => ({
+                slotTime: newSlotTimes[i], backendId: res.id, isBooked: false,
+              }));
+              this.blocks.update(bs => bs.map(bl =>
+                bl.id === b.id ? { ...bl, backendSlots: [...newSlots, ...bl.backendSlots] } : bl,
+              ));
+              this._invalidateSchedulingCache();
+            },
+            error: () => this.blocks.update(bs => bs.map(bl => bl.id === b.id ? b : bl)),
+          });
+        } else if (newStartMin > oldStartMin) {
+          // Shrinking from top: delete leading free slots
+          const removeCount = generateSlots(b.startTime, newStart, dur).length;
+          const leading = b.backendSlots.slice(0, removeCount);
+          if (leading.length > 0) {
+            const deleteOps = leading.map(s => this.apiService.deleteAvailability(s.backendId));
+            forkJoin(deleteOps).subscribe({
+              next: () => {
+                this.blocks.update(bs => bs.map(bl =>
+                  bl.id === b.id ? { ...bl, backendSlots: bl.backendSlots.slice(removeCount) } : bl,
+                ));
+                this._invalidateSchedulingCache();
+              },
+              error: () => this.blocks.update(bs => bs.map(bl => bl.id === b.id ? b : bl)),
+            });
+          }
+        }
       }
     };
 
@@ -1011,8 +1342,9 @@ export class AvailabilityComponent implements OnInit {
       const rect = colEl.getBoundingClientRect();
       const endMinRaw = ((e.clientY - rect.top + 3) / rowH + 8) * 60;
       const dur = this.editorSessionDuration();
-      const snapped = Math.round(endMinRaw / dur) * dur;
       const startMin = timeToMin(preview.startTime);
+      const sessions = Math.max(1, Math.round((endMinRaw - startMin) / dur));
+      const snapped = startMin + sessions * dur;
       const clamped = Math.max(startMin + dur, Math.min(20 * 60, snapped));
       const next = minToTime(clamped);
       if (next !== this.editorEndTime()) {
@@ -1043,10 +1375,12 @@ export class AvailabilityComponent implements OnInit {
   ): void {
     const tempId = ++this._nextId;
     const date = isRecurring && weekday ? this.dateForWeekday(weekday) : (startDate ?? '');
+    const dur = this.editorSessionDuration();
+    const slotTimes = generateSlots(this.editorStartTime(), this.editorEndTime(), dur);
 
     const tempBlock: TherapistBlock = {
       id: tempId,
-      backendId: null,
+      backendSlots: slotTimes.map(t => ({ slotTime: t, backendId: -1, isBooked: false })),
       services,
       modality: this.editorModality(),
       isRecurring,
@@ -1054,18 +1388,26 @@ export class AvailabilityComponent implements OnInit {
       startDate: isRecurring ? undefined : date,
       startTime: this.editorStartTime(),
       endTime: this.editorEndTime(),
-      sessionDuration: this.editorSessionDuration(),
+      sessionDuration: dur,
       local: this.editorModality() !== Modality.REMOTE ? this.editorLocal() : undefined,
     };
 
     this.blocks.update(bs => [...bs, tempBlock]);
     this.selectedBlockId.set(tempId);
 
-    const payload = this.buildPayload(services, isRecurring, weekday, startDate);
-    this.apiService.createAvailability(payload).subscribe({
-      next: (res) => {
+    const createOps = slotTimes.map(t =>
+      this.apiService.createAvailability(
+        this.buildSlotPayload(services, isRecurring, date, t, minToTime(timeToMin(t) + dur)),
+      )
+    );
+
+    forkJoin(createOps).subscribe({
+      next: (results) => {
+        const newSlots: BackendSlot[] = results.map((res, i) => ({
+          slotTime: slotTimes[i], backendId: res.id, isBooked: false,
+        }));
         this.blocks.update(bs => bs.map(b =>
-          b.id === tempId ? { ...b, backendId: res.id } : b,
+          b.id === tempId ? { ...b, backendSlots: newSlots } : b,
         ));
       },
       error: (e) => {
@@ -1076,18 +1418,18 @@ export class AvailabilityComponent implements OnInit {
     });
   }
 
-  private buildPayload(
+  private buildSlotPayload(
     services: ProfessionalService[],
     isRecurring: boolean,
-    weekday?: DayOfWeek,
-    startDate?: string,
+    date: string,
+    slotStart: string,
+    slotEnd: string,
   ): AvailabilityPayload {
-    const date = isRecurring && weekday ? this.dateForWeekday(weekday) : (startDate ?? '');
     return {
       professionalServiceIds: services.map(s => s.id),
       startDate: date,
-      startTime: this.editorStartTime(),
-      endTime: this.editorEndTime(),
+      startTime: slotStart,
+      endTime: slotEnd,
       isRecurring,
     };
   }
@@ -1099,33 +1441,144 @@ export class AvailabilityComponent implements OnInit {
     return toKey(d);
   }
 
-  private mapAvailabilities(avails: AvailabilityModel[]): TherapistBlock[] {
-    return avails.map(a => {
-      const dow = BACKEND_DOW_MAP[a.dayOfWeek as unknown as string] ?? DayOfWeek.MONDAY;
-      return {
-        id: ++this._nextId,
-        backendId: a.id,
-        services: a.services,
-        modality: this.deriveModality(a.services),
-        isRecurring: a.isRecurring,
-        weekdays: a.isRecurring ? [dow] : [],
-        startDate: a.isRecurring ? undefined : a.startDate,
-        startTime: a.startTime.slice(0, 5),
-        endTime: a.endTime.slice(0, 5),
-        sessionDuration: 60 as const,
-      };
+  private groupAvailabilitiesIntoBlocks(avails: AvailabilityModel[]): TherapistBlock[] {
+    if (avails.length === 0) return [];
+
+    const sorted = [...avails].sort((a, b) => {
+      const gA = a.isRecurring ? `R-${a.dayOfWeek}` : `S-${a.startDate}`;
+      const gB = b.isRecurring ? `R-${b.dayOfWeek}` : `S-${b.startDate}`;
+      const gc = gA.localeCompare(gB);
+      return gc !== 0 ? gc : a.startTime.localeCompare(b.startTime);
     });
+
+    const blocks: TherapistBlock[] = [];
+    let group: AvailabilityModel[] = [];
+
+    const flush = () => {
+      if (group.length > 0) { blocks.push(this._avGroupToBlock(group)); group = []; }
+    };
+
+    for (const av of sorted) {
+      if (group.length === 0) {
+        group.push(av);
+      } else {
+        const last = group[group.length - 1];
+        const sameDay = av.isRecurring === last.isRecurring &&
+          (av.isRecurring ? av.dayOfWeek === last.dayOfWeek : av.startDate === last.startDate);
+        if (sameDay && av.startTime === last.endTime && this._sameServiceSet(av.services, last.services)) {
+          group.push(av);
+        } else {
+          flush();
+          group.push(av);
+        }
+      }
+    }
+    flush();
+    return blocks;
   }
 
-  private extractBlockFields(res: AvailabilityModel): Partial<TherapistBlock> {
-    const dow = BACKEND_DOW_MAP[res.dayOfWeek as unknown as string] ?? DayOfWeek.MONDAY;
+  private _avGroupToBlock(avails: AvailabilityModel[]): TherapistBlock {
+    const first = avails[0];
+    const last = avails[avails.length - 1];
+    const firstStart = stripSec(first.startTime);
+    const firstEnd = stripSec(first.endTime);
+    const slotDurMin = timeToMin(firstEnd) - timeToMin(firstStart);
+    const sessionDuration = (slotDurMin === 30 ? 30 : slotDurMin === 90 ? 90 : 60) as 30 | 60 | 90;
+    const dow = BACKEND_DOW_MAP[first.dayOfWeek as unknown as string] ?? DayOfWeek.MONDAY;
     return {
-      backendId: res.id,
-      startTime: res.startTime.slice(0, 5),
-      endTime: res.endTime.slice(0, 5),
-      startDate: res.isRecurring ? undefined : res.startDate,
-      weekdays: res.isRecurring ? [dow] : [],
+      id: ++this._nextId,
+      backendSlots: avails.map(a => ({ slotTime: stripSec(a.startTime), backendId: a.id, isBooked: a.isBooked })),
+      services: first.services,
+      modality: this.deriveModality(first.services),
+      isRecurring: first.isRecurring,
+      weekdays: first.isRecurring ? [dow] : [],
+      startDate: first.isRecurring ? undefined : first.startDate,
+      startTime: firstStart,
+      endTime: stripSec(last.endTime),
+      sessionDuration,
     };
+  }
+
+  private _invalidateSchedulingCache(): void {
+    this.schedulingService.schedulingForm.controls[SchedulingFormControls.SELECTED_SERVICE].setValue(null);
+    this.schedulingService.clearChainedRelatedFields(SchedulingSteps.SERVICE_SELECTION);
+  }
+
+  private _sameServiceSet(a: ProfessionalService[], b: ProfessionalService[]): boolean {
+    if (a.length !== b.length) return false;
+    const ids = new Set(a.map(s => s.id));
+    return b.every(s => ids.has(s.id));
+  }
+
+  private _syncBookedBlock(existing: TherapistBlock, updated: TherapistBlock, blockId: number): void {
+    const dur = updated.sessionDuration;
+    const date = updated.isRecurring && updated.weekdays[0]
+      ? this.dateForWeekday(updated.weekdays[0])
+      : (updated.startDate ?? '');
+
+    const updateOps = existing.backendSlots.map(s =>
+      this.apiService.updateAvailability(s.backendId, this.buildSlotPayload(
+        updated.services, updated.isRecurring, date, s.slotTime, minToTime(timeToMin(s.slotTime) + dur),
+      ))
+    );
+    if (updateOps.length > 0) {
+      forkJoin(updateOps).subscribe({
+        error: () => this.blocks.update(bs => bs.map(b => b.id === blockId ? existing : b)),
+      });
+    }
+
+    const oldEndMin = timeToMin(existing.endTime);
+    const newEndMin = timeToMin(updated.endTime);
+    if (newEndMin > oldEndMin) {
+      const newSlotTimes = generateSlots(existing.endTime, updated.endTime, dur);
+      const createOps = newSlotTimes.map(t =>
+        this.apiService.createAvailability(this.buildSlotPayload(
+          updated.services, updated.isRecurring, date, t, minToTime(timeToMin(t) + dur),
+        ))
+      );
+      forkJoin(createOps).subscribe({
+        next: (results) => {
+          const newSlots: BackendSlot[] = results.map((res, i) => ({
+            slotTime: newSlotTimes[i], backendId: res.id, isBooked: false,
+          }));
+          this.blocks.update(bs => bs.map(b =>
+            b.id === blockId ? { ...b, backendSlots: [...b.backendSlots, ...newSlots] } : b,
+          ));
+        },
+      });
+    }
+  }
+
+  private _deleteAndRecreateBlock(existing: TherapistBlock, updated: TherapistBlock, blockId: number): void {
+    const dur = updated.sessionDuration;
+    const date = updated.isRecurring && updated.weekdays[0]
+      ? this.dateForWeekday(updated.weekdays[0])
+      : (updated.startDate ?? '');
+    const slotTimes = generateSlots(updated.startTime, updated.endTime, dur);
+
+    const deleteOps = existing.backendSlots.map(s => this.apiService.deleteAvailability(s.backendId));
+    (deleteOps.length > 0 ? forkJoin(deleteOps) : of([])).subscribe({
+      next: () => {
+        if (slotTimes.length === 0) return;
+        const createOps = slotTimes.map(t =>
+          this.apiService.createAvailability(this.buildSlotPayload(
+            updated.services, updated.isRecurring, date, t, minToTime(timeToMin(t) + dur),
+          ))
+        );
+        forkJoin(createOps).subscribe({
+          next: (results) => {
+            const newSlots: BackendSlot[] = results.map((res, i) => ({
+              slotTime: slotTimes[i], backendId: res.id, isBooked: false,
+            }));
+            this.blocks.update(bs => bs.map(b =>
+              b.id === blockId ? { ...b, backendSlots: newSlots } : b,
+            ));
+          },
+          error: () => this.blocks.update(bs => bs.map(b => b.id === blockId ? existing : b)),
+        });
+      },
+      error: () => this.blocks.update(bs => bs.map(b => b.id === blockId ? existing : b)),
+    });
   }
 
   private deriveModality(services: ProfessionalService[]): Modality {
@@ -1136,6 +1589,259 @@ export class AvailabilityComponent implements OnInit {
     if (hasLocal && !hasRemote) return Modality.LOCAL;
     if (!hasLocal && hasRemote) return Modality.REMOTE;
     return Modality.ANY;
+  }
+
+  // ─ Appointment / slot helpers ────────────────────────────────────────────────
+
+  appointmentsForBlock(block: TherapistBlock): Appointment[] {
+    const backendIds = new Set(block.backendSlots.filter(s => s.backendId > 0).map(s => s.backendId));
+    return this.appointments().filter(a => {
+      if (backendIds.size > 0 && backendIds.has(a.availabilityId)) return true;
+      // Legacy fallback: match by day/time range
+      const sameDay = block.isRecurring
+        ? (a.isRecurring && BACKEND_DOW_MAP[a.dayOfWeek as unknown as string] === block.weekdays[0])
+        : (a.startDate === block.startDate);
+      return sameDay && a.startTime >= block.startTime && a.startTime < block.endTime;
+    });
+  }
+
+  bookedSlotsForBlock(block: TherapistBlock): SlotInfo[] {
+    const slots = generateSlots(block.startTime, block.endTime, block.sessionDuration);
+    // Per-slot mode: one backendSlot per generated slot
+    if (block.backendSlots.length === slots.length && block.backendSlots.every(s => s.backendId > 0)) {
+      return block.backendSlots.map((s, i) => {
+        const appointment = this.appointments().find(a => a.availabilityId === s.backendId);
+        return { time: s.slotTime, booked: s.isBooked || !!appointment, appointment };
+      });
+    }
+    // Legacy/transition mode: match appointments by slot start time
+    const appts = this.appointmentsForBlock(block);
+    return slots.map(time => {
+      const appointment = appts.find(a => a.startTime === time);
+      return { time, booked: !!appointment, appointment };
+    });
+  }
+
+  bookedCount(block: TherapistBlock): number {
+    return this.bookedSlotsForBlock(block).filter(s => s.booked).length;
+  }
+
+  hasBookings(block: TherapistBlock): boolean {
+    return this.bookedCount(block) > 0;
+  }
+
+  lastBookedEndMin(block: TherapistBlock): number | null {
+    const booked = this.bookedSlotsForBlock(block).filter(s => s.booked);
+    if (booked.length === 0) return null;
+    const lastStart = Math.max(...booked.map(s => timeToMin(s.time)));
+    return lastStart + block.sessionDuration;
+  }
+
+  firstBookedStartMin(block: TherapistBlock): number | null {
+    const booked = this.bookedSlotsForBlock(block).filter(s => s.booked);
+    if (booked.length === 0) return null;
+    return Math.min(...booked.map(s => timeToMin(s.time)));
+  }
+
+  canResizeTop(block: TherapistBlock): boolean {
+    const slots = this.bookedSlotsForBlock(block);
+    return slots.length > 0 && !slots[0].booked;
+  }
+
+  blockResizeTopPx(block: TherapistBlock, liveStartTime: string, rowH = ROW_H): number {
+    return hourRowIdx(liveStartTime) * rowH + 3;
+  }
+
+  blockResizeTopHeightPx(block: TherapistBlock, liveStartTime: string, rowH = ROW_H): number {
+    return (hourRowIdx(block.endTime) - hourRowIdx(liveStartTime)) * rowH - 6;
+  }
+
+  blockIsDense(block: TherapistBlock, rowH = ROW_H): boolean {
+    const height = this.blockHeightPx(block, rowH);
+    const slotCount = this.blockSlotCount(block);
+    return slotCount > 0 && (height / slotCount) < 30;
+  }
+
+  resizeFloorHeightPx(block: TherapistBlock, liveEndTime: string, rowH = ROW_H): number {
+    const floor = this.lastBookedEndMin(block);
+    if (floor === null) return 0;
+    const liveEndMin = timeToMin(liveEndTime);
+    return Math.max(0, (liveEndMin - floor)) / 60 * rowH;
+  }
+
+  slotServiceName(appt: Appointment): string {
+    const svc = this.services().find(s => s.id === appt.professionalServiceId);
+    return svc ? this.serviceDisplayName(svc.name) : '';
+  }
+
+  slotPatientName(appt: Appointment): string {
+    return appt.clientName ?? `Paciente #${appt.clientId}`;
+  }
+
+  slotPatientFirstName(appt: Appointment): string {
+    return this.slotPatientName(appt).split(' ')[0];
+  }
+
+  slotPatientInitials(appt: Appointment): string {
+    return this.slotPatientName(appt)
+      .split(' ').filter(Boolean).slice(0, 2).map(n => n[0].toUpperCase()).join('');
+  }
+
+  patientAvatarClass(idx: number): string {
+    return `c${idx % 4}`;
+  }
+
+  bookedSvcIds(block: TherapistBlock): Set<number> {
+    return new Set(this.appointmentsForBlock(block).map(a => a.professionalServiceId));
+  }
+
+  bookedModalityFixed(block: TherapistBlock): boolean {
+    return this.appointmentsForBlock(block).some(a => {
+      const m = String(a.modality);
+      return m === 'LOCAL' || m === 'Presencial' || m === 'REMOTE' || m === 'Remoto';
+    });
+  }
+
+  apptModalityLabel(appt: Appointment): string {
+    const m = String(appt.modality);
+    if (m === 'LOCAL' || m === 'Presencial') return 'presencial';
+    if (m === 'REMOTE' || m === 'Remoto') return 'remoto';
+    return '';
+  }
+
+  apptModalityDisplay(appt: Appointment): string {
+    const m = String(appt.modality);
+    if (m === 'LOCAL' || m === 'Presencial') return 'Presencial';
+    if (m === 'REMOTE' || m === 'Remoto') return 'Remoto';
+    return 'Qualquer';
+  }
+
+  apptDateLabel(appt: Appointment): string {
+    if (appt.isRecurring) {
+      const dow = BACKEND_DOW_MAP[appt.dayOfWeek as unknown as string];
+      const idx = COL_TO_DOW.indexOf(dow);
+      const day = idx >= 0 ? PT_DOW_LONG[idx] : '';
+      return day.charAt(0).toUpperCase() + day.slice(1);
+    }
+    if (appt.startDate) {
+      const d = new Date(appt.startDate + 'T00:00:00');
+      const dow = PT_DOW_LONG[(d.getDay() + 6) % 7];
+      return `${dow.charAt(0).toUpperCase() + dow.slice(1)}, ${d.getDate()} ${PT_MONTHS[d.getMonth()]}`;
+    }
+    return '';
+  }
+
+  selectSlot(event: Event, appt: Appointment): void {
+    event.stopPropagation();
+    this.selectedAppointment.set(appt);
+  }
+
+  clearSelectedAppointment(): void {
+    this.selectedAppointment.set(null);
+  }
+
+  cancelAppointment(appt: Appointment): void {
+    this.apiService.deleteAppointment(appt.id).subscribe({
+      next: () => {
+        this.appointments.update(list => list.filter(a => a.id !== appt.id));
+        this.blocks.update(bs => bs.map(b => ({
+          ...b,
+          backendSlots: b.backendSlots.map(s =>
+            s.backendId === appt.availabilityId ? { ...s, isBooked: false } : s,
+          ),
+        })));
+        this.selectedAppointment.set(null);
+        this.snackbarService.openSnackBar({ message: 'Sessão cancelada com sucesso.' });
+      },
+      error: () => {
+        this.snackbarService.openSnackBar({ message: 'Erro ao cancelar a sessão. Tente novamente.' });
+      },
+    });
+  }
+
+  removeSlot(event: Event, block: TherapistBlock, slotIndex: number): void {
+    event.stopPropagation();
+    const slot = block.backendSlots[slotIndex];
+    if (!slot || slot.isBooked) return;
+
+    this.apiService.deleteAvailability(slot.backendId).subscribe({
+      next: () => {
+        this._invalidateSchedulingCache();
+        const remaining = block.backendSlots.filter((_, i) => i !== slotIndex);
+
+        if (remaining.length === 0) {
+          this.blocks.update(bs => bs.filter(b => b.id !== block.id));
+          if (this.selectedBlockId() === block.id) this.resetEditor();
+          return;
+        }
+
+        // Group remaining slots into contiguous runs (gap = not consecutive by duration)
+        const dur = block.sessionDuration;
+        const groups: BackendSlot[][] = [];
+        let current: BackendSlot[] = [remaining[0]];
+        for (let i = 1; i < remaining.length; i++) {
+          const gap = timeToMin(remaining[i].slotTime) - timeToMin(remaining[i - 1].slotTime);
+          if (gap === dur) {
+            current.push(remaining[i]);
+          } else {
+            groups.push(current);
+            current = [remaining[i]];
+          }
+        }
+        groups.push(current);
+
+        if (groups.length === 1) {
+          // Slot was at start or end — just shrink the block
+          const newSlots = groups[0];
+          const newStart = newSlots[0].slotTime;
+          const newEnd = minToTime(timeToMin(newSlots[newSlots.length - 1].slotTime) + dur);
+          this.blocks.update(bs => bs.map(b => b.id === block.id
+            ? { ...b, startTime: newStart, endTime: newEnd, backendSlots: newSlots }
+            : b,
+          ));
+          if (this.selectedBlockId() === block.id) {
+            this.editorStartTime.set(newStart);
+            this.editorEndTime.set(newEnd);
+          }
+        } else {
+          // Slot was in the middle — split into multiple blocks
+          const newBlocks: TherapistBlock[] = groups.map(group => ({
+            ...block,
+            id: ++this._nextId,
+            startTime: group[0].slotTime,
+            endTime: minToTime(timeToMin(group[group.length - 1].slotTime) + dur),
+            backendSlots: group,
+          }));
+          this.blocks.update(bs => [
+            ...bs.filter(b => b.id !== block.id),
+            ...newBlocks,
+          ]);
+          // Close editor so both resulting blocks are visible on the calendar
+          if (this.selectedBlockId() === block.id) {
+            this.resetEditor();
+          }
+        }
+        this.snackbarService.openSnackBar({ message: 'Horário removido.' });
+      },
+      error: () => {
+        this.snackbarService.openSnackBar({ message: 'Erro ao remover o horário. Tente novamente.' });
+      },
+    });
+  }
+
+  rescheduleAppointment(): void {
+    this.snackbarService.openSnackBar({ message: 'Funcionalidade em construção.' });
+  }
+
+  private validateHonorsBookings(updated: TherapistBlock): boolean {
+    const appts = this.appointmentsForBlock(updated);
+    if (appts.length === 0) return true;
+    const slots = new Set(generateSlots(updated.startTime, updated.endTime, updated.sessionDuration));
+    const svcIds = new Set(updated.services.map(s => s.id));
+    return appts.every(a =>
+      slots.has(a.startTime) &&
+      (a.professionalServiceId == null || svcIds.has(a.professionalServiceId)),
+    );
   }
 
   // ─ Mobile sheet ─────────────────────────────────────────────────────────────
