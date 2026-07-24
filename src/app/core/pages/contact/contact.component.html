@@ -14,7 +14,7 @@
 
       <div class="field" [class.is-error]="isError('telefone')">
         <label for="telefone" class="field-label">Telefone:</label>
-        <input id="telefone" type="tel" class="field-input" formControlName="telefone" placeholder="+351 915 784 896" />
+        <input id="telefone" type="tel" class="field-input" formControlName="telefone" [maskito]="phoneMask" placeholder="351 915 784 896" />
       </div>
 
       <div class="field" [class.is-error]="isError('assunto')">

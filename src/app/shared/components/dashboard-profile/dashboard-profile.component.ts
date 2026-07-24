@@ -1,6 +1,8 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MaskitoDirective } from '@maskito/angular';
+import { MaskitoOptions } from '@maskito/core';
 import { FormService } from '../../../core/services/form.service';
 import { SessionService } from '../../services/session.service';
 import { UserService } from '../../services/user.service';
@@ -13,10 +15,11 @@ import { UpdateProfilePayload } from '../../models/update-profile-payload.model'
 import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog.component';
 import { User } from '../../../auth/user.model';
 import {getEnumKeyByValue} from '../../utils/getEnumKeyByValue';
+import digitsOnlyMask from '../../masks/digits-only.mask';
 
 @Component({
   selector: 'app-dashboard-profile',
-  imports: [ReactiveFormsModule, MatDialogModule],
+  imports: [ReactiveFormsModule, MatDialogModule, MaskitoDirective],
   templateUrl: './dashboard-profile.component.html',
   styleUrl: './dashboard-profile.component.scss',
 })
@@ -31,6 +34,7 @@ export class DashboardProfileComponent implements OnInit {
   readonly genders = Object.values(Genders);
   readonly maxBirthdate = (() => { const d = new Date(); d.setFullYear(d.getFullYear() - 18); return d.toISOString().slice(0, 10); })();
   readonly minDate = new Date(new Date().getFullYear() - 120, 0, 1).toISOString().slice(0, 10);
+  readonly phoneMask: MaskitoOptions = digitsOnlyMask;
   readonly user = this.sessionService.user;
 
   readonly userInitials = computed(() => {

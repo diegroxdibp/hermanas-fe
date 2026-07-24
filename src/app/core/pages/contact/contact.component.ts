@@ -1,15 +1,19 @@
 import { Component } from '@angular/core';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
+import { MaskitoDirective } from '@maskito/angular';
+import { MaskitoOptions } from '@maskito/core';
 import { NavigationService } from '../../../shared/services/navigation.service';
 import { Pages } from '../../../shared/enums/pages.enum';
+import digitsOnlyMask from '../../../shared/masks/digits-only.mask';
 
 @Component({
   selector: 'app-contact',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, MaskitoDirective],
   templateUrl: './contact.component.html',
   styleUrl: './contact.component.scss',
 })
 export class ContactComponent {
+  readonly phoneMask: MaskitoOptions = digitsOnlyMask;
   sent = false;
 
   form = new FormGroup({

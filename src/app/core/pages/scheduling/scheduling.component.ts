@@ -19,7 +19,7 @@ import { Professional } from '../../../shared/models/get-professional-by-service
 import { ProfessionalService } from '../../../shared/models/professional-service.model';
 import { emptyAvailabilityConfiguration } from '../../../shared/models/input-configuration-objects/availability-configuration-object';
 import { parseDate, formatTime } from '../../../shared/utils/date-helper.util';
-import { getAllowedModalities } from '../../../shared/utils/modality-compatibility.util';
+import { getBookableModalities } from '../../../shared/utils/modality-compatibility.util';
 
 const PT_MONTHS = [
   'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
@@ -105,7 +105,11 @@ export class SchedulingComponent implements OnDestroy {
       this.confirmedSlotId.set(null);
       if (prof) {
         this.apiService.getAvailabilitiesByProfessionalId(prof.id).pipe(take(1)).subscribe((av: AvailabilityModel[]) => {
-          this.schedulingService.setAvailabilitites(av);
+          const serviceId = this.selectedService?.id;
+          const forService = serviceId
+            ? av.filter(a => a.services?.some(s => s.id === serviceId))
+            : av;
+          this.schedulingService.setAvailabilitites(forService);
         });
       }
     }));
@@ -144,7 +148,7 @@ export class SchedulingComponent implements OnDestroy {
   }
 
   allowedModalitiesFor(slot: AvailabilityModel): Modality[] {
-    return getAllowedModalities(slot.modality);
+    return getBookableModalities(slot.modality);
   }
 
   isModalityAllowed(m: Modality, slot: AvailabilityModel): boolean {
@@ -229,7 +233,9 @@ export class SchedulingComponent implements OnDestroy {
       this.expandedSlotId.set(null);
     } else {
       this.expandedSlotId.set(id);
-      this.slotModality.set(Modality.ANY);
+      const slot = this.filteredSlots.find(s => s.id === id);
+      const allowed = slot ? this.allowedModalitiesFor(slot) : [Modality.ANY];
+      this.slotModality.set(allowed.includes(Modality.ANY) ? Modality.ANY : allowed[0]);
     }
   }
 

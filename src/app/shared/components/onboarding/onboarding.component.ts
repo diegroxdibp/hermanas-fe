@@ -1,6 +1,8 @@
 import { Component, computed, HostListener, inject, OnInit, signal } from '@angular/core';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
+import { MaskitoDirective } from '@maskito/angular';
+import { MaskitoOptions } from '@maskito/core';
 import { FormService } from '../../../core/services/form.service';
 import { SessionService } from '../../services/session.service';
 import { UserService } from '../../services/user.service';
@@ -9,6 +11,7 @@ import { CountryModel, defaultCountry } from '../../models/country.model';
 import { Countries } from '../../../../assets/countries';
 import { Genders } from '../../enums/genders.enum';
 import { OnboardingResponse } from '../../models/onboarding-response.model';
+import digitsOnlyMask from '../../masks/digits-only.mask';
 
 const PT_MONTHS = [
   'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
@@ -17,11 +20,13 @@ const PT_MONTHS = [
 
 @Component({
   selector: 'app-onboarding',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, MaskitoDirective],
   templateUrl: './onboarding.component.html',
   styleUrl: './onboarding.component.scss',
 })
 export class OnboardingComponent implements OnInit {
+  readonly phoneMask: MaskitoOptions = digitsOnlyMask;
+
   private readonly formService = inject(FormService);
   private readonly sessionService = inject(SessionService);
   private readonly userService = inject(UserService);

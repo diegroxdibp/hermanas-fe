@@ -83,7 +83,7 @@
         </div>
         <div class="phone-input-wrap">
           <span class="dial-code">+{{ selectedCountry.InternationalAreaCode }}</span>
-          <input type="tel" [formControl]="phoneCtrl" placeholder="000 000 000" inputmode="numeric" pattern="[0-9]*" />
+          <input type="tel" [formControl]="phoneCtrl" [maskito]="phoneMask" placeholder="000 000 000" inputmode="numeric" pattern="[0-9]*" />
         </div>
       </div>
     </div>

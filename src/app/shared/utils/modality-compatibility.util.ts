@@ -19,6 +19,19 @@ export function isModalityCompatible(serviceModality: string, candidate: Modalit
   return getAllowedModalities(serviceModality).includes(candidate);
 }
 
+// Given an availability slot's configured modality, returns the concrete
+// modality options a patient can pick when booking it. Unlike
+// getAllowedModalities (which checks whether a *service* stays eligible under
+// a chosen block modality, where ANY is a valid match either way), a
+// LOCAL/REMOTE-only slot only ever produces a session of that one modality -
+// "Qualquer" isn't itself a bookable outcome, so it must not appear here.
+export function getBookableModalities(slotModality: string): Modality[] {
+  const normalized = normalizeModality(slotModality);
+  if (normalized === Modality.LOCAL) return [Modality.LOCAL];
+  if (normalized === Modality.REMOTE) return [Modality.REMOTE];
+  return [Modality.ANY, Modality.LOCAL, Modality.REMOTE];
+}
+
 // Backend expects the raw SessionModality enum name, not the Portuguese label.
 export function toBackendModality(m: Modality): string {
   if (m === Modality.LOCAL) return 'LOCAL';
