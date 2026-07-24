@@ -1,22 +1,23 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, computed, HostListener, inject, OnInit, signal } from '@angular/core';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FormService } from '../../../core/services/form.service';
 import { SessionService } from '../../services/session.service';
 import { UserService } from '../../services/user.service';
-import { NavigationService } from '../../services/navigation.service';
 import { FormControlsNames } from '../../enums/form-controls-names.enum';
 import { CountryModel, defaultCountry } from '../../models/country.model';
 import { Countries } from '../../../../assets/countries';
 import { Genders } from '../../enums/genders.enum';
 import { OnboardingResponse } from '../../models/onboarding-response.model';
-import { CalendarComponent } from '../calendar/calendar.component';
-import { CalendarConfigurationObject } from '../../models/input-configuration-objects/calendar-configuration-object';
-import { CalendarType } from '../../enums/calendar-type.enum';
+
+const PT_MONTHS = [
+  'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+  'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro',
+];
 
 @Component({
   selector: 'app-onboarding',
-  imports: [ReactiveFormsModule, CalendarComponent],
+  imports: [ReactiveFormsModule],
   templateUrl: './onboarding.component.html',
   styleUrl: './onboarding.component.scss',
 })
@@ -25,11 +26,58 @@ export class OnboardingComponent implements OnInit {
   private readonly sessionService = inject(SessionService);
   private readonly userService = inject(UserService);
   private readonly router = inject(Router);
-  readonly navigationService = inject(NavigationService);
 
   readonly countries = Countries;
   readonly genders = Object.values(Genders);
   error: string | null = null;
+
+  readonly months = PT_MONTHS;
+  readonly weekdays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+
+  private readonly oldestBirthdate = new Date(new Date().getFullYear() - 120, 0, 1);
+  private readonly youngestBirthdate = (() => {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() - 18);
+    return d;
+  })();
+
+  readonly years = (() => {
+    const from = this.oldestBirthdate.getFullYear();
+    const to = this.youngestBirthdate.getFullYear();
+    const list: number[] = [];
+    for (let y = to; y >= from; y--) list.push(y);
+    return list;
+  })();
+
+  readonly calendarOpen = signal(false);
+  readonly calendarViewDate = signal<Date>(this.youngestBirthdate);
+
+  readonly calendarDays = computed(() => {
+    const view = this.calendarViewDate();
+    const year = view.getFullYear();
+    const month = view.getMonth();
+    const offset = new Date(year, month, 1).getDay();
+    const days: Array<{ date: Date; inMonth: boolean; key: string }> = [];
+
+    for (let i = offset - 1; i >= 0; i--) {
+      const d = new Date(year, month, -i);
+      days.push({ date: d, inMonth: false, key: this.toKey(d) });
+    }
+
+    const total = new Date(year, month + 1, 0).getDate();
+    for (let i = 1; i <= total; i++) {
+      const d = new Date(year, month, i);
+      days.push({ date: d, inMonth: true, key: this.toKey(d) });
+    }
+
+    while (days.length < 42) {
+      const prev = days[days.length - 1].date;
+      const d = new Date(prev.getFullYear(), prev.getMonth(), prev.getDate() + 1);
+      days.push({ date: d, inMonth: false, key: this.toKey(d) });
+    }
+
+    return days;
+  });
 
   get nameCtrl(): FormControl {
     return this.formService.onboardingForm.get(FormControlsNames.NAME) as FormControl;
@@ -39,8 +87,16 @@ export class OnboardingComponent implements OnInit {
     return this.formService.onboardingForm.get(FormControlsNames.BIRTHDATE) as FormControl;
   }
 
-  get birthdateCalendarConfig(): CalendarConfigurationObject {
-    return { control: this.birthdateCtrl, calendarType: CalendarType.BIRTHDATE };
+  get selectedBirthdateLabel(): string {
+    return this.birthdateCtrl.value ? this.fmtDate(this.birthdateCtrl.value) : '';
+  }
+
+  get calMonthIndex(): number {
+    return this.calendarViewDate().getMonth();
+  }
+
+  get calYear(): number {
+    return this.calendarViewDate().getFullYear();
   }
 
   get genderCtrl(): FormControl {
@@ -64,11 +120,72 @@ export class OnboardingComponent implements OnInit {
     });
   }
 
+  @HostListener('document:mousedown')
+  onDocClick(): void {
+    this.calendarOpen.set(false);
+  }
+
   onCountryChange(code: string): void {
     const c = Countries.find(x => x.code === code);
     if (c) {
       this.formService.onboardingForm.get(FormControlsNames.PHONE_PREFIX)?.setValue(c);
     }
+  }
+
+  toggleCalendar(): void {
+    this.calendarOpen.update(v => !v);
+  }
+
+  prevMonth(): void {
+    const d = this.calendarViewDate();
+    this.calendarViewDate.set(new Date(d.getFullYear(), d.getMonth() - 1, 1));
+  }
+
+  nextMonth(): void {
+    const d = this.calendarViewDate();
+    this.calendarViewDate.set(new Date(d.getFullYear(), d.getMonth() + 1, 1));
+  }
+
+  onMonthChange(monthIndex: string): void {
+    const d = this.calendarViewDate();
+    this.calendarViewDate.set(new Date(d.getFullYear(), Number(monthIndex), 1));
+  }
+
+  onYearChange(year: string): void {
+    const d = this.calendarViewDate();
+    this.calendarViewDate.set(new Date(Number(year), d.getMonth(), 1));
+  }
+
+  selectDate(key: string): void {
+    if (this.isOutOfRange(key)) return;
+    this.birthdateCtrl.setValue(key);
+    this.calendarOpen.set(false);
+  }
+
+  isToday(date: Date): boolean {
+    const t = new Date();
+    return date.getFullYear() === t.getFullYear() &&
+      date.getMonth() === t.getMonth() &&
+      date.getDate() === t.getDate();
+  }
+
+  isOutOfRange(key: string): boolean {
+    const [y, m, d] = key.split('-').map(Number);
+    const date = new Date(y, m - 1, d);
+    return date < this.oldestBirthdate || date > this.youngestBirthdate;
+  }
+
+  fmtDate(key: string | null): string {
+    if (!key) return '';
+    const [y, m, d] = key.split('-');
+    return `${d}/${m}/${y}`;
+  }
+
+  private toKey(date: Date): string {
+    const y = date.getFullYear();
+    const m = (date.getMonth() + 1).toString().padStart(2, '0');
+    const d = date.getDate().toString().padStart(2, '0');
+    return `${y}-${m}-${d}`;
   }
 
   submit(event: Event): void {

@@ -23,6 +23,8 @@ export class RegisterComponent {
 
   readonly Pages = Pages;
   error: string | null = null;
+  showPassword = false;
+  showConfirmPassword = false;
 
   readonly confirmPasswordCtrl = new FormControl('');
   readonly agreeTermsCtrl = new FormControl(false);
@@ -56,6 +58,14 @@ export class RegisterComponent {
       this.confirmPasswordCtrl.value === this.pwd &&
       !!this.agreeTermsCtrl.value
     );
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
+
+  toggleConfirmPasswordVisibility(): void {
+    this.showConfirmPassword = !this.showConfirmPassword;
   }
 
   signUp(event: Event): void {

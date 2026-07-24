@@ -110,7 +110,8 @@ export class FormService {
   }
 
   onboardingPayload(): OnboardingPayload {
-    const name = this.onboardingForm.get(FormControlsNames.NAME)?.value;
+    const nameCtrl = this.onboardingForm.get(FormControlsNames.NAME);
+    const name = nameCtrl?.value;
 
     const gender = getEnumKeyByValue(
       Genders,
@@ -121,18 +122,24 @@ export class FormService {
     )?.value;
     const phone = this.buildPhoneNumber();
 
-    if (!name) {
-      throw new Error('Invalid name!');
+    if (nameCtrl?.hasError('required')) {
+      throw new Error('Indique o seu nome.');
+    }
+    if (nameCtrl?.hasError('minlength')) {
+      throw new Error('O nome deve ter pelo menos 8 caracteres.');
+    }
+    if (nameCtrl?.hasError('maxlength')) {
+      throw new Error('O nome é demasiado longo.');
     }
     if (!birthDate) {
-      throw new Error('Invalid birth date!');
+      throw new Error('Indique a sua data de nascimento.');
     }
     if (!phone) {
-      throw new Error('Invalid phone!');
+      throw new Error('Indique o seu número de telefone.');
     }
 
     if (!gender) {
-      throw new Error('Invalid gender');
+      throw new Error('Selecione o seu género.');
     }
 
     const payload: OnboardingPayload = {

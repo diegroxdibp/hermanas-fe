@@ -6,6 +6,7 @@ export interface CountryModel {
   continent?: string;
   iso: boolean;
   name: string;
+  namePt: string;
   ISOCode: string;
   InternationalAreaCode: number;
   LengthOfInternationalAreaCode: number;

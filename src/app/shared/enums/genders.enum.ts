@@ -1,7 +1,9 @@
 export enum Genders {
-  CIS_MALE = 'Homem cis',
   CIS_FEMALE = 'Mulher cis',
-  TRANS_MALE = 'Homem trans',
+  CIS_MALE = 'Homem cis',
   TRANS_FEMALE = 'Mulher trans',
+  TRANS_MALE = 'Homem trans',
   NON_BINARY = 'Não binário',
+  OTHER = 'Outros',
+  PREFER_NOT_TO_SAY = 'Não quero declarar',
 }

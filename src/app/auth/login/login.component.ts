@@ -22,6 +22,7 @@ export class LoginComponent {
 
   readonly Pages = Pages;
   error: string | null = null;
+  showPassword = false;
 
   get emailCtrl(): FormControl {
     return this.formService.authForm.get(FormControlsNames.EMAIL) as FormControl;
@@ -39,10 +40,14 @@ export class LoginComponent {
       error: (err) => {
         this.error =
           err.status === 401
-            ? (err.error?.error ?? 'Email ou password incorretos.')
+            ? (err.error?.error ?? 'Email ou senha incorretos.')
             : 'Ocorreu um erro. Tente novamente.';
       },
     });
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
   }
 
   signInWithGoogle(event: Event): void {

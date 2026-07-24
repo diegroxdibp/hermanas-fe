@@ -4,7 +4,14 @@ import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { ErrorService } from '../services/error.service';
 
-const AUTH_ENDPOINTS = ['/api/auth/login', '/api/auth/register', '/api/auth/me'];
+// Endpoints whose callers already render a specific, server-provided error
+// message inline — skip the generic snackbar so it doesn't duplicate/clash.
+const SELF_HANDLED_ENDPOINTS = [
+  '/api/auth/login',
+  '/api/auth/register',
+  '/api/auth/me',
+  '/api/user/onboarding',
+];
 
 const ERROR_MESSAGES: Partial<Record<number, string>> = {
   400: 'Pedido inválido. Verifique os dados e tente novamente.',
@@ -24,11 +31,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => err);
       }
 
-      const isAuthEndpoint = AUTH_ENDPOINTS.some(e => req.url.includes(e));
+      const isSelfHandled = SELF_HANDLED_ENDPOINTS.some(e => req.url.includes(e));
 
-      if (!isAuthEndpoint && (err.status === 0 || err.status >= 500)) {
+      if (!isSelfHandled && (err.status === 0 || err.status >= 500)) {
         router.navigate(['/error']);
-      } else if (!isAuthEndpoint) {
+      } else if (!isSelfHandled) {
         const message =
           ERROR_MESSAGES[err.status] ??
           'Ocorreu um erro. Tente novamente mais tarde.';

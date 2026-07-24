@@ -72,7 +72,7 @@
         <div class="select-wrap country-select">
           <select (change)="onCountryChange($any($event.target).value)">
             @for (c of countries; track c.code) {
-              <option [value]="c.code" [selected]="c.code === selectedCountry.code">{{ c.name }} (+{{ c.InternationalAreaCode }})</option>
+              <option [value]="c.code" [selected]="c.code === selectedCountry.code">{{ c.namePt }} (+{{ c.InternationalAreaCode }})</option>
             }
           </select>
           <span class="chev" aria-hidden="true">

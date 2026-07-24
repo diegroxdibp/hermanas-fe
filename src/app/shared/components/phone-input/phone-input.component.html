@@ -44,7 +44,7 @@
       (valueChange)="clearInput()"
       required
     >
-      @for (country of countries; track country.name) {
+      @for (country of countries; track country.code) {
       <mat-option
         [value]="country"
         (click)="formService.currentCountryPhone.next(country)"
@@ -55,7 +55,7 @@
           aria-hidden="true"
         ></span>
         <span class="text"
-          >{{ country.name }} (+{{ country.InternationalAreaCode }})</span
+          >{{ country.namePt }} (+{{ country.InternationalAreaCode }})</span
         ></mat-option
       >
 
