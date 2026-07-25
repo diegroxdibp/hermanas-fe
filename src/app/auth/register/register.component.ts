@@ -51,6 +51,11 @@ export class RegisterComponent {
     ];
   }
 
+  get passwordsMismatch(): boolean {
+    const confirm = this.confirmPasswordCtrl.value ?? '';
+    return confirm.length > 0 && confirm !== this.pwd;
+  }
+
   get canSubmit(): boolean {
     return (
       this.emailCtrl?.valid &&

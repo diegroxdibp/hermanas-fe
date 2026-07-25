@@ -12,10 +12,35 @@
         <input id="nome" type="text" class="field-input" formControlName="nome" placeholder="O seu nome" />
       </div>
 
-      <div class="field" [class.is-error]="isError('telefone')">
-        <label for="telefone" class="field-label">Telefone:</label>
-        <input id="telefone" type="tel" class="field-input" formControlName="telefone" [maskito]="phoneMask" placeholder="351 915 784 896" />
-      </div>
+      @if (!isAuthenticated()) {
+        <div class="field" [class.is-error]="isError('email')">
+          <label for="c-email" class="field-label">Email:</label>
+          <input id="c-email" type="email" class="field-input" formControlName="email" placeholder="seu@email.com" autocomplete="email" />
+        </div>
+
+        <div class="phone-row">
+          <div class="field country-field">
+            <label id="c-country-label" class="field-label">País:</label>
+            <app-styled-select
+              inputId="c-country"
+              [options]="countryOptions"
+              [value]="selectedCountry.code"
+              (valueChange)="onCountryChange($event)"
+            />
+          </div>
+
+          <div class="field phone-field" [class.is-error]="isError('telefone')">
+            <label for="c-phone" class="field-label">Telefone:</label>
+            <app-country-phone-field
+              [country]="selectedCountry"
+              [phoneControl]="telefoneCtrl"
+              inputId="c-phone"
+              placeholder="912 345 678"
+              (prefixCountryChange)="onPhonePrefixChange($event)"
+            />
+          </div>
+        </div>
+      }
 
       <div class="field" [class.is-error]="isError('assunto')">
         <label for="assunto" class="field-label">Assunto:</label>
@@ -27,19 +52,30 @@
         <textarea id="mensagem" class="field-input" formControlName="mensagem" rows="4" placeholder="Escreva a sua mensagem"></textarea>
       </div>
 
-      <button type="submit" class="enviar-btn" [class.is-sent]="sent">
+      @if (error) {
+        <div class="error-msg">{{ error }}</div>
+      }
+
+      <button type="submit" class="enviar-btn" [class.is-sent]="sent" [disabled]="sending">
         @if (sent) {
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <polyline points="20 6 9 17 4 12"/>
           </svg>
           Mensagem enviada
+        } @else if (sending) {
+          A enviar...
         } @else {
           ENVIAR
         }
       </button>
 
       <div class="card-fineprint">
-        <p>Ao enviar o email, aceito os termos de uso e política de privacidade.</p>
+        <p>
+          Ao enviar o email, aceito os
+          <a [routerLink]="'/' + Pages.TERMOS_USO">termos de uso</a>
+          e a
+          <a [routerLink]="'/' + Pages.POLITICA_PRIVACIDADE">política de privacidade</a>.
+        </p>
         <p>Se quer agendar algum serviço, clique <a (click)="goToScheduling()"><strong>aqui</strong></a>.</p>
       </div>
     </div>

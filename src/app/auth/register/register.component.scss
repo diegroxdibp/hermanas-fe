@@ -84,7 +84,16 @@ h1 {
 
     &:focus { border-color: palette.$primaryColorBlue; }
     &::placeholder { color: var(--color-muted); }
+    &.has-error { border-color: #c0392b; }
   }
+}
+
+.field-error {
+  font-family: typography.$sourceSans;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #c0392b;
+  margin-top: -2px;
 }
 
 .password-field {
@@ -272,6 +281,9 @@ h1 {
     color: palette.$primaryColorPurple;
     font-weight: 700;
     cursor: pointer;
+    transition: opacity 0.2s ease;
+
+    &:hover { text-decoration: underline; }
   }
 }
 

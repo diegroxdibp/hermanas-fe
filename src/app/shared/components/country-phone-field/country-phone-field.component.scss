@@ -1,0 +1,117 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.phone-field-root {
+  position: relative;
+}
+
+.phone-input-wrap {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: #fff;
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+
+  &:focus-within { border-color: var(--color-primary-blue); }
+}
+
+.dial-code {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-muted);
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--color-border);
+  padding: 13px 10px 13px 14px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease;
+
+  &:hover { background: var(--color-surface-tint); }
+
+  &.open { color: var(--color-primary-blue); }
+
+  .chev {
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+  }
+
+  &.open .chev { transform: rotate(180deg); }
+}
+
+input {
+  border: none !important;
+  outline: none !important;
+  padding: 13px 14px !important;
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  color: var(--color-primary-blue);
+  background: transparent;
+
+  &::placeholder { color: var(--color-muted); }
+}
+
+.prefix-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-height: 280px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid var(--color-border-soft, var(--color-border));
+  border-radius: var(--radius-md);
+  filter: var(--shadow-floating, drop-shadow(0 8px 24px rgba(34, 50, 110, 0.18)));
+  z-index: 500;
+  box-sizing: border-box;
+}
+
+.prefix-option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-sans);
+  transition: background 0.15s ease;
+
+  &:hover { background: var(--color-surface-tint); }
+
+  &.selected {
+    background: var(--color-surface-tint);
+    .option-name { font-weight: 600; }
+  }
+}
+
+.option-name {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-primary-blue);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.option-code {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-muted);
+  flex-shrink: 0;
+}

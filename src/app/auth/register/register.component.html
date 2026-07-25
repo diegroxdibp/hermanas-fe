@@ -67,6 +67,7 @@
           id="confirm"
           [type]="showConfirmPassword ? 'text' : 'password'"
           [formControl]="confirmPasswordCtrl"
+          [class.has-error]="passwordsMismatch"
           placeholder="••••••••"
           autocomplete="new-password"
         />
@@ -89,6 +90,9 @@
           }
         </button>
       </div>
+      @if (passwordsMismatch) {
+        <span class="field-error">As senhas não coincidem.</span>
+      }
     </div>
 
     <label class="terms">

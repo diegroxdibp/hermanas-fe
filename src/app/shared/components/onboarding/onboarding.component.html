@@ -82,58 +82,36 @@
       </div>
 
       <div class="field">
-        <label for="ob-gender">Gênero:</label>
-        <div class="select-wrap">
-          <select id="ob-gender" [formControl]="genderCtrl">
-            <option value="" disabled>Selecione</option>
-            @for (g of genders; track g) {
-              <option [value]="g">{{ g }}</option>
-            }
-          </select>
-          <span class="chev" aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="6 9 12 15 18 9"/>
-            </svg>
-          </span>
-        </div>
+        <label id="ob-gender-label">Gênero:</label>
+        <app-styled-select
+          inputId="ob-gender"
+          [options]="genderOptions"
+          [value]="genderCtrl.value"
+          (valueChange)="genderCtrl.setValue($event)"
+        />
       </div>
     </div>
 
     <div class="phone-row">
       <div class="field country-field">
-        <label for="ob-country">País:</label>
-        <div class="select-wrap">
-          <select
-            id="ob-country"
-            [value]="selectedCountry.code"
-            (change)="onCountryChange($any($event.target).value)"
-          >
-            @for (c of countries; track c.code) {
-              <option [value]="c.code">{{ c.namePt }} (+{{ c.InternationalAreaCode }})</option>
-            }
-          </select>
-          <span class="chev" aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="6 9 12 15 18 9"/>
-            </svg>
-          </span>
-        </div>
+        <label id="ob-country-label">País:</label>
+        <app-styled-select
+          inputId="ob-country"
+          [options]="countryOptions"
+          [value]="selectedCountry().code"
+          (valueChange)="onCountryChange($event)"
+        />
       </div>
 
       <div class="field phone-field">
         <label for="ob-phone">Telefone:</label>
-        <div class="phone-input-wrap">
-          <span class="dial-code">+{{ selectedCountry.InternationalAreaCode }}</span>
-          <input
-            id="ob-phone"
-            type="tel"
-            [formControl]="phoneCtrl"
-            [maskito]="phoneMask"
-            placeholder="000 000 000"
-            inputmode="numeric"
-            pattern="[0-9]*"
-          />
-        </div>
+        <app-country-phone-field
+          [country]="selectedCountry()"
+          [phoneControl]="phoneCtrl"
+          inputId="ob-phone"
+          placeholder="912 345 678"
+          (prefixCountryChange)="onPhonePrefixChange($event)"
+        />
       </div>
     </div>
 

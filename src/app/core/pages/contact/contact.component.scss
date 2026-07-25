@@ -106,6 +106,31 @@ textarea.field-input {
   border-color: var(--color-secondary-pink);
 }
 
+.phone-row {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  .country-field { flex: 1; width: 100%; }
+  .phone-field { flex: 1; width: 100%; }
+
+  @media (min-width: breakpoint.$breakpoint-sm) {
+    flex-direction: row;
+
+    .country-field,
+    .phone-field { width: auto; }
+  }
+}
+
+.error-msg {
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  color: #c0392b;
+  padding: 10px 14px;
+  background: rgba(192, 57, 43, 0.06);
+  border-radius: var(--radius-sm);
+}
+
 .enviar-btn {
   margin-top: 8px;
   width: 100%;
@@ -139,6 +164,12 @@ textarea.field-input {
   }
 
   &:active { transform: scale(0.99); }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
 
   &.is-sent {
     background: var(--color-secondary-green);

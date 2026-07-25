@@ -5,6 +5,8 @@ import { AuthComponent } from './auth.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { CallbackComponent } from './callback/callback.component';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { GuestOnlyGuard } from './guest-only.guard';
 
 const routes: Routes = [
@@ -17,6 +19,16 @@ const routes: Routes = [
         path: 'signup',
         canMatch: [GuestOnlyGuard],
         component: RegisterComponent,
+      },
+      {
+        path: 'forgot-password',
+        canMatch: [GuestOnlyGuard],
+        component: ForgotPasswordComponent,
+      },
+      {
+        path: 'reset-password',
+        canMatch: [GuestOnlyGuard],
+        component: ResetPasswordComponent,
       },
       { path: 'callback', component: CallbackComponent },
       { path: '', redirectTo: 'signin', pathMatch: 'full' },

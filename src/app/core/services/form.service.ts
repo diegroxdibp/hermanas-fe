@@ -1,7 +1,4 @@
-import {
-  CountryModel,
-  defaultCountry,
-} from './../../shared/models/country.model';
+import { CountryModel } from './../../shared/models/country.model';
 import { Genders } from './../../shared/enums/genders.enum';
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -17,6 +14,7 @@ import { ProfileView } from '../../shared/models/profile-view.model';
 import { User } from '../../auth/user.model';
 import { ProfessionalModel } from '../../shared/models/professional.model';
 import { Modality } from '../../shared/enums/modality.enum';
+import { getBrowserCountry } from '../../shared/utils/browser-country.util';
 
 @Injectable({
   providedIn: 'root',
@@ -30,7 +28,7 @@ export class FormService {
   professionals: ProfessionalModel[] = [];
 
   currentCountryPhone: BehaviorSubject<CountryModel> =
-    new BehaviorSubject<CountryModel>(defaultCountry);
+    new BehaviorSubject<CountryModel>(getBrowserCountry());
 
   passwordRules = {
     minLength: 8,
@@ -64,7 +62,7 @@ export class FormService {
       ]),
       [FormControlsNames.BIRTHDATE]: this.fb.control('', [Validators.required]),
       [FormControlsNames.PHONE_PREFIX]:
-        this.fb.control<CountryModel>(defaultCountry),
+        this.fb.control<CountryModel>(getBrowserCountry()),
       [FormControlsNames.PHONE]: this.fb.control(''),
       [FormControlsNames.GENDER]: this.fb.control(''),
     });
@@ -84,7 +82,7 @@ export class FormService {
         Validators.required,
       ]),
       [FormControlsNames.PHONE_PREFIX_PROFILE]:
-        this.fb.control<CountryModel>(defaultCountry),
+        this.fb.control<CountryModel>(getBrowserCountry()),
       [FormControlsNames.PHONE_PROFILE]: this.fb.control(''),
       [FormControlsNames.GENDER_PROFILE]: this.fb.control(''),
       [FormControlsNames.BIO_PROFILE]: this.fb.control(''),

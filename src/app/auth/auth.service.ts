@@ -13,6 +13,8 @@ import { SignInPayload } from '../shared/models/sign-in-payload';
 import { SignInResponse } from '../shared/models/sign-in-response';
 import { SignUpPayload } from '../shared/models/sign-up-payload';
 import { SignUpResponse } from '../shared/models/sign-up-response';
+import { ForgotPasswordPayload } from '../shared/models/forgot-password-payload';
+import { ResetPasswordPayload } from '../shared/models/reset-password-payload';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { AppConstants } from '../app-constants';
@@ -56,6 +58,20 @@ export class AuthService {
         withCredentials: true,
       })
       .pipe(switchMap(() => this.refreshSession()));
+  }
+
+  forgotPassword(payload: ForgotPasswordPayload): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(
+      AppConstants.apiEndpoints.forgotPassword,
+      payload,
+    );
+  }
+
+  resetPassword(payload: ResetPasswordPayload): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(
+      AppConstants.apiEndpoints.resetPassword,
+      payload,
+    );
   }
 
   logout() {

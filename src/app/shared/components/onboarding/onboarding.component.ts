@@ -1,17 +1,17 @@
 import { Component, computed, HostListener, inject, OnInit, signal } from '@angular/core';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
-import { MaskitoDirective } from '@maskito/angular';
-import { MaskitoOptions } from '@maskito/core';
 import { FormService } from '../../../core/services/form.service';
 import { SessionService } from '../../services/session.service';
 import { UserService } from '../../services/user.service';
 import { FormControlsNames } from '../../enums/form-controls-names.enum';
-import { CountryModel, defaultCountry } from '../../models/country.model';
+import { CountryModel } from '../../models/country.model';
 import { Countries } from '../../../../assets/countries';
 import { Genders } from '../../enums/genders.enum';
 import { OnboardingResponse } from '../../models/onboarding-response.model';
-import digitsOnlyMask from '../../masks/digits-only.mask';
+import { getBrowserCountry } from '../../utils/browser-country.util';
+import { CountryPhoneFieldComponent } from '../country-phone-field/country-phone-field.component';
+import { StyledSelectComponent, StyledSelectOption } from '../styled-select/styled-select.component';
 
 const PT_MONTHS = [
   'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
@@ -20,13 +20,11 @@ const PT_MONTHS = [
 
 @Component({
   selector: 'app-onboarding',
-  imports: [ReactiveFormsModule, MaskitoDirective],
+  imports: [ReactiveFormsModule, CountryPhoneFieldComponent, StyledSelectComponent],
   templateUrl: './onboarding.component.html',
   styleUrl: './onboarding.component.scss',
 })
 export class OnboardingComponent implements OnInit {
-  readonly phoneMask: MaskitoOptions = digitsOnlyMask;
-
   private readonly formService = inject(FormService);
   private readonly sessionService = inject(SessionService);
   private readonly userService = inject(UserService);
@@ -35,6 +33,17 @@ export class OnboardingComponent implements OnInit {
   readonly countries = Countries;
   readonly genders = Object.values(Genders);
   error: string | null = null;
+
+  readonly countryOptions: StyledSelectOption[] = Countries.map(c => ({
+    value: c.code,
+    label: c.namePt,
+    meta: `+${c.InternationalAreaCode}`,
+  }));
+
+  readonly genderOptions: StyledSelectOption[] = Object.values(Genders).map(g => ({
+    value: g,
+    label: g,
+  }));
 
   readonly months = PT_MONTHS;
   readonly weekdays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
@@ -112,16 +121,13 @@ export class OnboardingComponent implements OnInit {
     return this.formService.onboardingForm.get(FormControlsNames.PHONE) as FormControl;
   }
 
-  get selectedCountry(): CountryModel {
-    return (
-      (this.formService.onboardingForm.get(FormControlsNames.PHONE_PREFIX)?.value as CountryModel) ??
-      defaultCountry
-    );
-  }
+  readonly selectedCountry = signal<CountryModel>(getBrowserCountry());
 
   ngOnInit(): void {
+    const initial = getBrowserCountry();
+    this.selectedCountry.set(initial);
     this.formService.onboardingForm.reset({
-      [FormControlsNames.PHONE_PREFIX]: defaultCountry,
+      [FormControlsNames.PHONE_PREFIX]: initial,
     });
   }
 
@@ -133,8 +139,12 @@ export class OnboardingComponent implements OnInit {
   onCountryChange(code: string): void {
     const c = Countries.find(x => x.code === code);
     if (c) {
-      this.formService.onboardingForm.get(FormControlsNames.PHONE_PREFIX)?.setValue(c);
+      this.selectedCountry.set(c);
     }
+  }
+
+  onPhonePrefixChange(country: CountryModel): void {
+    this.formService.onboardingForm.get(FormControlsNames.PHONE_PREFIX)?.setValue(country);
   }
 
   toggleCalendar(): void {

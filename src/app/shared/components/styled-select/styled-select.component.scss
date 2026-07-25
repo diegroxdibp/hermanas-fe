@@ -1,0 +1,101 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.styled-select-root {
+  position: relative;
+}
+
+.select-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--color-primary-blue);
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 13px 16px;
+  cursor: pointer;
+  text-align: left;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+
+  &:hover { border-color: var(--color-primary-blue); }
+  &.open { border-color: var(--color-primary-blue); }
+
+  .trigger-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &.placeholder { color: var(--color-muted); }
+  }
+
+  .chev {
+    flex-shrink: 0;
+    color: var(--color-primary-blue);
+    transition: transform 0.2s ease;
+  }
+
+  &.open .chev { transform: rotate(180deg); }
+}
+
+.select-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-height: 280px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid var(--color-border-soft, var(--color-border));
+  border-radius: var(--radius-md);
+  filter: var(--shadow-floating, drop-shadow(0 8px 24px rgba(34, 50, 110, 0.18)));
+  z-index: 500;
+  box-sizing: border-box;
+}
+
+.select-option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-sans);
+  transition: background 0.15s ease;
+
+  &:hover { background: var(--color-surface-tint); }
+
+  &.selected {
+    background: var(--color-surface-tint);
+    .option-name { font-weight: 600; }
+  }
+}
+
+.option-name {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-primary-blue);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.option-code {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-muted);
+  flex-shrink: 0;
+}

@@ -1,0 +1,34 @@
+<div class="phone-field-root" (mousedown)="$event.stopPropagation()">
+  <div class="phone-input-wrap">
+    <button type="button" class="dial-code" [class.open]="dropdownOpen()" (mousedown)="toggleDropdown($event)">
+      <span>+{{ prefixCountry().InternationalAreaCode }}</span>
+      <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
+    </button>
+
+    <input
+      [id]="inputId"
+      type="tel"
+      [formControl]="phoneControl"
+      [maskito]="phoneMask"
+      [placeholder]="placeholder"
+    />
+  </div>
+
+  @if (dropdownOpen()) {
+    <div class="prefix-dropdown">
+      @for (c of countries; track c.code) {
+        <button
+          type="button"
+          class="prefix-option"
+          [class.selected]="c.code === prefixCountry().code"
+          (mousedown)="selectPrefixCountry(c, $event)"
+        >
+          <span class="option-name">{{ c.namePt }}</span>
+          <span class="option-code">+{{ c.InternationalAreaCode }}</span>
+        </button>
+      }
+    </div>
+  }
+</div>

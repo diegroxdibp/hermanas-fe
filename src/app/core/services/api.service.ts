@@ -23,6 +23,7 @@ import { ProfessionalService } from '../../shared/models/professional-service.mo
 import { ProfessionalSessionService } from '../../shared/enums/professional-session-service.enum';
 import { Professional } from '../../shared/models/get-professional-by-service-response.model';
 import { Appointment } from '../../shared/models/appointment.model';
+import { ContactPayload } from '../../shared/models/contact-payload';
 
 @Injectable({
   providedIn: 'root',
@@ -145,15 +146,11 @@ export class ApiService {
     );
   }
 
-  sendEmail(subject: string, body: string) {
-    this.http
-      .post(`${environment.apiUrl}/email/send`, {
-        to: 'diegrox.rox@gmail.com',
-        subject,
-        body,
-      })
-      .subscribe((response) => {
-        console.log(response);
-      });
+  sendContactMessage(payload: ContactPayload): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(
+      `${environment.apiUrl}/api/contact`,
+      payload,
+      { withCredentials: true },
+    );
   }
 }
