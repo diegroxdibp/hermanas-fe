@@ -4,6 +4,16 @@ import { Pages } from '../../../shared/enums/pages.enum';
 import { Bio } from '../../../shared/models/bio.model';
 import { ScrollAnimateDirective } from '../../../shared/directives/scroll-animate.directive';
 
+interface Publication {
+  category: string;
+  title: string;
+  source: string;
+  href: string;
+  image: string;
+  imagePosition: string;
+  cta: string;
+}
+
 @Component({
   selector: 'app-about',
   imports: [ScrollAnimateDirective],
@@ -22,6 +32,56 @@ export class AboutComponent implements OnInit {
       'Formada em psicologia pela Universidade Federal de São Paulo (UNIFESP) em 2013, pós-graduada através da Residência Multiprofissional na Universidade Federal do Rio de Janeiro (UFRJ) em 2016, cursou a formação no Instituto de Formação e Pesquisa Wilhelm Reich (IFP) no Rio de Janeiro em 2017, pós-graduada pela Universidade Nova de Lisboa (NOVA) em sociologia e estudos sobre as mulheres em 2020, cursou a formação no Centro Português de Estudos Reichianos (CPER) em Lisboa no ano de 2021 e atualmente na formação em trauma com o método Somatic Experiencing de Peter Levine na Associação Brasileira de Trauma (ABT). Além de trabalhos na rede pública como no Sistema Nacional de Saúde (SUS) e centros de cidadanias para mulheres, assim como, em clínica particular e trabalhos coletivos na construção de clínica social em Lisboa.',
     ],
   };
+
+  publications: Publication[] = [
+    {
+      category: 'Artigo científico',
+      title:
+        'Abordagem fenomenológica das vivências e significados do baile flamenco para mulheres adultas',
+      source: 'ResearchGate · corpo, dança e subjetividade',
+      href: 'https://www.researchgate.net/publication/311706170_Aborgagem_fenomenologica_para_a_compreensao_das_vivencias_e_significados_do_baile_flamenco_para_mulheres_adultas_Fenomenological_approach_to_comprehend_experiences_and_meanings_of_flamenco_dance_for_a',
+      image: 'assets/images/FotoArtigoFlamenco.JPG',
+      imagePosition: '50% 0',
+      cta: 'Ler →',
+    },
+    {
+      category: 'Projeto clínico',
+      title: 'Casa Acolhe — rede de apoio psicológico e psicoterapêutico',
+      source: 'Casa do Brasil de Lisboa · clínica social e migração',
+      href: 'https://www.instagram.com/casadobrasildelisboa/reels/',
+      image: 'assets/images/FotoCasaAcolhe.JPG',
+      imagePosition: '50% 30%',
+      cta: 'Ver →',
+    },
+    {
+      category: 'Capítulo de livro',
+      title: 'Clínica Comum: itinerários de uma formação em saúde',
+      source: 'Biblioteca Trabalho em Saúde · UNIFESP',
+      href: 'https://trabalhoemsaude.unifesp.br/biblioteca',
+      image: 'assets/images/FotoLivro.JPG',
+      imagePosition: '50% 20%',
+      cta: 'Ler →',
+    },
+    {
+      category: 'Livro',
+      title: 'Gênero e Imigração',
+      source: 'Apple Books · vivências de mulheres brasileiras em Portugal',
+      href: 'https://books.apple.com/us/book/g%C3%AAnero-e-imigra%C3%A7%C3%A3o/id6443192492',
+      image: 'assets/images/FotoLivroImigração.JPG',
+      imagePosition: '50% 20%',
+      cta: 'Ler →',
+    },
+    {
+      category: 'Associação',
+      title: 'Associação Somatic Experiencing Portugal - ASEP',
+      source: 'somatic-experiencing.pt · associação portuguesa de Somatic Experiencing®',
+      href: 'https://www.somatic-experiencing.pt/',
+      image: 'assets/images/foto-asep.jpg',
+      imagePosition: '0% 0%',
+      cta: 'Ver →',
+    },
+  ];
+
   constructor(public navigationService: NavigationService) {}
 
   ngOnInit(): void {

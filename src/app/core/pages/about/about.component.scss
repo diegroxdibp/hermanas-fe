@@ -9,26 +9,21 @@
   align-items: center;
   gap: 2em;
 
-  .first {
-    padding: 0 !important;
+  // ─── Hero — gradient + wave divider ────────────────────────────────────────
+  .hero {
+    padding: 0;
     max-width: none;
-    gap: 2em;
-
-    .about-intro {
-      max-width: variables.$main-column-max-width-md;
-    }
-  }
-
-  .motif {
-    height: 200px;
+    position: relative;
+    height: 260px;
     width: 100%;
     overflow: hidden;
-    position: relative;
-    mask-repeat: no-repeat;
-    background: #FFFFFF;
+    background: palette.$supportingColorWhite;
 
-    &::before {
-      content: "";
+    @media (min-width: breakpoint.$breakpoint-sm) {
+      height: 300px;
+    }
+
+    .hero-bg {
       position: absolute;
       top: 0;
       left: 0;
@@ -39,7 +34,7 @@
       background-position: 50% 30%;
     }
 
-    .custom-shape-divider-bottom-1775951696 {
+    .wave-divider {
       position: absolute;
       bottom: 0;
       left: 0;
@@ -47,21 +42,64 @@
       overflow: hidden;
       line-height: 0;
       transform: rotate(180deg);
+
+      svg {
+        position: relative;
+        display: block;
+        width: calc(185% + 1.3px);
+        max-width: none; // overrides the sitewide `svg { max-width: 100% }` reset,
+        // which would otherwise silently clamp this back to 100% and cancel the overshoot
+        height: 56px;
+
+        @media (min-width: breakpoint.$breakpoint-sm) {
+          height: 84px;
+        }
+      }
+
+      .shape-fill {
+        fill: palette.$supportingColorWhite;
+      }
     }
 
-    .custom-shape-divider-bottom-1775951696 svg {
-      position: relative;
-      display: block;
-      width: calc(185% + 1.3px);
-      height: 84px;
-    }
+    .hero-text {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 36px;
+      padding: 0 variables.$mobile-lateral-padding;
 
-    .custom-shape-divider-bottom-1775951696 .shape-fill {
-      fill: #FFFFFF;
+      @media (min-width: breakpoint.$breakpoint-sm) {
+        top: 56px;
+      }
+
+      @media (min-width: breakpoint.$breakpoint-lg) {
+        max-width: variables.$main-column-max-width-lg;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      h1 {
+        color: palette.$supportingColorWhite;
+        max-width: 760px;
+      }
+
+      .hero-subtitle {
+        margin-top: 10px;
+        color: palette.$supportingColorWhite;
+        font-size: 20px;
+        font-weight: 500;
+        font-style: italic;
+        line-height: 1.35;
+        text-align: left;
+
+        @media (min-width: breakpoint.$breakpoint-sm) {
+          margin-top: 14px;
+          font-size: 24px;
+          max-width: 640px;
+        }
+      }
     }
   }
-
-
 
   section,
   .wrapper {
@@ -81,7 +119,7 @@
   .wrapper {
     padding: 40px 0;
     background-color: palette.$secondaryColorPink;
-    border-radius: 50px 50px 0 0;
+    border-radius: 32px 32px 0 0;
   }
 
   .about-intro {
@@ -89,8 +127,6 @@
     align-items: center;
     justify-content: space-between;
     padding: 0 1.5em;
-
-
 
     picture {
       max-width: 300px;
@@ -103,9 +139,35 @@
     }
   }
 
+  .pillars {
+    flex-direction: column;
+    align-items: center;
+  }
+
   .bio {
     h1 {
       text-align: center;
+    }
+
+    .founder-label {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 1.6px;
+      text-transform: uppercase;
+      color: palette.$secondaryColorPurple;
+      text-align: center;
+    }
+
+    .founder-quote {
+      text-align: left;
+      padding-left: 18px;
+      border-left: 2px solid palette.$primaryColorPurple;
+      margin-top: 12px;
+
+      @media (min-width: breakpoint.$breakpoint-md) {
+        padding-left: 22px;
+        margin-top: 28px;
+      }
     }
   }
 
@@ -122,46 +184,158 @@
       max-width: variables.$main-column-max-width-md;
       gap: 1em;
 
-      ul {
-        width: 100%;
-        flex-direction: column;
-        gap: 16px;
-
-        li {
-          justify-content: flex-start;
-          font-weight: 600;
-        }
-      }
-
-      .gallery {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-        width: 100%;
-
-        img {
-          display: block;
-          width: 60%;
-          height: auto;
-          margin: 0 auto;
-          border-radius: var(--radius-md);
-          filter: var(--shadow-card);
-          transition: transform 0.2s ease;
-
-          &:hover {
-            transform: scale(1.03);
-          }
-        }
-      }
-
       h1,
       h2,
       h3,
       p,
-      li,
       svg {
         color: palette.$secondaryColorPurple;
         fill: palette.$supportingColorWhite;
+      }
+    }
+
+    .experience-intro {
+      margin-bottom: 4px;
+    }
+
+    .linkedin-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 14px 20px;
+      border-radius: var(--radius-lg);
+      background: palette.$primaryColorBlue;
+      color: palette.$supportingColorWhite !important;
+      fill: palette.$supportingColorWhite !important;
+      font-size: 17px;
+      font-weight: 700;
+      transition: background var(--dur-fast) ease;
+
+      &:hover {
+        background: palette.$primaryColorPurple;
+      }
+
+      @media (min-width: breakpoint.$breakpoint-sm) {
+        display: inline-flex;
+        width: auto;
+        padding: 14px 24px;
+        font-size: 18px;
+      }
+    }
+
+    .publications {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .publication {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 10px;
+      margin: 0 -10px;
+      border-radius: 10px;
+      outline: 2px solid transparent;
+      transition:
+        outline-color var(--dur-fast) ease,
+        background var(--dur-fast) ease;
+
+      @media (min-width: breakpoint.$breakpoint-sm) {
+        gap: 28px;
+        padding: 20px;
+        margin: 0;
+      }
+
+      &:hover {
+        outline-color: palette.$primaryColorPurple;
+        background: #ffffff40;
+      }
+    }
+
+    .publication-cover {
+      flex: none;
+      width: 82px;
+      height: 112px;
+      margin: 0;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      background: palette.$supportingColorWhite;
+      filter: var(--shadow-card);
+
+      @media (min-width: breakpoint.$breakpoint-sm) {
+        width: 120px;
+        height: 160px;
+      }
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 0;
+      }
+    }
+
+    .publication-body {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+      min-width: 0;
+
+      @media (min-width: breakpoint.$breakpoint-sm) {
+        gap: 8px;
+      }
+    }
+
+    .publication-category {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: palette.$secondaryColorPurple;
+
+      @media (min-width: breakpoint.$breakpoint-sm) {
+        font-size: 13px;
+        letter-spacing: 1.6px;
+      }
+    }
+
+    .publication-title {
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.3;
+      color: palette.$primaryColorBlue;
+
+      @media (min-width: breakpoint.$breakpoint-sm) {
+        font-size: 24px;
+        line-height: 1.25;
+      }
+    }
+
+    .publication-source {
+      font-size: 15px;
+      font-weight: 400;
+      line-height: 21px;
+      color: palette.$secondaryColorPurple;
+
+      @media (min-width: breakpoint.$breakpoint-sm) {
+        font-size: 17px;
+        line-height: 26px;
+      }
+    }
+
+    .publication-cta {
+      display: none;
+      flex: none;
+      font-size: 17px;
+      font-weight: 700;
+      color: palette.$primaryColorBlue;
+
+      @media (min-width: breakpoint.$breakpoint-sm) {
+        display: block;
       }
     }
   }
@@ -169,12 +343,6 @@
   @media (min-width: breakpoint.$breakpoint-sm) {
     max-width: unset;
     gap: 3em;
-
-    .first {
-      padding: 0;
-      gap: 3em;
-    }
-
 
     .about-intro {
       flex-direction: row;
@@ -186,20 +354,24 @@
       picture {
         image {
           margin: 0 0 0 auto;
-
         }
       }
     }
 
     .wrapper {
       padding: 80px 0;
-      // border-radius: 140px 140px 0 0;
+      border-radius: 50px 50px 0 0;
     }
 
     .bio {
       gap: 64px;
 
       h1 {
+        text-align: left;
+      }
+
+      .founder-label {
+        font-size: 17px;
         text-align: left;
       }
     }
@@ -236,10 +408,6 @@
       .academic {
         width: 100%;
         max-width: variables.$main-column-max-width-lg;
-
-        .gallery {
-          grid-template-columns: repeat(4, 1fr);
-        }
       }
     }
 

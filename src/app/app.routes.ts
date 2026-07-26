@@ -119,6 +119,43 @@ export const routes: Routes = [
       ),
   },
 
+  // public leaf routes - must come before the protected "" group below,
+  // since a canMatch guard on an empty-path parent is evaluated as a
+  // candidate match for any URL (not just ones its children match), and a
+  // guard returning a redirect UrlTree short-circuits the whole navigation
+  // before the router ever gets to try routes later in this array.
+  {
+    path: Pages.INSTITUTIONAL,
+    loadComponent: () =>
+      import('./core/pages/legal/legal.component').then(
+        (m) => m.LegalPageComponent,
+      ),
+  },
+
+  {
+    path: Pages.POLITICA_PRIVACIDADE,
+    loadComponent: () =>
+      import('./core/pages/legal/legal.component').then(
+        (m) => m.LegalPageComponent,
+      ),
+  },
+
+  {
+    path: Pages.TERMOS_USO,
+    loadComponent: () =>
+      import('./core/pages/legal/legal.component').then(
+        (m) => m.LegalPageComponent,
+      ),
+  },
+
+  {
+    path: 'error',
+    loadComponent: () =>
+      import('./core/pages/error/error.component').then(
+        (m) => m.ErrorPageComponent,
+      ),
+  },
+
   // protected area
   {
     path: '',
@@ -166,38 +203,6 @@ export const routes: Routes = [
           ),
       },
     ],
-  },
-
-  {
-    path: Pages.INSTITUTIONAL,
-    loadComponent: () =>
-      import('./core/pages/legal/legal.component').then(
-        (m) => m.LegalPageComponent,
-      ),
-  },
-
-  {
-    path: Pages.POLITICA_PRIVACIDADE,
-    loadComponent: () =>
-      import('./core/pages/legal/legal.component').then(
-        (m) => m.LegalPageComponent,
-      ),
-  },
-
-  {
-    path: Pages.TERMOS_USO,
-    loadComponent: () =>
-      import('./core/pages/legal/legal.component').then(
-        (m) => m.LegalPageComponent,
-      ),
-  },
-
-  {
-    path: 'error',
-    loadComponent: () =>
-      import('./core/pages/error/error.component').then(
-        (m) => m.ErrorPageComponent,
-      ),
   },
 
   {
