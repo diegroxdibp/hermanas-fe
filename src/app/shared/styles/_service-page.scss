@@ -1,0 +1,50 @@
+@use '../../../assets/styles/breakpoints.scss' as breakpoint;
+
+// Shared layout for the single-section service detail pages
+// (Análise Corporal Reichiana, Mindfulness, Somatic Experiencing, ...).
+@mixin host {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+
+  section {
+    padding: 1.5em;
+  }
+}
+
+// Caps and centers a portrait image inside <content>, matching the
+// about page's .bio-pic treatment.
+@mixin portrait {
+  max-width: 320px;
+  margin: 0 auto;
+
+  img {
+    width: 100%;
+  }
+}
+
+// Primary CTA button, matching the hero's .btn-primary look.
+@mixin cta-button {
+  align-self: center;
+  margin-top: 1.5em;
+  border: none;
+  background: var(--color-primary-blue);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 17px;
+  font-weight: 600;
+  padding: 14px 30px;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: transform var(--dur-fast) ease, background var(--dur-fast) ease;
+  width: 100%;
+
+  @media (min-width: breakpoint.$breakpoint-sm) {
+    width: auto;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}

@@ -1,15 +1,29 @@
+@use '../../styles/service-page' as service-page;
+
 :host {
+  @include service-page.host;
+}
+
+.bio-pic {
+  @include service-page.portrait;
+}
+
+.list {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  align-items: flex-start;
+  gap: 0.5em;
   width: 100%;
-  align-items: center;
 
-  section {
-    padding: 1.5em;
+  li {
+    display: list-item;
+    justify-content: flex-start;
+    text-align: left;
+    list-style: disc;
+    margin-left: 1.5em;
   }
 }
 
 .agendar {
-  margin-top: 1.5em;
+  @include service-page.cta-button;
 }

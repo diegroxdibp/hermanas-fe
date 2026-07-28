@@ -79,6 +79,15 @@ export class NavigationService {
     this.router.navigate([page], fragment ? { fragment } : undefined);
   }
 
+  /** Navigates to Scheduling, pre-selecting a service. `serviceKey` must match ProfessionalService.name as returned by the backend (the ProfessionalSessionService enum key, e.g. 'MINDFULNESS') — read by SchedulingComponent via the `service` query param. */
+  navigateToScheduling(serviceKey?: string): void {
+    this.snackbarService.closeSnackbar();
+    this.router.navigate(
+      [Pages.SCHEDULING],
+      serviceKey ? { queryParams: { service: serviceKey } } : undefined,
+    );
+  }
+
   /** Reads and clears the section requested via navigateTo(), if any. */
   consumePendingSection(): string | null {
     const section = this.pendingSection;

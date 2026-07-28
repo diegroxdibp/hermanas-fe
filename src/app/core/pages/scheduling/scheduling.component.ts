@@ -7,6 +7,7 @@ import {
   OnDestroy,
   signal,
 } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { take, Subscription } from 'rxjs';
 import { ApiService } from '../../services/api.service';
 import { SchedulingService } from '../../../shared/services/scheduling.service';
@@ -34,6 +35,7 @@ const PT_MONTHS = [
 })
 export class SchedulingComponent implements OnDestroy {
   private readonly apiService = inject(ApiService);
+  private readonly route = inject(ActivatedRoute);
   readonly schedulingService = inject(SchedulingService);
   private readonly elRef = inject(ElementRef);
   private readonly subs: Subscription[] = [];
@@ -83,11 +85,20 @@ export class SchedulingComponent implements OnDestroy {
   });
 
   constructor() {
+    const svcCtrl = this.schedulingService.schedulingForm.controls[SchedulingFormControls.SELECTED_SERVICE];
+
     this.apiService.getServices().pipe(take(1)).subscribe((services: ProfessionalService[]) => {
       this.schedulingService.services = services;
+
+      const wantedService = this.route.snapshot.queryParamMap.get('service');
+      const preselected = wantedService
+        ? services.find((s) => s.name === wantedService)
+        : null;
+      if (preselected) {
+        svcCtrl.setValue(preselected);
+      }
     });
 
-    const svcCtrl = this.schedulingService.schedulingForm.controls[SchedulingFormControls.SELECTED_SERVICE];
     this.subs.push(svcCtrl.valueChanges.subscribe((svc: ProfessionalService | null) => {
       this.schedulingService.clearChainedRelatedFields(SchedulingSteps.SERVICE_SELECTION);
       this.confirmedSlotId.set(null);

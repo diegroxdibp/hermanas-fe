@@ -1,11 +1,9 @@
-:host {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    width: 100%;
-    align-items: center;
+@use '../../styles/service-page' as service-page;
 
-    section {
-      padding: 1.5em;
-    }
+:host {
+  @include service-page.host;
+}
+
+.agendar {
+  @include service-page.cta-button;
 }

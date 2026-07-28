@@ -1,0 +1,9 @@
+@use '../../styles/service-page' as service-page;
+
+:host {
+  @include service-page.host;
+}
+
+.agendar {
+  @include service-page.cta-button;
+}

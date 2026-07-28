@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { AppConstants } from '../../../app-constants';
 import { NavigationService } from '../../services/navigation.service';
 import { Pages } from '../../enums/pages.enum';
+import { ServiceType } from '../../models/service.model';
 import { MatButtonModule } from '@angular/material/button';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 
@@ -52,5 +53,9 @@ export class ServicesListComponent {
 
   navigateTo(page: Pages) {
     this.navigationService.navigateTo(page);
+  }
+
+  navigateToScheduling(serviceType: ServiceType) {
+    this.navigationService.navigateToScheduling(serviceType.sessionService);
   }
 }

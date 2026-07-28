@@ -37,6 +37,9 @@ yarn-error.log
 testem.log
 /typings
 
+# Design handoff references (not needed at runtime or in deployments)
+/src/design-system/
+
 # System files
 .DS_Store
 Thumbs.db

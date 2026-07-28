@@ -99,11 +99,11 @@
 
               <!-- Actions -->
               <div class="actions">
-                <button class="btn-reschedule">
+                <button class="btn-reschedule" (click)="rescheduleSession()">
                   <span class="material-symbols-outlined">event_repeat</span>
                   Reagendar
                 </button>
-                <button class="btn-cancel">Cancelar sessão</button>
+                <button class="btn-cancel" (click)="cancelSession(s)">Cancelar sessão</button>
               </div>
             </div>
           } @else {

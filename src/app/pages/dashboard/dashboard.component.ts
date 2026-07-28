@@ -7,10 +7,13 @@ import {
   RouterOutlet,
 } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { MatDialog } from '@angular/material/dialog';
 import { SessionService } from '../../shared/services/session.service';
 import { ApiService } from '../../core/services/api.service';
 import { AuthService } from '../../auth/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
+import { SnackbarService } from '../../shared/services/snackbar.service';
+import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
 import { Appointment } from '../../shared/models/appointment.model';
 import { DayOfWeek } from '../../shared/enums/day-of-week.enum';
 import { Modality } from '../../shared/enums/modality.enum';
@@ -19,6 +22,7 @@ import { ProfessionalService } from '../../shared/models/professional-service.mo
 import { filter } from 'rxjs';
 
 export interface DashSession {
+  appointmentId: number;
   date: Date;
   dow: string;
   fullDow: string;
@@ -43,6 +47,8 @@ export class DashboardPageComponent implements OnInit {
   private readonly apiService = inject(ApiService);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly dialog = inject(MatDialog);
+  private readonly snackbarService = inject(SnackbarService);
   readonly notificationService = inject(NotificationService);
 
   readonly Pages = Pages;
@@ -159,6 +165,38 @@ export class DashboardPageComponent implements OnInit {
     this.authService.logout();
   }
 
+  rescheduleSession(): void {
+    this.snackbarService.openSnackBar({ message: 'Funcionalidade em construção.' });
+  }
+
+  cancelSession(session: DashSession): void {
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      width: '440px',
+      panelClass: 'care-dialog',
+      data: {
+        title: 'Cancelar sessão',
+        message: 'Deseja realmente cancelar esta sessão? Essa ação não poderá ser desfeita.',
+        confirmLabel: 'Cancelar sessão',
+        cancelLabel: 'Voltar',
+      },
+    });
+    ref.afterClosed().subscribe((confirmed) => {
+      if (!confirmed) return;
+
+      this.apiService.deleteAppointment(session.appointmentId).subscribe({
+        next: () => {
+          this.appointments.update((list) =>
+            list.filter((a) => a.id !== session.appointmentId),
+          );
+          this.snackbarService.openSnackBar({ message: 'Sessão cancelada com sucesso.' });
+        },
+        error: () => {
+          this.snackbarService.openSnackBar({ message: 'Erro ao cancelar a sessão. Tente novamente.' });
+        },
+      });
+    });
+  }
+
   private buildSessions(appointments: Appointment[], services: ProfessionalService[]): DashSession[] {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -176,6 +214,7 @@ export class DashboardPageComponent implements OnInit {
 
       for (const date of dates) {
         sessions.push({
+          appointmentId: appt.id,
           date,
           dow: DashboardPageComponent.DOW_ABR[appt.dayOfWeek] ?? '?',
           fullDow: DashboardPageComponent.DOW_FULL[appt.dayOfWeek] ?? '?',
