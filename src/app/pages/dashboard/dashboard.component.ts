@@ -19,6 +19,7 @@ import { DayOfWeek } from '../../shared/enums/day-of-week.enum';
 import { Modality } from '../../shared/enums/modality.enum';
 import { Pages } from '../../shared/enums/pages.enum';
 import { ProfessionalService } from '../../shared/models/professional-service.model';
+import { ProfessionalSessionService } from '../../shared/enums/professional-session-service.enum';
 import { filter } from 'rxjs';
 
 export interface DashSession {
@@ -210,7 +211,8 @@ export class DashboardPageComponent implements OnInit {
         ? this.recurringDates(appt, today, limit)
         : this.oneTimeDates(appt);
 
-      const serviceName = services.find(s => s.id === appt.professionalServiceId)?.name ?? '';
+      const rawServiceName = services.find(s => s.id === appt.professionalServiceId)?.name ?? '';
+      const serviceName = ProfessionalSessionService[rawServiceName as keyof typeof ProfessionalSessionService] ?? rawServiceName;
 
       for (const date of dates) {
         sessions.push({

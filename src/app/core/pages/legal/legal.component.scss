@@ -141,13 +141,29 @@
 }
 
 .legal__list {
+  display: block;
   margin: 8px 0 12px;
   padding: 0 0 0 22px;
+  list-style: disc;
   color: var(--color-secondary-indigo);
   font-size: 15.5px;
   line-height: 1.7;
+  text-align: left;
 
-  li { margin-bottom: 6px; }
+  li {
+    display: list-item;
+    list-style: disc;
+    margin-bottom: 6px;
+    font-family: var(--font-sans);
+    font-size: inherit;
+    font-weight: var(--fw-regular);
+    font-style: normal;
+    color: inherit;
+    justify-content: flex-start;
+    text-align: left;
+
+    &:last-child { margin-bottom: 0; }
+  }
 }
 
 .legal__link {
