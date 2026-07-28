@@ -4,11 +4,19 @@
     overflow: hidden;
 }
 
+// Kept as variables because the loop distance below is computed from them —
+// changing width/gap/count here without updating the keyframe will
+// reintroduce the seam.
+$marquee-slide-width: 300px;
+$marquee-gap: 20px;
+$marquee-item-count: 5;
+
 .marquee-track {
     display: flex;
     width: max-content;
-    gap: 20px;
+    gap: $marquee-gap;
     animation: marquee 20s linear infinite;
+    will-change: transform;
     user-select: none; // ← impede seleção de texto/elementos
 }
 
@@ -18,15 +26,20 @@
     }
 
     to {
-        transform: translateX(-50%);
+        // Exact pixel width of one full slide set (N slides + N gaps — the
+        // Nth gap being the one connecting the last original slide to the
+        // first duplicated one). Using -50% here looks equivalent but isn't:
+        // the flex `gap` adds one extra "seam" gap when the two sets are
+        // concatenated, so 50% of the *total* track width lands half a gap
+        // short of where the duplicate set actually starts, producing a
+        // visible jump/flicker every time the loop restarts.
+        transform: translateX(calc(#{-$marquee-item-count} * (#{$marquee-slide-width} + #{$marquee-gap})));
     }
-
-    // -50% porque duplicamos os itens
 }
 
 .slide {
     flex-shrink: 0; // ← importante: impede que os slides encolham
-    width: 300px; // ← defina a largura fixa que quiser
+    width: $marquee-slide-width; // ← defina a largura fixa que quiser
     display: flex;
     flex-direction: column;
     align-items: center;
