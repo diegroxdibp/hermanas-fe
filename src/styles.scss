@@ -13,6 +13,16 @@
 html {
   height: 100%;
   overflow-x: hidden;
+  // Always reserve the vertical scrollbar's width, even on pages/states that
+  // don't need to scroll yet. Without this, content height settling during
+  // load (icons revealing, fonts swapping) can cross the scroll threshold,
+  // the scrollbar pops in/out, and the whole page shifts left/right by its
+  // width (~15-17px on Windows). overflow-y: scroll forces the scrollbar to
+  // always render (verified empirically to be the reliable mechanism here —
+  // scrollbar-gutter: stable alone did not reserve the gutter on short pages
+  // in this environment, so it's kept only as a defensive addition).
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
 }
 
 body,
@@ -56,6 +66,31 @@ picture {
   img {
     margin: auto;
   }
+}
+
+// Material Symbols is a ligature icon font: its text content (e.g.
+// "expand_more") is only ever meant to be read as a glyph. Constrain every
+// usage to a fixed square box (sized off its own font-size) so a slow font
+// load can't spell out the ligature name or resize the element while
+// swapping from text-width to icon-width. Also stay invisible (but keep the
+// box, so nothing shifts) until main.ts confirms the font is ready/failed —
+// visibility is used (not opacity) because several components already use
+// opacity on these spans for intentional dimming and shouldn't be fought.
+.material-symbols-outlined {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  overflow: hidden;
+  white-space: nowrap;
+  flex-shrink: 0;
+  vertical-align: middle;
+  visibility: hidden !important;
+}
+
+html.icons-ready .material-symbols-outlined {
+  visibility: visible !important;
 }
 
 h1 {

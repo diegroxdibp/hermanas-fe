@@ -1,227 +1,142 @@
-$sourceSans: Source Sans;
-//$sourceSerif: Source Serif;
+// Metric-matched local fallback for "Source Sans" — sized/positioned to match
+// Source Sans 3's own metrics (read from the actual font files) so that when
+// the real webfont swaps in, text doesn't reflow/shift the layout around it.
+@font-face {
+  font-family: "Source Sans Fallback";
+  src: local("Arial");
+  ascent-override: 102.4%;
+  descent-override: 40%;
+  line-gap-override: 0%;
+  size-adjust: 96.4%;
+}
+
+$sourceSans: "Source Sans", "Source Sans Fallback", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
 //Source Sans Pro
 @font-face {
   font-family: "Source Sans";
-  src: url("/assets/font/SourceSans3-ExtraLight.ttf") format("truetype");
+  src: url("/assets/font/SourceSans3-ExtraLight.woff2") format("woff2");
+  font-display: optional;
   font-weight: 200;
 }
 
 @font-face {
   font-family: "Source Sans";
-  src: url("/assets/font/SourceSans3-ExtraLightItalic.ttf") format("truetype");
+  src: url("/assets/font/SourceSans3-ExtraLightItalic.woff2") format("woff2");
+  font-display: optional;
   font-weight: 200;
   font-style: italic;
 }
 
 @font-face {
   font-family: "Source Sans";
-  src: url("/assets/font/SourceSans3-Light.ttf") format("truetype");
+  src: url("/assets/font/SourceSans3-Light.woff2") format("woff2");
+  font-display: optional;
   font-weight: 300;
   font-style: normal;
 }
 
 @font-face {
   font-family: "Source Sans";
-  src: url("/assets/font/SourceSans3-LightItalic.ttf") format("truetype");
+  src: url("/assets/font/SourceSans3-LightItalic.woff2") format("woff2");
+  font-display: optional;
   font-weight: 300;
   font-style: italic;
 }
 
 @font-face {
   font-family: "Source Sans";
-  src: url("/assets/font/SourceSans3-Regular.ttf") format("truetype");
+  src: url("/assets/font/SourceSans3-Regular.woff2") format("woff2");
+  font-display: optional;
   font-weight: 400;
   font-style: normal;
 }
 
 @font-face {
   font-family: "Source Sans";
-  src: url("/assets/font/SourceSans3-Italic.ttf") format("truetype");
+  src: url("/assets/font/SourceSans3-Italic.woff2") format("woff2");
+  font-display: optional;
   font-weight: 400;
   font-style: italic;
 }
 
 @font-face {
   font-family: "Source Sans";
-  src: url("/assets/font/SourceSans3-Medium.ttf") format("truetype");
+  src: url("/assets/font/SourceSans3-Medium.woff2") format("woff2");
+  font-display: optional;
   font-weight: 500;
   font-style: normal;
 }
 
 @font-face {
   font-family: "Source Sans";
-  src: url("/assets/font/SourceSans3-MediumItalic.ttf") format("truetype");
+  src: url("/assets/font/SourceSans3-MediumItalic.woff2") format("woff2");
+  font-display: optional;
   font-weight: 500;
   font-style: italic;
 }
 
 @font-face {
   font-family: "Source Sans";
-  src: url("/assets/font/SourceSans3-SemiBold.ttf") format("truetype");
+  src: url("/assets/font/SourceSans3-SemiBold.woff2") format("woff2");
+  font-display: optional;
   font-weight: 600;
   font-style: normal;
 }
 
 @font-face {
   font-family: "Source Sans";
-  src: url("/assets/font/SourceSans3-SemiBoldItalic.ttf") format("truetype");
+  src: url("/assets/font/SourceSans3-SemiBoldItalic.woff2") format("woff2");
+  font-display: optional;
   font-weight: 600;
   font-style: italic;
 }
 
 @font-face {
   font-family: "Source Sans";
-  src: url("/assets/font/SourceSans3-Bold.ttf") format("truetype");
+  src: url("/assets/font/SourceSans3-Bold.woff2") format("woff2");
+  font-display: optional;
   font-weight: 700;
   font-style: normal;
 }
 
 @font-face {
   font-family: "Source Sans";
-  src: url("/assets/font/SourceSans3-BoldItalic.ttf") format("truetype");
+  src: url("/assets/font/SourceSans3-BoldItalic.woff2") format("woff2");
+  font-display: optional;
   font-weight: 700;
   font-style: italic;
 }
 
 @font-face {
   font-family: "Source Sans";
-  src: url("/assets/font/SourceSans3-ExtraBold.ttf") format("truetype");
+  src: url("/assets/font/SourceSans3-ExtraBold.woff2") format("woff2");
+  font-display: optional;
   font-weight: 800;
   font-style: normal;
 }
 
 @font-face {
   font-family: "Source Sans";
-  src: url("/assets/font/SourceSans3-ExtraBoldItalic.ttf") format("truetype");
+  src: url("/assets/font/SourceSans3-ExtraBoldItalic.woff2") format("woff2");
+  font-display: optional;
   font-weight: 800;
   font-style: italic;
 }
 
 @font-face {
   font-family: "Source Sans";
-  src: url("/assets/font/SourceSans3-Black.ttf") format("truetype");
+  src: url("/assets/font/SourceSans3-Black.woff2") format("woff2");
+  font-display: optional;
   font-weight: 900;
   font-style: normal;
 }
 
 @font-face {
   font-family: "Source Sans";
-  src: url("/assets/font/SourceSans3-BlackItalic.ttf") format("truetype");
+  src: url("/assets/font/SourceSans3-BlackItalic.woff2") format("woff2");
+  font-display: optional;
   font-weight: 900;
   font-style: italic;
 }
 
-//Source Serif Pro
-//@font-face {
-//  font-family: "Source Serif";
-//  src: url("/assets/font/SourceSerif4-ExtraLight.ttf") format("truetype");
-//  font-weight: 200;
-//  font-style: normal;
-//}
-//
-//@font-face {
-//  font-family: "Source Serif";
-//  src: url("/assets/font/SourceSerif4-ExtraLightItalic.ttf") format("truetype");
-//  font-weight: 200;
-//  font-style: italic;
-//}
-//
-//@font-face {
-//  font-family: "Source Serif";
-//  src: url("/assets/font/SourceSerif4-Light.ttf") format("truetype");
-//  font-weight: 300;
-//  font-style: normal;
-//}
-//
-//@font-face {
-//  font-family: "Source Serif";
-//  src: url("/assets/font/SourceSerif4-LightItalic.ttf") format("truetype");
-//  font-weight: 300;
-//  font-style: italic;
-//}
-//
-//@font-face {
-//  font-family: "Source Serif";
-//  src: url("/assets/font/SourceSerif4-Regular.ttf") format("truetype");
-//  font-weight: 400;
-//  font-style: normal;
-//}
-//
-//@font-face {
-//  font-family: "Source Serif";
-//  src: url("/assets/font/SourceSerif4-Italic.ttf") format("truetype");
-//  font-weight: 400;
-//  font-style: italic;
-//}
-//
-//@font-face {
-//  font-family: "Source Serif";
-//  src: url("/assets/font/SourceSerif4-Medium.ttf") format("truetype");
-//  font-weight: 500;
-//  font-style: normal;
-//}
-//
-//@font-face {
-//  font-family: "Source Serif";
-//  src: url("/assets/font/SourceSerif4-MediumItalic.ttf") format("truetype");
-//  font-weight: 500;
-//  font-style: italic;
-//}
-//
-//@font-face {
-//  font-family: "Source Serif";
-//  src: url("/assets/font/SourceSerif4-SemiBold.ttf") format("truetype");
-//  font-weight: 600;
-//  font-style: normal;
-//}
-//
-//@font-face {
-//  font-family: "Source Serif";
-//  src: url("/assets/font/SourceSerif4-SemiBoldItalic.ttf") format("truetype");
-//  font-weight: 600;
-//  font-style: italic;
-//}
-//
-//@font-face {
-//  font-family: "Source Serif";
-//  src: url("/assets/font/SourceSerif4-Bold.ttf") format("truetype");
-//  font-weight: 700;
-//  font-style: normal;
-//}
-//
-//@font-face {
-//  font-family: "Source Serif";
-//  src: url("/assets/font/SourceSerif4-BoldItalic.ttf") format("truetype");
-//  font-weight: 700;
-//  font-style: italic;
-//}
-//
-//@font-face {
-//  font-family: "Source Serif";
-//  src: url("/assets/font/SourceSerif4-ExtraBold.ttf") format("truetype");
-//  font-weight: 800;
-//  font-style: normal;
-//}
-//
-//@font-face {
-//  font-family: "Source Serif";
-//  src: url("/assets/font/SourceSerif4-ExtraBoldItalic.ttf") format("truetype");
-//  font-weight: 800;
-//  font-style: italic;
-//}
-//
-//@font-face {
-//  font-family: "Source Serif";
-//  src: url("/assets/font/SourceSerif4-Black.ttf") format("truetype");
-//  font-weight: 900;
-//  font-style: normal;
-//}
-//
-//@font-face {
-//  font-family: "Source Serif";
-//  src: url("/assets/font/SourceSerif4-BlackItalic.ttf") format("truetype");
-//  font-weight: 900;
-//  font-style: italic;
-//}

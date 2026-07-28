@@ -21,22 +21,56 @@
     />
     <meta name="apple-mobile-web-app-title" content="Care" />
     <link rel="manifest" href="/assets/favicon/site.webmanifest" />
+    <!-- Preload the most-used weights of the self-hosted body font (used by every h1/h2/p/a/nav-item on first paint) -->
+    <link
+      rel="preload"
+      href="/assets/font/SourceSans3-Regular.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/assets/font/SourceSans3-Bold.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/assets/font/SourceSans3-SemiBold.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
       rel="stylesheet"
     />
+    <!-- display=block (not swap): this is a ligature icon font — its raw text
+         content (e.g. "expand_more") is only ever meant to be read as a glyph,
+         never as literal words, so briefly showing nothing while it loads
+         beats briefly showing the ligature name spelled out. -->
     <link
-      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block"
       rel="stylesheet"
     />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css"
-    />
+    <!-- .material-symbols-outlined spans stay invisible (styles.scss) until
+         this confirms the font is ready or has given up, so raw ligature
+         text (e.g. "expand_more") is never shown. -->
+    <script>
+      (function () {
+        var reveal = function () { document.documentElement.classList.add('icons-ready'); };
+        if (document.fonts && document.fonts.load) {
+          document.fonts.load('24px "Material Symbols Outlined"').then(reveal, reveal);
+          setTimeout(reveal, 2000); // never hide icons indefinitely if the check hangs
+        } else {
+          reveal();
+        }
+      })();
+    </script>
   </head>
   <body>
     <app-root></app-root>

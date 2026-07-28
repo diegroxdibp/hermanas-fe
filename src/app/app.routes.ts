@@ -3,38 +3,30 @@ import { RouterModule, Routes } from '@angular/router';
 import { Pages } from './shared/enums/pages.enum';
 import { AccessGuard } from './auth/auth.guard';
 import { AuthOnlyGuard } from './auth/authOnly.guard';
+import { HomeComponent } from './core/pages/home/home.component';
 
 export const routes: Routes = [
-  // HOME continua eager
+  // HOME is eager (not loadComponent): it's the landing page almost every
+  // visitor hits first, and lazy-loading it left a real gap where the
+  // router-outlet was empty and the sticky footer collapsed up to fill the
+  // short page, then jumped down once the chunk arrived.
   {
     path: Pages.HOME,
-    loadComponent: () =>
-      import('./core/pages/home/home.component').then(
-        (m) => m.HomeComponent,
-      ),
+    component: HomeComponent,
   },
 
   // páginas usando HomeComponent
   {
     path: Pages.ATENDIMENTO,
-    loadComponent: () =>
-      import('./core/pages/home/home.component').then(
-        (m) => m.HomeComponent,
-      ),
+    component: HomeComponent,
   },
   {
     path: Pages.ATENDIMENTO_INDIVIDUAL,
-    loadComponent: () =>
-      import('./core/pages/home/home.component').then(
-        (m) => m.HomeComponent,
-      ),
+    component: HomeComponent,
   },
   {
     path: Pages.ATENDIMENTO_GRUPO,
-    loadComponent: () =>
-      import('./core/pages/home/home.component').then(
-        (m) => m.HomeComponent,
-      ),
+    component: HomeComponent,
   },
 
   // páginas isoladas

@@ -16,110 +16,110 @@
 
 @font-face {
   font-family: "Source Sans 3";
-  src: url("/assets/font/SourceSans3-Light.ttf") format("truetype");
+  src: url("/assets/font/SourceSans3-Light.woff2") format("woff2");
   font-weight: 300;
   font-style: normal;
-  font-display: swap;
+  font-display: optional;
 }
 @font-face {
   font-family: "Source Sans 3";
-  src: url("/assets/font/SourceSans3-Regular.ttf") format("truetype");
+  src: url("/assets/font/SourceSans3-Regular.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
-  font-display: swap;
+  font-display: optional;
 }
 @font-face {
   font-family: "Source Sans 3";
-  src: url("/assets/font/SourceSans3-Italic.ttf") format("truetype");
+  src: url("/assets/font/SourceSans3-Italic.woff2") format("woff2");
   font-weight: 400;
   font-style: italic;
-  font-display: swap;
+  font-display: optional;
 }
 @font-face {
   font-family: "Source Sans 3";
-  src: url("/assets/font/SourceSans3-Medium.ttf") format("truetype");
+  src: url("/assets/font/SourceSans3-Medium.woff2") format("woff2");
   font-weight: 500;
   font-style: normal;
-  font-display: swap;
+  font-display: optional;
 }
 @font-face {
   font-family: "Source Sans 3";
-  src: url("/assets/font/SourceSans3-MediumItalic.ttf") format("truetype");
+  src: url("/assets/font/SourceSans3-MediumItalic.woff2") format("woff2");
   font-weight: 500;
   font-style: italic;
-  font-display: swap;
+  font-display: optional;
 }
 @font-face {
   font-family: "Source Sans 3";
-  src: url("/assets/font/SourceSans3-SemiBold.ttf") format("truetype");
+  src: url("/assets/font/SourceSans3-SemiBold.woff2") format("woff2");
   font-weight: 600;
   font-style: normal;
-  font-display: swap;
+  font-display: optional;
 }
 @font-face {
   font-family: "Source Sans 3";
-  src: url("/assets/font/SourceSans3-Bold.ttf") format("truetype");
+  src: url("/assets/font/SourceSans3-Bold.woff2") format("woff2");
   font-weight: 700;
   font-style: normal;
-  font-display: swap;
+  font-display: optional;
 }
 @font-face {
   font-family: "Source Sans 3";
-  src: url("/assets/font/SourceSans3-BoldItalic.ttf") format("truetype");
+  src: url("/assets/font/SourceSans3-BoldItalic.woff2") format("woff2");
   font-weight: 700;
   font-style: italic;
-  font-display: swap;
+  font-display: optional;
 }
 @font-face {
   font-family: "Source Sans 3";
-  src: url("/assets/font/SourceSans3-Black.ttf") format("truetype");
+  src: url("/assets/font/SourceSans3-Black.woff2") format("woff2");
   font-weight: 900;
   font-style: normal;
-  font-display: swap;
+  font-display: optional;
 }
 
 /* Editorial serif — optional. Use for slides, pull quotes, big covers. */
 @font-face {
   font-family: "Source Serif 4";
-  src: url("/assets/font/SourceSerif4-Light.ttf") format("truetype");
+  src: url("/assets/font/SourceSerif4-Light.woff2") format("woff2");
   font-weight: 300;
   font-style: normal;
-  font-display: swap;
+  font-display: optional;
 }
 @font-face {
   font-family: "Source Serif 4";
-  src: url("/assets/font/SourceSerif4-Regular.ttf") format("truetype");
+  src: url("/assets/font/SourceSerif4-Regular.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
-  font-display: swap;
+  font-display: optional;
 }
 @font-face {
   font-family: "Source Serif 4";
-  src: url("/assets/font/SourceSerif4-Italic.ttf") format("truetype");
+  src: url("/assets/font/SourceSerif4-Italic.woff2") format("woff2");
   font-weight: 400;
   font-style: italic;
-  font-display: swap;
+  font-display: optional;
 }
 @font-face {
   font-family: "Source Serif 4";
-  src: url("/assets/font/SourceSerif4-Medium.ttf") format("truetype");
+  src: url("/assets/font/SourceSerif4-Medium.woff2") format("woff2");
   font-weight: 500;
   font-style: normal;
-  font-display: swap;
+  font-display: optional;
 }
 @font-face {
   font-family: "Source Serif 4";
-  src: url("/assets/font/SourceSerif4-SemiBold.ttf") format("truetype");
+  src: url("/assets/font/SourceSerif4-SemiBold.woff2") format("woff2");
   font-weight: 600;
   font-style: normal;
-  font-display: swap;
+  font-display: optional;
 }
 @font-face {
   font-family: "Source Serif 4";
-  src: url("/assets/font/SourceSerif4-Bold.ttf") format("truetype");
+  src: url("/assets/font/SourceSerif4-Bold.woff2") format("woff2");
   font-weight: 700;
   font-style: normal;
-  font-display: swap;
+  font-display: optional;
 }
 
 /* ---------- Tokens ---------- */
@@ -171,8 +171,8 @@
   --bg-section-green: var(--color-secondary-green);
 
   /* ---- Type families ---- */
-  --font-sans: "Source Sans 3", "Source Sans", system-ui, -apple-system,
-               "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Source Sans 3", "Source Sans", "Source Sans Fallback", system-ui,
+               -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-serif: "Source Serif 4", "Source Serif", Georgia, "Times New Roman", serif;
 
   /* ---- Type scale (mobile-first; lg breakpoint upscales display sizes) ---- */
