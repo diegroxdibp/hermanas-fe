@@ -265,6 +265,24 @@
                     }
                   </div></div>
                 </div>
+                @if (appt.platform) {
+                  <div class="ad-row">
+                    <span class="material-symbols-outlined">videocam</span>
+                    <div><div class="ad-k">Plataforma</div><div class="ad-v">{{ appt.platform }}</div></div>
+                  </div>
+                }
+                @if (appt.price != null) {
+                  <div class="ad-row">
+                    <span class="material-symbols-outlined">payments</span>
+                    <div><div class="ad-k">Valor</div><div class="ad-v">{{ apptPriceDisplay(appt) }}</div></div>
+                  </div>
+                }
+                @if (appt.priceBRL != null) {
+                  <div class="ad-row">
+                    <span class="material-symbols-outlined">payments</span>
+                    <div><div class="ad-k">Valor em Reais</div><div class="ad-v">{{ apptPriceBRLDisplay(appt) }}</div></div>
+                  </div>
+                }
                 @if (appt.clientEmail) {
                   <div class="ad-row">
                     <span class="material-symbols-outlined">mail</span>
@@ -599,6 +617,9 @@
         Serviços com reservas (•) não podem ser removidos.
       </div>
     }
+    @if (serviceErrorMessage(); as err) {
+      <span class="field-error">{{ err }}</span>
+    }
   </div>
 
   <!-- Modalidade -->
@@ -614,9 +635,6 @@
         [class.on]="editorModality() === Modality.ANY"
         (click)="setEditorModality(Modality.ANY)"
       >
-        @if (editorModality() === Modality.ANY) {
-          <span class="material-symbols-outlined">check</span>
-        }
         Qualquer
       </button>
       <button
@@ -624,9 +642,6 @@
         class="presencial"
         (click)="setEditorModality(Modality.LOCAL)"
       >
-        @if (editorModality() === Modality.LOCAL) {
-          <span class="material-symbols-outlined">check</span>
-        }
         Presencial
       </button>
       <button
@@ -634,14 +649,11 @@
         class="remoto"
         (click)="setEditorModality(Modality.REMOTE)"
       >
-        @if (editorModality() === Modality.REMOTE) {
-          <span class="material-symbols-outlined">check</span>
-        }
         Remoto
       </button>
     </div>
     @if (editorModality() !== Modality.REMOTE) {
-      <div class="field" style="margin-top: 12px;">
+      <div class="field" style="margin-top: 12px;" [class.has-error]="localErrorMessage()">
         <div class="field-inner">
           <span class="field-label">Local</span>
           <input
@@ -649,12 +661,96 @@
             type="text"
             [value]="editorLocal()"
             (input)="editorLocal.set($any($event.target).value)"
-            placeholder="Endereço do consultório"
+            placeholder="Consultório · R. da Misericórdia 53"
           />
         </div>
         <span class="material-symbols-outlined field-icon">location_on</span>
       </div>
+      @if (localErrorMessage(); as err) {
+        <span class="field-error">{{ err }}</span>
+      }
     }
+    @if (editorModality() !== Modality.LOCAL) {
+      <div class="field field-textarea" style="margin-top: 12px;" [class.has-error]="platformErrorMessage()">
+        <div class="field-inner">
+          <span class="field-label">Plataforma</span>
+          <textarea
+            class="field-value"
+            rows="3"
+            [value]="editorPlatform()"
+            (input)="editorPlatform.set($any($event.target).value)"
+            placeholder="Partilhe orientações sobre a plataforma a usar, o envio do link e outros procedimentos."
+          ></textarea>
+        </div>
+        <span class="material-symbols-outlined field-icon">videocam</span>
+      </div>
+      @if (platformErrorMessage(); as err) {
+        <span class="field-error">{{ err }}</span>
+      }
+    }
+  </div>
+
+  <!-- Valor -->
+  <div class="be-section">
+    <label class="control-label">Valor</label>
+    <div class="money-row">
+      <div class="money-col">
+        <div class="field field-money" [class.has-error]="priceErrorMessage()">
+          <div class="field-inner">
+            <span class="field-label">Valor por sessão</span>
+            <div class="money-input">
+              @if (currencyIsPrefix) {
+                <span class="currency-affix">{{ currencySymbol }}</span>
+              }
+              <input
+                class="field-value"
+                type="text"
+                inputmode="decimal"
+                autocomplete="off"
+                [value]="editorPrice()"
+                (keydown)="onPriceKeydown($event)"
+                (input)="onPriceInput($event)"
+                [placeholder]="pricePlaceholder"
+              />
+              @if (!currencyIsPrefix) {
+                <span class="currency-affix">{{ currencySymbol }}</span>
+              }
+            </div>
+          </div>
+        </div>
+        @if (priceErrorMessage(); as err) {
+          <span class="field-error">{{ err }}</span>
+        }
+      </div>
+      <div class="money-col">
+        <div class="field field-money" [class.has-error]="priceBRLErrorMessage()">
+          <div class="field-inner">
+            <span class="field-label">Valor em Reais</span>
+            <div class="money-input">
+              @if (currencyIsPrefixBRL) {
+                <span class="currency-affix">{{ currencySymbolBRL }}</span>
+              }
+              <input
+                class="field-value"
+                type="text"
+                inputmode="decimal"
+                autocomplete="off"
+                [value]="editorPriceBRL()"
+                (keydown)="onPriceKeydown($event)"
+                (input)="onPriceBRLInput($event)"
+                [placeholder]="pricePlaceholderBRL"
+              />
+              @if (!currencyIsPrefixBRL) {
+                <span class="currency-affix">{{ currencySymbolBRL }}</span>
+              }
+            </div>
+          </div>
+        </div>
+        @if (priceBRLErrorMessage(); as err) {
+          <span class="field-error">{{ err }}</span>
+        }
+      </div>
+    </div>
   </div>
 
   <!-- Frequência -->
@@ -670,18 +766,12 @@
         [class.on]="editorFrequency() === 'once'"
         (click)="setEditorFrequency('once')"
       >
-        @if (editorFrequency() === 'once') {
-          <span class="material-symbols-outlined">check</span>
-        }
         Data única
       </button>
       <button
         [class.on]="editorFrequency() === 'weekly'"
         (click)="setEditorFrequency('weekly')"
       >
-        @if (editorFrequency() === 'weekly') {
-          <span class="material-symbols-outlined">check</span>
-        }
         Semanal
       </button>
     </div>
@@ -705,9 +795,12 @@
             </button>
           }
         </div>
+        @if (weekdayErrorMessage(); as err) {
+          <span class="field-error">{{ err }}</span>
+        }
       </div>
     } @else {
-      <div class="field date-field-wrap" style="margin-top: 14px;" (click)="edCalToggle($event)">
+      <div class="field date-field-wrap" style="margin-top: 14px;" [class.has-error]="dateErrorMessage()" (click)="edCalToggle($event)">
         <div class="field-inner">
           <span class="field-label">
             Data
@@ -753,6 +846,9 @@
           </div>
         }
       </div>
+      @if (dateErrorMessage(); as err) {
+        <span class="field-error">{{ err }}</span>
+      }
     }
   </div>
 

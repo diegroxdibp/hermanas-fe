@@ -17,4 +17,7 @@ export interface Appointment {
   dayOfWeek: DayOfWeek;
   clientName?: string;
   clientEmail?: string;
+  platform?: string;
+  price?: number;
+  priceBRL?: number;
 }

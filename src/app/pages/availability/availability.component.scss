@@ -133,6 +133,91 @@
     flex-shrink: 0;
     cursor: pointer;
   }
+
+  &.field-textarea {
+    position: relative;
+    align-items: stretch;
+    cursor: default;
+
+    // Icon is taken out of flex flow so field-inner (and the textarea inside it)
+    // can use the box's full width instead of being squeezed to leave room for it.
+    .field-icon {
+      position: absolute;
+      top: 12px;
+      right: 18px;
+    }
+  }
+
+  &.field-money { cursor: text; }
+
+  &.has-error {
+    border-color: #c0392b;
+  }
+}
+
+.money-input {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.currency-affix {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-muted);
+  font-family: var(--font-sans);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.money-row {
+  display: flex;
+  gap: 12px;
+}
+
+.money-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.field-error {
+  display: block;
+  margin-top: 6px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #c0392b;
+}
+
+textarea.field-value {
+  resize: none;
+  line-height: 1.4;
+  font-weight: 400;
+  cursor: text;
+  min-height: 78px;
+
+  // Firefox
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-primary-blue) transparent;
+
+  // WebKit (Chrome / Edge / Safari)
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--color-primary-blue);
+    border-radius: var(--radius-pill);
+  }
+}
+
+// Money input — no native number-input spinner (removed via type="text" in the template);
+// this belt-and-suspenders rule keeps any other numeric field in this component spinner-free too.
+input[type="number"].field-value {
+  -moz-appearance: textfield;
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 }
 
 // Control label

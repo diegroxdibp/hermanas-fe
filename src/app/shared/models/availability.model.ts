@@ -15,6 +15,9 @@ export interface AvailabilityModel {
   dayOfWeek: DayOfWeek;
   isBooked: boolean;
   modality: string;
+  platform?: string;
+  price?: number;
+  priceBRL?: number;
   services: ProfessionalService[];
 }
 

@@ -1,8 +1,9 @@
-import { forkJoin, of } from 'rxjs';
+import { forkJoin, of, tap, type Observable } from 'rxjs';
 import { CommonModule, NgTemplateOutlet } from '@angular/common';
 import {
   Component,
   HostListener,
+  LOCALE_ID,
   OnInit,
   computed,
   inject,
@@ -119,6 +120,29 @@ function toKey(d: Date): string {
   return `${y}-${m}-${day}`;
 }
 
+// Money input's decimal separator is locale-derived (see `decimalSeparator` on the component);
+// the API always wants a plain number regardless of how it was typed.
+function parsePriceInput(raw: string, separator: string): number | undefined {
+  if (!raw) return undefined;
+  const n = Number(raw.split(separator).join('.'));
+  return Number.isFinite(n) ? n : undefined;
+}
+
+function formatPriceForEditor(price: number | undefined, separator: string): string {
+  return price != null ? price.toFixed(2).replace('.', separator) : '';
+}
+
+// Sanitizes free-typed input into a valid "digits<sep>digits(0-2)" money string as the user types.
+function sanitizePriceInput(raw: string, separator: string): string {
+  let value = [...raw].filter(ch => (ch >= '0' && ch <= '9') || ch === separator).join('');
+  const firstSep = value.indexOf(separator);
+  if (firstSep !== -1) {
+    value = value.slice(0, firstSep + 1) + [...value.slice(firstSep + 1)].filter(ch => ch !== separator).join('');
+  }
+  const [intPart, decPart] = value.split(separator);
+  return decPart !== undefined ? `${intPart}${separator}${decPart.slice(0, 2)}` : value;
+}
+
 // ─── Models ───────────────────────────────────────────────────────────────────
 
 interface DragSelection {
@@ -159,6 +183,9 @@ interface TherapistBlock {
   endTime: string;
   sessionDuration: 30 | 60 | 90;
   local?: string;
+  platform?: string;
+  price?: number;
+  priceBRL?: number;
 }
 
 // ─── Backend → frontend enum maps ─────────────────────────────────────────────
@@ -190,6 +217,7 @@ export class AvailabilityComponent implements OnInit {
   readonly screenSize = inject(ScreenSizeService);
   private readonly sessionService = inject(SessionService);
   private readonly dialog = inject(MatDialog);
+  private readonly locale = inject(LOCALE_ID);
 
   // ─ Expose to template
   readonly HOURS = HOURS;
@@ -262,7 +290,115 @@ export class AvailabilityComponent implements OnInit {
   editorStartTime = signal<string>('09:00');
   editorEndTime = signal<string>('13:00');
   editorSessionDuration = signal<30 | 60 | 90>(60);
-  editorLocal = signal<string>('Consultório · R. da Misericórdia 53');
+  editorLocal = signal<string>('');
+  editorPlatform = signal<string>('');
+  editorPrice = signal<string>('');
+  editorPriceBRL = signal<string>('');
+
+  // Required-field errors only surface after a save attempt, so a freshly opened
+  // (empty) editor doesn't greet the user with a wall of red text.
+  attemptedSave = signal<boolean>(false);
+
+  readonly serviceErrorMessage = computed<string | null>(() => {
+    if (!this.attemptedSave()) return null;
+    return this.selectedServiceIds().size === 0 ? 'Selecione pelo menos um serviço.' : null;
+  });
+
+  readonly localErrorMessage = computed<string | null>(() => {
+    if (!this.attemptedSave()) return null;
+    if (this.editorModality() === Modality.REMOTE) return null;
+    return this.editorLocal().trim() === '' ? 'Indique o local do atendimento.' : null;
+  });
+
+  readonly platformErrorMessage = computed<string | null>(() => {
+    if (!this.attemptedSave()) return null;
+    if (this.editorModality() === Modality.LOCAL) return null;
+    return this.editorPlatform().trim() === '' ? 'Indique a plataforma a usar.' : null;
+  });
+
+  readonly weekdayErrorMessage = computed<string | null>(() => {
+    if (!this.attemptedSave()) return null;
+    if (this.editorFrequency() !== 'weekly') return null;
+    return this.selectedWeekdays().size === 0 ? 'Selecione pelo menos um dia da semana.' : null;
+  });
+
+  readonly dateErrorMessage = computed<string | null>(() => {
+    if (!this.attemptedSave()) return null;
+    if (this.editorFrequency() !== 'once') return null;
+    return this.editorDate().trim() === '' ? 'Selecione uma data.' : null;
+  });
+
+  // ─ Money fields (Valor): currency + locale-aware formatting/validation.
+  // EUR is the primary, required price; BRL is a second, independently-set price
+  // (not a conversion) for professionals who also charge clients in Brazil.
+  private readonly CURRENCY = 'EUR';
+  private readonly CURRENCY_BRL = 'BRL';
+  private readonly PRICE_MIN = 0;
+  private readonly PRICE_MAX = 10000;
+  private readonly decimalSeparator = new Intl.NumberFormat(this.locale)
+    .formatToParts(1.1)
+    .find(p => p.type === 'decimal')?.value ?? '.';
+
+  private readonly currencyParts = new Intl.NumberFormat(this.locale, {
+    style: 'currency',
+    currency: this.CURRENCY,
+  }).formatToParts(0);
+  readonly currencySymbol = this.currencyParts.find(p => p.type === 'currency')?.value ?? this.CURRENCY;
+  readonly currencyIsPrefix =
+    this.currencyParts.findIndex(p => p.type === 'currency') <
+    this.currencyParts.findIndex(p => p.type === 'integer');
+  readonly pricePlaceholder = (0).toLocaleString(this.locale, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+  private readonly currencyPartsBRL = new Intl.NumberFormat(this.locale, {
+    style: 'currency',
+    currency: this.CURRENCY_BRL,
+  }).formatToParts(0);
+  readonly currencySymbolBRL = this.currencyPartsBRL.find(p => p.type === 'currency')?.value ?? this.CURRENCY_BRL;
+  readonly currencyIsPrefixBRL =
+    this.currencyPartsBRL.findIndex(p => p.type === 'currency') <
+    this.currencyPartsBRL.findIndex(p => p.type === 'integer');
+  readonly pricePlaceholderBRL = this.pricePlaceholder;
+
+  readonly priceErrorMessage = computed<string | null>(() => {
+    if (!this.attemptedSave()) return null;
+    const raw = this.editorPrice();
+    const value = parsePriceInput(raw, this.decimalSeparator);
+    if (raw.trim() === '' || value === undefined) return 'Indique o valor da sessão.';
+    if (value <= this.PRICE_MIN) {
+      return `O valor deve ser superior a ${this._formatCurrencyWhole(this.PRICE_MIN, this.CURRENCY)}`;
+    }
+    if (value > this.PRICE_MAX) {
+      return `O valor máximo permitido é ${this._formatCurrencyWhole(this.PRICE_MAX, this.CURRENCY)}`;
+    }
+    return null;
+  });
+
+  // BRL is optional — a professional who doesn't bill in Reais just leaves it blank.
+  readonly priceBRLErrorMessage = computed<string | null>(() => {
+    if (!this.attemptedSave()) return null;
+    const raw = this.editorPriceBRL();
+    if (raw.trim() === '') return null;
+    const value = parsePriceInput(raw, this.decimalSeparator);
+    if (value === undefined) return 'Indique um valor válido.';
+    if (value <= this.PRICE_MIN) {
+      return `O valor deve ser superior a ${this._formatCurrencyWhole(this.PRICE_MIN, this.CURRENCY_BRL)}`;
+    }
+    if (value > this.PRICE_MAX) {
+      return `O valor máximo permitido é ${this._formatCurrencyWhole(this.PRICE_MAX, this.CURRENCY_BRL)}`;
+    }
+    return null;
+  });
+
+  private _formatCurrencyWhole(n: number, currency: string): string {
+    return new Intl.NumberFormat(this.locale, {
+      style: 'currency',
+      currency,
+      maximumFractionDigits: 0,
+    }).format(n);
+  }
 
   // ─ Date picker calendar (editor)
   readonly edCalWeekdays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
@@ -661,6 +797,7 @@ export class AvailabilityComponent implements OnInit {
     event.stopPropagation();
     this.selectedBlockId.set(block.id);
     this.selectedAppointment.set(null);
+    this.attemptedSave.set(false);
     this.loadBlockIntoEditor(block);
   }
 
@@ -673,7 +810,10 @@ export class AvailabilityComponent implements OnInit {
     this.editorStartTime.set(block.startTime);
     this.editorEndTime.set(block.endTime);
     this.editorSessionDuration.set(block.sessionDuration);
-    this.editorLocal.set(block.local ?? 'Consultório · R. da Misericórdia 53');
+    this.editorLocal.set(block.local ?? '');
+    this.editorPlatform.set(block.platform ?? '');
+    this.editorPrice.set(formatPriceForEditor(block.price, this.decimalSeparator));
+    this.editorPriceBRL.set(formatPriceForEditor(block.priceBRL, this.decimalSeparator));
   }
 
   startMove(event: PointerEvent, block: TherapistBlock, colIndex: number): void {
@@ -772,7 +912,7 @@ export class AvailabilityComponent implements OnInit {
           const slotStart = slotTimes[i] ?? s.slotTime;
           const slotEnd = minToTime(timeToMin(slotStart) + dur);
           return this.apiService.updateAvailability(s.backendId,
-            this.buildSlotPayload(block.services, block.modality, block.isRecurring, newDate, slotStart, slotEnd),
+            this.buildSlotPayload(block.services, block.modality, block.isRecurring, newDate, slotStart, slotEnd, block.platform, block.price, block.priceBRL),
           );
         });
         forkJoin(updateOps).subscribe({
@@ -907,7 +1047,55 @@ export class AvailabilityComponent implements OnInit {
     this.editorStartTime.set('09:00');
     this.editorEndTime.set('13:00');
     this.editorSessionDuration.set(60);
-    this.editorLocal.set('Consultório · R. da Misericórdia 53');
+    this.editorLocal.set('');
+    this.editorPlatform.set('');
+    this.editorPrice.set('');
+    this.editorPriceBRL.set('');
+    this.attemptedSave.set(false);
+  }
+
+  // Blocks invalid keystrokes outright (letters, extra dots/commas, a 3rd decimal digit).
+  // onPriceInput below is kept as a fallback sanitizer for paste/autofill/drag-drop.
+  onPriceKeydown(event: KeyboardEvent): void {
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
+
+    const navigationKeys = [
+      'Backspace', 'Delete', 'Tab', 'Escape', 'Enter',
+      'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End',
+    ];
+    if (navigationKeys.includes(event.key)) return;
+
+    const input = event.target as HTMLInputElement;
+    const value = input.value;
+    const selStart = input.selectionStart ?? value.length;
+    const selEnd = input.selectionEnd ?? value.length;
+    const hasSelection = selEnd > selStart;
+
+    if (event.key === this.decimalSeparator) {
+      if (value.includes(this.decimalSeparator) && !hasSelection) event.preventDefault();
+      return;
+    }
+
+    if (!/^[0-9]$/.test(event.key)) {
+      event.preventDefault();
+      return;
+    }
+
+    const sepIdx = value.indexOf(this.decimalSeparator);
+    if (!hasSelection && sepIdx !== -1 && selStart > sepIdx) {
+      const decimals = value.slice(sepIdx + 1);
+      if (decimals.length >= 2) event.preventDefault();
+    }
+  }
+
+  onPriceInput(event: Event): void {
+    const raw = (event.target as HTMLInputElement).value;
+    this.editorPrice.set(sanitizePriceInput(raw, this.decimalSeparator));
+  }
+
+  onPriceBRLInput(event: Event): void {
+    const raw = (event.target as HTMLInputElement).value;
+    this.editorPriceBRL.set(sanitizePriceInput(raw, this.decimalSeparator));
   }
 
   toggleService(id: number): void {
@@ -965,9 +1153,17 @@ export class AvailabilityComponent implements OnInit {
   }
 
   saveBlock(): void {
-    const selectedSvcs = this.services().filter(s => this.selectedServiceIds().has(s.id));
-    if (selectedSvcs.length === 0) return;
+    this.attemptedSave.set(true);
 
+    const formError = this.serviceErrorMessage() || this.localErrorMessage()
+      || this.platformErrorMessage() || this.priceErrorMessage() || this.priceBRLErrorMessage()
+      || this.weekdayErrorMessage() || this.dateErrorMessage();
+    if (formError) {
+      this.snackbarService.openSnackBar({ message: formError });
+      return;
+    }
+
+    const selectedSvcs = this.services().filter(s => this.selectedServiceIds().has(s.id));
     const isRecurring = this.editorFrequency() === 'weekly';
     const existingId = this.selectedBlockId();
 
@@ -990,6 +1186,9 @@ export class AvailabilityComponent implements OnInit {
         endTime: this.editorEndTime(),
         sessionDuration: this.editorSessionDuration(),
         local: this.editorModality() !== Modality.REMOTE ? this.editorLocal() : undefined,
+        platform: this.editorModality() !== Modality.LOCAL ? this.editorPlatform() : undefined,
+        price: parsePriceInput(this.editorPrice(), this.decimalSeparator),
+        priceBRL: parsePriceInput(this.editorPriceBRL(), this.decimalSeparator),
       };
 
       if (!this.validateHonorsBookings(updated)) {
@@ -1007,24 +1206,34 @@ export class AvailabilityComponent implements OnInit {
       } else {
         this._deleteAndRecreateBlock(existing, updated, existingId);
       }
-    } else {
-      if (this.previewBlocks().some(p => p.hasConflict)) {
-        this.snackbarService.openSnackBar({
-          message: 'Existe um conflito de horário. Resolva os conflitos antes de guardar.',
-        });
-        return;
-      }
 
-      this._invalidateSchedulingCache();
-      if (isRecurring) {
-        [...this.selectedWeekdays()].forEach(wd => this.createSingleBlock(selectedSvcs, true, wd));
-        this.resetEditor();
-      } else {
-        this.createSingleBlock(selectedSvcs, false, undefined, this.editorDate());
-      }
+      this.closeSheet();
+      return;
     }
 
-    this.closeSheet();
+    if (this.previewBlocks().some(p => p.hasConflict)) {
+      this.snackbarService.openSnackBar({
+        message: 'Existe um conflito de horário. Resolva os conflitos antes de guardar.',
+      });
+      return;
+    }
+
+    this._invalidateSchedulingCache();
+
+    const saveOps = isRecurring
+      ? [...this.selectedWeekdays()].map(wd => this.createSingleBlock(selectedSvcs, true, wd))
+      : [this.createSingleBlock(selectedSvcs, false, undefined, this.editorDate())];
+
+    // Only clear the form and close the panel once the save actually succeeds —
+    // resetting eagerly meant a failed request silently wiped whatever the user had typed.
+    // The global error interceptor already surfaces a toast for the failed request itself.
+    forkJoin(saveOps).subscribe({
+      next: () => {
+        this.resetEditor();
+        this.closeSheet();
+      },
+      error: (e) => console.error('saveBlock error', e),
+    });
   }
 
   removeBlock(): void {
@@ -1135,7 +1344,7 @@ export class AvailabilityComponent implements OnInit {
           const newSlotTimes = generateSlots(b.endTime, newEnd, dur);
           const createOps = newSlotTimes.map(t =>
             this.apiService.createAvailability(this.buildSlotPayload(
-              b.services, b.modality, b.isRecurring, date, t, minToTime(timeToMin(t) + dur),
+              b.services, b.modality, b.isRecurring, date, t, minToTime(timeToMin(t) + dur), b.platform, b.price, b.priceBRL,
             ))
           );
           forkJoin(createOps).subscribe({
@@ -1244,7 +1453,7 @@ export class AvailabilityComponent implements OnInit {
           const newSlotTimes = generateSlots(newStart, b.startTime, dur);
           const createOps = newSlotTimes.map(t =>
             this.apiService.createAvailability(this.buildSlotPayload(
-              b.services, b.modality, b.isRecurring, date, t, minToTime(timeToMin(t) + dur),
+              b.services, b.modality, b.isRecurring, date, t, minToTime(timeToMin(t) + dur), b.platform, b.price, b.priceBRL,
             ))
           );
           forkJoin(createOps).subscribe({
@@ -1404,7 +1613,7 @@ export class AvailabilityComponent implements OnInit {
     isRecurring: boolean,
     weekday?: DayOfWeek,
     startDate?: string,
-  ): void {
+  ): Observable<unknown> {
     const tempId = ++this._nextId;
     const date = isRecurring && weekday ? this.dateForWeekday(weekday) : (startDate ?? '');
     const dur = this.editorSessionDuration();
@@ -1422,6 +1631,9 @@ export class AvailabilityComponent implements OnInit {
       endTime: this.editorEndTime(),
       sessionDuration: dur,
       local: this.editorModality() !== Modality.REMOTE ? this.editorLocal() : undefined,
+      platform: this.editorModality() !== Modality.LOCAL ? this.editorPlatform() : undefined,
+      price: parsePriceInput(this.editorPrice(), this.decimalSeparator),
+      priceBRL: parsePriceInput(this.editorPriceBRL(), this.decimalSeparator),
     };
 
     this.blocks.update(bs => [...bs, tempBlock]);
@@ -1429,25 +1641,32 @@ export class AvailabilityComponent implements OnInit {
 
     const createOps = slotTimes.map(t =>
       this.apiService.createAvailability(
-        this.buildSlotPayload(services, this.editorModality(), isRecurring, date, t, minToTime(timeToMin(t) + dur)),
+        this.buildSlotPayload(
+          services, this.editorModality(), isRecurring, date, t, minToTime(timeToMin(t) + dur),
+          this.editorModality() !== Modality.LOCAL ? this.editorPlatform() : undefined,
+          parsePriceInput(this.editorPrice(), this.decimalSeparator),
+          parsePriceInput(this.editorPriceBRL(), this.decimalSeparator),
+        ),
       )
     );
 
-    forkJoin(createOps).subscribe({
-      next: (results) => {
-        const newSlots: BackendSlot[] = results.map((res, i) => ({
-          slotTime: slotTimes[i], backendId: res.id, isBooked: false,
-        }));
-        this.blocks.update(bs => bs.map(b =>
-          b.id === tempId ? { ...b, backendSlots: newSlots } : b,
-        ));
-      },
-      error: (e) => {
-        console.error('createAvailability error', e);
-        this.blocks.update(bs => bs.filter(b => b.id !== tempId));
-        if (this.selectedBlockId() === tempId) this.selectedBlockId.set(null);
-      },
-    });
+    return forkJoin(createOps).pipe(
+      tap({
+        next: (results) => {
+          const newSlots: BackendSlot[] = results.map((res, i) => ({
+            slotTime: slotTimes[i], backendId: res.id, isBooked: false,
+          }));
+          this.blocks.update(bs => bs.map(b =>
+            b.id === tempId ? { ...b, backendSlots: newSlots } : b,
+          ));
+        },
+        error: (e) => {
+          console.error('createAvailability error', e);
+          this.blocks.update(bs => bs.filter(b => b.id !== tempId));
+          if (this.selectedBlockId() === tempId) this.selectedBlockId.set(null);
+        },
+      }),
+    );
   }
 
   private buildSlotPayload(
@@ -1457,11 +1676,17 @@ export class AvailabilityComponent implements OnInit {
     date: string,
     slotStart: string,
     slotEnd: string,
+    platform?: string,
+    price?: number,
+    priceBRL?: number,
   ): AvailabilityPayload {
     return {
       professionalServiceIds: services.map(s => s.id),
       startDate: date,
       startTime: slotStart,
+      platform: modality !== Modality.LOCAL ? platform : undefined,
+      price,
+      priceBRL,
       endTime: slotEnd,
       isRecurring,
       modality: toBackendModality(modality),
@@ -1531,6 +1756,9 @@ export class AvailabilityComponent implements OnInit {
       startTime: firstStart,
       endTime: stripSec(last.endTime),
       sessionDuration,
+      platform: first.platform,
+      price: first.price,
+      priceBRL: first.priceBRL,
     };
   }
 
@@ -1553,7 +1781,7 @@ export class AvailabilityComponent implements OnInit {
 
     const updateOps = existing.backendSlots.map(s =>
       this.apiService.updateAvailability(s.backendId, this.buildSlotPayload(
-        updated.services, updated.modality, updated.isRecurring, date, s.slotTime, minToTime(timeToMin(s.slotTime) + dur),
+        updated.services, updated.modality, updated.isRecurring, date, s.slotTime, minToTime(timeToMin(s.slotTime) + dur), updated.platform, updated.price, updated.priceBRL,
       ))
     );
     if (updateOps.length > 0) {
@@ -1568,7 +1796,7 @@ export class AvailabilityComponent implements OnInit {
       const newSlotTimes = generateSlots(existing.endTime, updated.endTime, dur);
       const createOps = newSlotTimes.map(t =>
         this.apiService.createAvailability(this.buildSlotPayload(
-          updated.services, updated.modality, updated.isRecurring, date, t, minToTime(timeToMin(t) + dur),
+          updated.services, updated.modality, updated.isRecurring, date, t, minToTime(timeToMin(t) + dur), updated.platform, updated.price, updated.priceBRL,
         ))
       );
       forkJoin(createOps).subscribe({
@@ -1597,7 +1825,7 @@ export class AvailabilityComponent implements OnInit {
         if (slotTimes.length === 0) return;
         const createOps = slotTimes.map(t =>
           this.apiService.createAvailability(this.buildSlotPayload(
-            updated.services, updated.modality, updated.isRecurring, date, t, minToTime(timeToMin(t) + dur),
+            updated.services, updated.modality, updated.isRecurring, date, t, minToTime(timeToMin(t) + dur), updated.platform, updated.price, updated.priceBRL,
           ))
         );
         forkJoin(createOps).subscribe({
@@ -1749,6 +1977,16 @@ export class AvailabilityComponent implements OnInit {
     if (m === 'LOCAL' || m === 'Presencial') return 'Presencial';
     if (m === 'REMOTE' || m === 'Remoto') return 'Remoto';
     return 'Qualquer';
+  }
+
+  apptPriceDisplay(appt: Appointment): string {
+    if (appt.price == null) return '';
+    return new Intl.NumberFormat(this.locale, { style: 'currency', currency: this.CURRENCY }).format(appt.price);
+  }
+
+  apptPriceBRLDisplay(appt: Appointment): string {
+    if (appt.priceBRL == null) return '';
+    return new Intl.NumberFormat(this.locale, { style: 'currency', currency: this.CURRENCY_BRL }).format(appt.priceBRL);
   }
 
   apptDateLabel(appt: Appointment): string {
