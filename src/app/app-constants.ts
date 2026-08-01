@@ -76,6 +76,7 @@ export const AppConstants = {
           sessionService: 'SOMATIC_EXPERIENCE',
         },
       ],
+      available: true,
     } as Service,
 
     {
@@ -84,14 +85,11 @@ export const AppConstants = {
         'Atendimentos em grupo com psicóloga, visando o autoconhecimento e o restabelecimento da saúde mental.',
       serviceType: [
         {
-          name: 'Grupo de Mulheres',
-          description: 'Mulher, só que em grupo.',
-        },
-        {
-          name: 'Grupo de Leitura',
-          description: 'Leitura, só que em grupo.',
+          name: 'Autorregulação para Profissionais',
+          description: 'Estamos chegando com um novo jeito de cuidar. Em breve, mais informações.',
         },
       ],
+      available: false,
     } as Service,
 
     {
@@ -103,8 +101,10 @@ export const AppConstants = {
           description:
             'A supervisão na abordagem da Análise Corporal Reichiana ocorre individual e em grupos pequenos, com ênfase no atendimento individual de adultos. São encontros semanais, quinzenais ou mensais no formato presencial (em Lisboa) ou remoto.',
           knowMorePage: Pages.SUPERVISION,
+          sessionService: 'SUPERVISION',
         },
       ],
+      available: true,
     } as Service,
   ],
 
@@ -138,11 +138,8 @@ export const AppConstants = {
         {
           question: 'Como faço um agendamento?',
           answer: {
-            steps: [
-              'Faça login na plataforma.',
-              'Clique em “Agendamento” na coluna do lado esquerdo.',
-              'Escolha o serviço, a pessoa profissional e aceda à agenda com horários disponíveis, modalidade de atendimento e valor.',
-            ],
+            intro: "No FAQ a pergunta “Como faço um agendamento?” está com o texto da resposta desformatado. Precisa alterar o texto para: O processo exige login primeiro. Depois pode clicar no botão “Agendar” no menu de navegação no topo da página e  escolher o serviço, a pessoa profissional e, então, visualizar a agenda (horários disponíveis, modalidade de atendimento e valor). \n" +
+              "O agendamento também pode ser feito através do perfil no botão \"+ Agendar Sessão\".\n",
           },
         } as FaqTopicItem,
         {
@@ -160,13 +157,13 @@ export const AppConstants = {
         {
           question: 'Como cancelar um agendamento?',
           answer: {
-            intro: 'Pelo perfil no botão “Agendamentos”, com as opções de cancelamento ou reagendamento.',
+            intro: 'Pelo perfil no botão “Agendamentos” no botão “Cancelar Sessão”.',
           },
         } as FaqTopicItem,
         {
-          question: 'Depois da primeira consulta com uma pessoa profissional ou grupo, terei que agendar as seguintes consultas através da CARE?',
+          question: 'Depois do primeiro atendimento com uma pessoa profissional ou grupo, terei de agendar os seguintes atendimentos através da CARE?',
           answer: {
-            intro: 'Não é obrigatório. O agendamento das sessões seguintes pode ser negociado diretamente com a pessoa profissional na primeira consulta ou grupo.',
+            intro: 'Não é obrigatório. Os agendamentos seguintes podem ser negociados diretamente com a pessoa profissional no primeiro atendimento ou grupo.',
           },
         } as FaqTopicItem,
       ],
@@ -190,10 +187,7 @@ export const AppConstants = {
               'Somatic Experiencing® — voltado à regulação do sistema nervoso autônomo e à renegociação de trauma;',
               'Supervisão na abordagem Reichiana — destinada a profissionais.',
             ],
-            outro: 'Os serviços podem mudar.',
-            links: [
-              { label: 'Confira sempre a lista atualizada', url: '/', fragment: 'services' },
-            ],
+            outro: 'Os serviços podem mudar e estarão sempre atualizados na página principal (Home).',
           },
         } as FaqTopicItem,
       ],
@@ -214,7 +208,7 @@ export const AppConstants = {
         {
           question: 'Errei um dado pessoal ao me inscrever na plataforma. Como faço para retificar meus dados?',
           answer: {
-            intro: 'É possível corrigir os dados a qualquer momento. Basta fazer Log in, aceder “Dados Pessoais” e realizar as correções.',
+            intro: 'É possível corrigir os dados a qualquer momento. Basta fazer Log in, aceder ao “Perfil” e realizar as correções.',
           },
         } as FaqTopicItem,
         {
@@ -232,7 +226,7 @@ export const AppConstants = {
         {
           question: 'Posso excluir permanentemente minha conta e meus dados?',
           answer: {
-            intro: 'Sim. Basta aceder a conta e clicar na opção de “Exclusão de conta”. Após a exclusão, os seus dados pessoais serão removidos do sistema ativo.',
+            intro: 'Sim. Basta aceder ao “Perfil” e clicar na opção de “Apagar conta”. Após a exclusão, os seus dados pessoais serão removidos do sistema ativo.',
             outro: 'Importante: atualmente, não há registros clínicos armazenados na plataforma. Caso o profissional mantenha seus próprios registros fora da CARE, a exclusão da sua conta na plataforma não afeta esses arquivos externos.',
           },
         } as FaqTopicItem,

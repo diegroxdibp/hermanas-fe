@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://api.careclinica.com',
+  apiUrl: 'https://care-be-staging.fly.dev',
 };

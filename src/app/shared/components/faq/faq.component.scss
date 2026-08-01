@@ -82,6 +82,13 @@
   color: var(--color-muted);
   transition: background 0.2s var(--ease-care), color 0.2s var(--ease-care);
 
+  &:hover:not(.is-active) {
+    background: var(--color-surface-tint);
+    color: var(--color-secondary-indigo);
+
+    .faq__navBar { height: 34%; }
+  }
+
   &.is-active {
     background: var(--color-surface-tint);
     color: var(--color-primary-blue);
@@ -115,6 +122,9 @@
   display: flex;
   flex-direction: column;
   border-bottom: 1px solid var(--color-border-soft);
+  transition: background 0.2s var(--ease-care);
+
+  &:hover { background: var(--color-surface-tint); }
 }
 
 .faq__q {
@@ -127,14 +137,17 @@
   border: none;
   cursor: pointer;
   text-align: left;
-  padding: 20px 0;
+  padding: 20px 12px;
 
   > span:first-child {
     color: var(--color-primary-blue);
     font-weight: 700;
     font-size: 18px;
     line-height: 1.32;
+    transition: color 0.2s var(--ease-care);
   }
+
+  .faq__row:hover & > span:first-child { color: var(--color-primary-purple); }
 }
 
 .faq__answer {
@@ -158,7 +171,15 @@
     font-size: 16px;
     line-height: 1.62;
 
-    li { margin-bottom: 4px; }
+    // Overrides the site-wide `ul, li { display: flex; justify-content: center }`
+    // reset (styles.scss), which otherwise centers these steps horizontally.
+    li {
+      display: list-item;
+      justify-content: flex-start;
+      text-align: left;
+      font-style: normal;
+      margin-bottom: 4px;
+    }
   }
 
   .faq__links {
@@ -211,6 +232,8 @@
   padding: 16px 12px 16px 18px;
   transition: background 0.2s var(--ease-care);
 
+  &:hover { background: var(--color-surface-tint); }
+
   .faq__topic.is-open & { background: var(--color-surface-tint); }
   .faq__topic.is-open & .faq__navBar { height: 60%; }
 }
@@ -245,6 +268,7 @@
   fill: var(--color-muted);
   transition: transform 0.35s var(--ease-care), fill 0.2s var(--ease-care);
 
+  .faq__topicHead:hover & { fill: var(--color-primary-purple); }
   .faq__topic.is-open & { fill: var(--color-primary-purple); transform: rotate(180deg); }
 }
 
@@ -265,6 +289,9 @@
   display: flex;
   flex-direction: column;
   border-top: 1px solid var(--color-border);
+  transition: background 0.2s var(--ease-care);
+
+  &:hover { background: var(--color-white); }
 }
 
 .faq__subq {
@@ -284,7 +311,10 @@
     font-weight: 600;
     font-size: 15px;
     line-height: 1.38;
+    transition: color 0.2s var(--ease-care);
   }
+
+  .faq__subrow:hover & > span:first-child { color: var(--color-primary-purple); }
 }
 
 .faq__answer--sm {
@@ -301,6 +331,12 @@
   width: 20px;
   height: 20px;
   margin-top: 2px;
+  transition: transform 0.2s var(--ease-care);
+
+  .faq__row:hover &,
+  .faq__subrow:hover & {
+    transform: scale(1.15);
+  }
 
   &::before, &::after {
     content: '';

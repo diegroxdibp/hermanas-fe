@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { Pages } from './shared/enums/pages.enum';
 import { AccessGuard } from './auth/auth.guard';
 import { AuthOnlyGuard } from './auth/authOnly.guard';
+import { AvailabilityAccessGuard } from './auth/availability-access.guard';
 import { HomeComponent } from './core/pages/home/home.component';
 
 export const routes: Routes = [
@@ -176,6 +177,14 @@ export const routes: Routes = [
                 './shared/components/dashboard-notifications/dashboard-notifications.component'
               ).then((m) => m.DashboardNotificationsComponent),
           },
+
+          {
+            path: 'proposals/:id',
+            loadComponent: () =>
+              import(
+                './shared/components/proposal-confirm/proposal-confirm.component'
+              ).then((m) => m.ProposalConfirmComponent),
+          },
         ],
       },
 
@@ -189,6 +198,7 @@ export const routes: Routes = [
 
       {
         path: Pages.AVAILABILITY,
+        canMatch: [AvailabilityAccessGuard],
         loadComponent: () =>
           import('./pages/availability/availability.component').then(
             (m) => m.AvailabilityComponent,

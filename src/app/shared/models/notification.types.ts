@@ -2,6 +2,10 @@ export type NotificationType =
   | 'APPOINTMENT_BOOKED'
   | 'APPOINTMENT_CANCELLED'
   | 'APPOINTMENT_RESCHEDULED'
+  | 'APPOINTMENT_PROPOSAL_RECEIVED'
+  | 'APPOINTMENT_PROPOSAL_ACCEPTED'
+  | 'APPOINTMENT_PROPOSAL_DECLINED'
+  | 'APPOINTMENT_PROPOSAL_CANCELLED'
   | 'GENERAL';
 
 export type Role =
@@ -24,6 +28,8 @@ export interface NotificationResponse {
   message: string;
   type: NotificationType;
   read: boolean;
+  /** Optional deep-link — e.g. a recurring-appointment-proposal confirmation page. */
+  link?: string | null;
   /** ISO-8601 datetime string, e.g. "2026-05-23T14:30:00" */
   createdAt: string;
 }

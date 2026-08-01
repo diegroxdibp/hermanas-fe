@@ -15,9 +15,11 @@ export interface Appointment {
   endTime: string;
   isRecurring: boolean;
   dayOfWeek: DayOfWeek;
+  recurrenceFrequency?: 'WEEKLY' | 'BIWEEKLY' | 'MONTHLY';
   clientName?: string;
   clientEmail?: string;
   platform?: string;
   price?: number;
   priceBRL?: number;
+  status: 'PENDING' | 'CONFIRMED';
 }

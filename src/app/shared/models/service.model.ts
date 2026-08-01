@@ -10,6 +10,7 @@ export interface Service {
   name: string;
   cardDescription: string;
   serviceType: ServiceType[];
+  available: boolean;
 }
 
 export interface ServiceType {

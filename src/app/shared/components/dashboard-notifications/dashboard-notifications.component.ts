@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { NotificationService } from '../../../core/services/notification.service';
 import { NotificationResponse, NotificationType } from '../../models/notification.types';
 
@@ -10,12 +11,17 @@ import { NotificationResponse, NotificationType } from '../../models/notificatio
 })
 export class DashboardNotificationsComponent {
   readonly notificationService = inject(NotificationService);
+  private readonly router = inject(Router);
 
   typeIcon(type: NotificationType): string {
     switch (type) {
-      case 'APPOINTMENT_BOOKED':     return 'event_available';
-      case 'APPOINTMENT_CANCELLED':  return 'event_busy';
+      case 'APPOINTMENT_BOOKED':      return 'event_available';
+      case 'APPOINTMENT_CANCELLED':   return 'event_busy';
       case 'APPOINTMENT_RESCHEDULED': return 'event_repeat';
+      case 'APPOINTMENT_PROPOSAL_RECEIVED':  return 'event_repeat';
+      case 'APPOINTMENT_PROPOSAL_ACCEPTED':  return 'check_circle';
+      case 'APPOINTMENT_PROPOSAL_DECLINED':  return 'cancel';
+      case 'APPOINTMENT_PROPOSAL_CANCELLED': return 'cancel';
       default:                        return 'notifications';
     }
   }
@@ -25,6 +31,10 @@ export class DashboardNotificationsComponent {
       case 'APPOINTMENT_BOOKED':      return 'type-booked';
       case 'APPOINTMENT_CANCELLED':   return 'type-cancelled';
       case 'APPOINTMENT_RESCHEDULED': return 'type-rescheduled';
+      case 'APPOINTMENT_PROPOSAL_RECEIVED':  return 'type-proposal';
+      case 'APPOINTMENT_PROPOSAL_ACCEPTED':  return 'type-booked';
+      case 'APPOINTMENT_PROPOSAL_DECLINED':  return 'type-cancelled';
+      case 'APPOINTMENT_PROPOSAL_CANCELLED': return 'type-cancelled';
       default:                         return 'type-general';
     }
   }
@@ -44,6 +54,9 @@ export class DashboardNotificationsComponent {
   markAsRead(n: NotificationResponse): void {
     if (!n.read) {
       this.notificationService.markAsRead(n.id).subscribe();
+    }
+    if (n.link) {
+      this.router.navigateByUrl(n.link);
     }
   }
 

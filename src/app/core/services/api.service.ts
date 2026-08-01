@@ -10,6 +10,7 @@ export interface AvailabilityPayload {
   startTime: string;
   endTime: string;
   isRecurring: boolean;
+  recurrenceFrequency?: 'WEEKLY' | 'BIWEEKLY' | 'MONTHLY';
   modality: string;
   platform?: string;
   price?: number;
@@ -27,6 +28,8 @@ import { ProfessionalSessionService } from '../../shared/enums/professional-sess
 import { Professional } from '../../shared/models/get-professional-by-service-response.model';
 import { Appointment } from '../../shared/models/appointment.model';
 import { ContactPayload } from '../../shared/models/contact-payload';
+import { PatientSummary } from '../../shared/models/patient.model';
+import { RecurringProposalPayload } from '../../shared/models/recurring-proposal-payload.model';
 
 @Injectable({
   providedIn: 'root',
@@ -145,6 +148,36 @@ export class ApiService {
   deleteAppointment(id: number): Observable<void> {
     return this.http.delete<void>(
       `${environment.apiUrl}/api/appointments/delete/${id}`,
+      { withCredentials: true },
+    );
+  }
+
+  getAppointmentById(id: number): Observable<Appointment> {
+    return this.http.get<Appointment>(
+      `${environment.apiUrl}/api/appointments/${id}`,
+      { withCredentials: true },
+    );
+  }
+
+  getPatients(professionalId: number): Observable<PatientSummary[]> {
+    return this.http.get<PatientSummary[]>(
+      `${environment.apiUrl}/api/appointments/professional/${professionalId}/patients`,
+      { withCredentials: true },
+    );
+  }
+
+  proposeRecurringAppointment(payload: RecurringProposalPayload): Observable<Appointment> {
+    return this.http.post<Appointment>(
+      `${environment.apiUrl}/api/appointments/propose-recurring`,
+      payload,
+      { withCredentials: true },
+    );
+  }
+
+  respondToProposal(id: number, accept: boolean): Observable<Appointment> {
+    return this.http.patch<Appointment>(
+      `${environment.apiUrl}/api/appointments/${id}/respond`,
+      { accept },
       { withCredentials: true },
     );
   }

@@ -126,12 +126,11 @@
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    padding: 0 1.5em;
 
     picture {
       max-width: 300px;
       max-height: 500px;
-      margin: 0;
+      margin: 0 auto;
 
       img {
         width: 80%;
@@ -428,6 +427,7 @@
   max-width: 400px;
   max-height: 500px;
 }
+
 
 .pillars-illustration {
   display: flex;

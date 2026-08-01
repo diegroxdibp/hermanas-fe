@@ -1,10 +1,21 @@
-import { inject, Injectable } from '@angular/core';
+import { computed, inject, Injectable } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { Pages } from '../enums/pages.enum';
 import { NavigationItem } from '../models/navigation-item.model';
 import { ViewportScroller } from '@angular/common';
 import { BehaviorSubject, filter, Subject } from 'rxjs';
 import { SnackbarService } from './snackbar.service';
+import { SessionService } from './session.service';
+import { Roles } from '../enums/roles.enum';
+import { environment } from '../../../environments/environment';
+
+// Kept in sync with AvailabilityAccessGuard: production-only role gate for
+// the Disponibilidade area, staging/dev stay open to any authenticated user.
+const AVAILABILITY_ALLOWED_ROLES: string[] = [
+  Roles.THERAPIST,
+  Roles.PROFESSIONAL,
+  Roles.ADMIN,
+];
 
 @Injectable({
   providedIn: 'root',
@@ -13,6 +24,7 @@ export class NavigationService {
   router = inject(Router);
   viewportScroller = inject(ViewportScroller);
   snackbarService = inject(SnackbarService);
+  private sessionService = inject(SessionService);
   Pages = Pages;
   navigationItems: NavigationItem[] = [
     { name: 'Home',            destination: Pages.HOME,         icon: 'home' },
@@ -21,6 +33,20 @@ export class NavigationService {
     { name: 'Disponibilidade', destination: Pages.AVAILABILITY, icon: 'calendar_month' },
     { name: 'Agendar',         destination: Pages.SCHEDULING,   icon: 'calendar_today' },
   ];
+
+  readonly visibleNavigationItems = computed(() => {
+    if (!environment.production) return this.navigationItems;
+
+    const roles = this.sessionService.user()?.roles ?? [];
+    const canSeeAvailability = roles.some((role) =>
+      AVAILABILITY_ALLOWED_ROLES.includes(role),
+    );
+    if (canSeeAvailability) return this.navigationItems;
+
+    return this.navigationItems.filter(
+      (item) => item.destination !== Pages.AVAILABILITY,
+    );
+  });
   private routesWithAnchor = [`/${Pages.ATENDIMENTO}`, '/', '/contact'];
   readonly currentUrl: BehaviorSubject<string> = new BehaviorSubject('/');
   private previousBaseUrl: string | null = null;

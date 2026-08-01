@@ -98,7 +98,9 @@ export class SchedulingService {
       appointmentDate: fc[SchedulingFormControls.SELECTED_DAY].value,
       startTime: fc[SchedulingFormControls.SELECTED_AVAILABILITY].value?.startTime,
       endTime: fc[SchedulingFormControls.SELECTED_AVAILABILITY].value?.endTime,
-      isRecurring: fc[SchedulingFormControls.SELECTED_AVAILABILITY].value?.isRecurring,
+      // Booking via Agendar is always a single session — the availability slot
+      // itself may recur weekly, but that doesn't make this particular booking recurring.
+      isRecurring: false,
       modality: MODALITY_MAP[rawModality] ?? rawModality,
     } as AppointmentPayload;
     return payload;

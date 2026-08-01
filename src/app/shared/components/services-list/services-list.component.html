@@ -19,10 +19,10 @@
                     {{ serviceType.description }}
                 </p>
                 <div class="service-actions">
-                    <button mat-raised-button (click)="navigateTo(serviceType.knowMorePage)">
+                    <button mat-raised-button [disabled]="!service.available" (click)="navigateTo(serviceType.knowMorePage)">
                         <a>SAIBA MAIS</a>
                     </button>
-                    <button mat-raised-button (click)="navigateToScheduling(serviceType)">
+                    <button mat-raised-button [disabled]="!service.available" (click)="navigateToScheduling(serviceType)">
                         <a>AGENDAR</a>
                     </button>
                 </div>

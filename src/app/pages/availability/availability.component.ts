@@ -9,11 +9,19 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { animate, style, transition, trigger } from '@angular/animations';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
+import {
+  ProposeRecurringDialogComponent,
+  ProposeRecurringDialogData,
+  ProposeRecurringDialogResult,
+} from '../../shared/components/propose-recurring-dialog/propose-recurring-dialog.component';
 import { Modality } from '../../shared/enums/modality.enum';
 import { isModalityCompatible, normalizeModality, toBackendModality } from '../../shared/utils/modality-compatibility.util';
 import { DayOfWeek } from '../../shared/enums/day-of-week.enum';
+import { RecurrenceFrequency } from '../../shared/enums/recurrence-frequency.enum';
+import { normalizeRecurrenceFrequency, occursOnDate, toBackendRecurrenceFrequency } from '../../shared/utils/recurrence.util';
 import { ProfessionalService } from '../../shared/models/professional-service.model';
 import { ApiService, AvailabilityPayload } from '../../core/services/api.service';
 import { AvailabilityModel } from '../../shared/models/availability.model';
@@ -25,6 +33,7 @@ import { SchedulingService } from '../../shared/services/scheduling.service';
 import { SchedulingSteps } from '../../shared/enums/scheduling-steps.enum';
 import { SchedulingFormControls } from '../../shared/enums/scheduling-form-controls.enum';
 import { ProfessionalSessionService } from '../../shared/enums/professional-session-service.enum';
+import { StyledSelectComponent, StyledSelectOption } from '../../shared/components/styled-select/styled-select.component';
 
 // ─── Module-level constants ───────────────────────────────────────────────────
 
@@ -177,7 +186,11 @@ interface TherapistBlock {
   services: ProfessionalService[];
   modality: Modality;
   isRecurring: boolean;
+  recurrenceFrequency?: RecurrenceFrequency;
   weekdays: DayOfWeek[];
+  // Anchor date. Populated for BOTH recurring blocks (needed to compute
+  // biweekly/monthly occurrence per displayed week) and one-time blocks
+  // (the actual calendar date).
   startDate?: string;
   startTime: string;
   endTime: string;
@@ -205,9 +218,24 @@ const BACKEND_DOW_MAP: Record<string, DayOfWeek> = {
 @Component({
   selector: 'app-availability',
   standalone: true,
-  imports: [CommonModule, NgTemplateOutlet],
+  imports: [CommonModule, NgTemplateOutlet, StyledSelectComponent],
   templateUrl: './availability.component.html',
   styleUrl: './availability.component.scss',
+  animations: [
+    // Sections that only appear conditionally in the block editor (Repete-se,
+    // Dias da semana, Local, Plataforma, Data) fade + grow in instead of
+    // popping in abruptly, and reverse the same way when they disappear.
+    trigger('revealSection', [
+      transition(':enter', [
+        style({ opacity: 0, height: 0, overflow: 'hidden' }),
+        animate('220ms cubic-bezier(0.4, 0, 0.2, 1)', style({ opacity: 1, height: '*' })),
+      ]),
+      transition(':leave', [
+        style({ opacity: 1, height: '*', overflow: 'hidden' }),
+        animate('180ms cubic-bezier(0.4, 0, 0.2, 1)', style({ opacity: 0, height: 0 })),
+      ]),
+    ]),
+  ],
 })
 export class AvailabilityComponent implements OnInit {
   // ─ Services
@@ -229,6 +257,10 @@ export class AvailabilityComponent implements OnInit {
   readonly MOB_ROW_H = MOB_ROW_H;
   readonly Modality = Modality;
   readonly DayOfWeek = DayOfWeek;
+  readonly RecurrenceFrequency = RecurrenceFrequency;
+  readonly RECURRENCE_PATTERNS: RecurrenceFrequency[] = [
+    RecurrenceFrequency.WEEKLY, RecurrenceFrequency.BIWEEKLY, RecurrenceFrequency.MONTHLY,
+  ];
   readonly PT_DOW_SHORT = PT_DOW_SHORT;
   readonly SESSION_DURATIONS = SESSION_DURATIONS;
   readonly WEEKDAYS = WEEKDAYS;
@@ -285,6 +317,7 @@ export class AvailabilityComponent implements OnInit {
   selectedServiceIds = signal<Set<number>>(new Set());
   editorModality = signal<Modality>(Modality.ANY);
   editorFrequency = signal<'once' | 'weekly'>('weekly');
+  editorRecurrencePattern = signal<RecurrenceFrequency>(RecurrenceFrequency.WEEKLY);
   selectedWeekdays = signal<Set<DayOfWeek>>(new Set());
   editorDate = signal<string>('');
   editorStartTime = signal<string>('09:00');
@@ -305,13 +338,13 @@ export class AvailabilityComponent implements OnInit {
   });
 
   readonly localErrorMessage = computed<string | null>(() => {
-    if (!this.attemptedSave()) return null;
+    if (!this.attemptedSave() || this.isEditingLockedBlock()) return null;
     if (this.editorModality() === Modality.REMOTE) return null;
     return this.editorLocal().trim() === '' ? 'Indique o local do atendimento.' : null;
   });
 
   readonly platformErrorMessage = computed<string | null>(() => {
-    if (!this.attemptedSave()) return null;
+    if (!this.attemptedSave() || this.isEditingLockedBlock()) return null;
     if (this.editorModality() === Modality.LOCAL) return null;
     return this.editorPlatform().trim() === '' ? 'Indique a plataforma a usar.' : null;
   });
@@ -363,7 +396,7 @@ export class AvailabilityComponent implements OnInit {
   readonly pricePlaceholderBRL = this.pricePlaceholder;
 
   readonly priceErrorMessage = computed<string | null>(() => {
-    if (!this.attemptedSave()) return null;
+    if (!this.attemptedSave() || this.isEditingLockedBlock()) return null;
     const raw = this.editorPrice();
     const value = parsePriceInput(raw, this.decimalSeparator);
     if (raw.trim() === '' || value === undefined) return 'Indique o valor da sessão.';
@@ -378,7 +411,7 @@ export class AvailabilityComponent implements OnInit {
 
   // BRL is optional — a professional who doesn't bill in Reais just leaves it blank.
   readonly priceBRLErrorMessage = computed<string | null>(() => {
-    if (!this.attemptedSave()) return null;
+    if (!this.attemptedSave() || this.isEditingLockedBlock()) return null;
     const raw = this.editorPriceBRL();
     if (raw.trim() === '') return null;
     const value = parsePriceInput(raw, this.decimalSeparator);
@@ -485,6 +518,13 @@ export class AvailabilityComponent implements OnInit {
     this.blocks().find(b => b.id === this.selectedBlockId()) ?? null,
   );
 
+  // Once a block has bookings, Local/Plataforma/Valor are locked and disabled - their
+  // validation must not fire (or show as errors) since the user has no way to fix them.
+  readonly isEditingLockedBlock = computed<boolean>(() => {
+    const block = this.selectedBlock();
+    return !!block && this.hasBookings(block);
+  });
+
   readonly generatedSlots = computed(() =>
     generateSlots(
       this.editorStartTime(),
@@ -507,6 +547,14 @@ export class AvailabilityComponent implements OnInit {
     }
     return opts;
   });
+
+  readonly editorStartTimeSelectOptions = computed<StyledSelectOption[]>(() =>
+    this.editorStartTimeOptions().map(h => ({ value: h, label: h })),
+  );
+
+  readonly editorEndTimeSelectOptions = computed<StyledSelectOption[]>(() =>
+    this.editorEndTimeOptions().map(h => ({ value: h, label: h })),
+  );
 
   readonly editorTitle = computed<string>(() => {
     if (this.editorFrequency() === 'weekly') {
@@ -532,7 +580,7 @@ export class AvailabilityComponent implements OnInit {
 
     if (this.editorFrequency() === 'weekly') {
       const wds = [...this.selectedWeekdays()];
-      if (wds.length === 0) return 'Semanal';
+      if (wds.length === 0) return this.editorRecurrencePattern();
       const days = wds.map(wd => {
         const idx = COL_TO_DOW.indexOf(wd);
         return idx >= 0 ? PT_DOW_PLURAL[idx] : wd;
@@ -679,6 +727,8 @@ export class AvailabilityComponent implements OnInit {
 
   edCalToggle(event: MouseEvent): void {
     event.stopPropagation();
+    const sel = this.selectedBlock();
+    if (sel && this.hasBookings(sel)) return;
     const wasOpen = this.edCalOpen();
     if (!wasOpen) {
       const selected = this.editorDate();
@@ -698,6 +748,8 @@ export class AvailabilityComponent implements OnInit {
   }
 
   edCalSelectDate(key: string): void {
+    const sel = this.selectedBlock();
+    if (sel && this.hasBookings(sel)) return;
     this.edCalOpen.set(false);
     this.onEditorDateChange(key);
   }
@@ -744,6 +796,16 @@ export class AvailabilityComponent implements OnInit {
         return b.startDate === dayKey;
       }
     });
+  }
+
+  // Weekly blocks occur on their weekday every week; biweekly/monthly blocks
+  // only occur some weeks - this decides whether the currently displayed week
+  // is one of them, so the template can render a dimmed "ghost" otherwise.
+  isBlockOccurring(block: TherapistBlock, colIndex: number): boolean {
+    if (!block.isRecurring || !block.startDate) return true;
+    const anchor = new Date(block.startDate + 'T00:00:00');
+    const candidate = this.weekDays()[colIndex];
+    return occursOnDate(block.recurrenceFrequency, anchor, candidate);
   }
 
   blockTopPx(block: TherapistBlock, rowH: number = ROW_H): number {
@@ -805,8 +867,9 @@ export class AvailabilityComponent implements OnInit {
     this.selectedServiceIds.set(new Set(block.services.map(s => s.id)));
     this.editorModality.set(block.modality);
     this.editorFrequency.set(block.isRecurring ? 'weekly' : 'once');
+    this.editorRecurrencePattern.set(block.recurrenceFrequency ?? RecurrenceFrequency.WEEKLY);
     this.selectedWeekdays.set(new Set(block.weekdays));
-    this.editorDate.set(block.startDate ?? '');
+    this.editorDate.set(block.isRecurring ? '' : (block.startDate ?? ''));
     this.editorStartTime.set(block.startTime);
     this.editorEndTime.set(block.endTime);
     this.editorSessionDuration.set(block.sessionDuration);
@@ -912,7 +975,7 @@ export class AvailabilityComponent implements OnInit {
           const slotStart = slotTimes[i] ?? s.slotTime;
           const slotEnd = minToTime(timeToMin(slotStart) + dur);
           return this.apiService.updateAvailability(s.backendId,
-            this.buildSlotPayload(block.services, block.modality, block.isRecurring, newDate, slotStart, slotEnd, block.platform, block.price, block.priceBRL),
+            this.buildSlotPayload(block.services, block.modality, block.isRecurring, newDate, slotStart, slotEnd, block.platform, block.price, block.priceBRL, block.recurrenceFrequency),
           );
         });
         forkJoin(updateOps).subscribe({
@@ -1004,6 +1067,8 @@ export class AvailabilityComponent implements OnInit {
 
   setEditorFrequency(freq: 'once' | 'weekly'): void {
     if (freq === this.editorFrequency()) return;
+    const sel = this.selectedBlock();
+    if (sel && this.hasBookings(sel)) return;
 
     if (freq === 'once') {
       // Carry the day over: map first selected weekday → its actual date in the visible week
@@ -1099,6 +1164,8 @@ export class AvailabilityComponent implements OnInit {
   }
 
   toggleService(id: number): void {
+    const sel = this.selectedBlock();
+    if (sel && this.hasBookings(sel)) return;
     const set = new Set(this.selectedServiceIds());
     if (set.has(id)) {
       set.delete(id);
@@ -1113,6 +1180,8 @@ export class AvailabilityComponent implements OnInit {
   }
 
   setEditorModality(m: Modality): void {
+    const sel = this.selectedBlock();
+    if (sel && this.hasBookings(sel)) return;
     this.editorModality.set(m);
     const eligibleIds = new Set(
       this.services().filter(s => isModalityCompatible(s.modality, m)).map(s => s.id),
@@ -1143,6 +1212,8 @@ export class AvailabilityComponent implements OnInit {
   }
 
   toggleWeekday(wd: DayOfWeek): void {
+    const sel = this.selectedBlock();
+    if (sel && this.hasBookings(sel)) return;
     const set = new Set(this.selectedWeekdays());
     if (set.has(wd)) {
       set.delete(wd);
@@ -1155,6 +1226,10 @@ export class AvailabilityComponent implements OnInit {
   saveBlock(): void {
     this.attemptedSave.set(true);
 
+    const existingId = this.selectedBlockId();
+    const existing = existingId !== null ? this.blocks().find(b => b.id === existingId) : undefined;
+    const isLockedByBookings = this.isEditingLockedBlock();
+
     const formError = this.serviceErrorMessage() || this.localErrorMessage()
       || this.platformErrorMessage() || this.priceErrorMessage() || this.priceBRLErrorMessage()
       || this.weekdayErrorMessage() || this.dateErrorMessage();
@@ -1165,10 +1240,8 @@ export class AvailabilityComponent implements OnInit {
 
     const selectedSvcs = this.services().filter(s => this.selectedServiceIds().has(s.id));
     const isRecurring = this.editorFrequency() === 'weekly';
-    const existingId = this.selectedBlockId();
 
     if (existingId !== null) {
-      const existing = this.blocks().find(b => b.id === existingId);
       if (!existing || existing.backendSlots.length === 0) return;
 
       const effectiveStartDate = !isRecurring
@@ -1180,20 +1253,32 @@ export class AvailabilityComponent implements OnInit {
         services: selectedSvcs,
         modality: this.editorModality(),
         isRecurring,
+        recurrenceFrequency: isRecurring ? this.editorRecurrencePattern() : undefined,
         weekdays: isRecurring ? existing.weekdays : [],
-        startDate: isRecurring ? undefined : effectiveStartDate,
+        startDate: effectiveStartDate,
         startTime: this.editorStartTime(),
         endTime: this.editorEndTime(),
         sessionDuration: this.editorSessionDuration(),
-        local: this.editorModality() !== Modality.REMOTE ? this.editorLocal() : undefined,
-        platform: this.editorModality() !== Modality.LOCAL ? this.editorPlatform() : undefined,
-        price: parsePriceInput(this.editorPrice(), this.decimalSeparator),
-        priceBRL: parsePriceInput(this.editorPriceBRL(), this.decimalSeparator),
+        local: isLockedByBookings
+          ? existing.local
+          : (this.editorModality() !== Modality.REMOTE ? this.editorLocal() : undefined),
+        platform: isLockedByBookings
+          ? existing.platform
+          : (this.editorModality() !== Modality.LOCAL ? this.editorPlatform() : undefined),
+        price: isLockedByBookings ? existing.price : parsePriceInput(this.editorPrice(), this.decimalSeparator),
+        priceBRL: isLockedByBookings ? existing.priceBRL : parsePriceInput(this.editorPriceBRL(), this.decimalSeparator),
       };
 
       if (!this.validateHonorsBookings(updated)) {
         this.snackbarService.openSnackBar({
           message: 'Esta alteração deixaria sessão(ões) reservada(s) sem disponibilidade. Ajuste mantendo as sessões marcadas.',
+        });
+        return;
+      }
+
+      if (this.previewBlocks().some(p => p.hasConflict)) {
+        this.snackbarService.openSnackBar({
+          message: 'Existe um conflito de horário. Resolva os conflitos antes de guardar.',
         });
         return;
       }
@@ -1344,7 +1429,7 @@ export class AvailabilityComponent implements OnInit {
           const newSlotTimes = generateSlots(b.endTime, newEnd, dur);
           const createOps = newSlotTimes.map(t =>
             this.apiService.createAvailability(this.buildSlotPayload(
-              b.services, b.modality, b.isRecurring, date, t, minToTime(timeToMin(t) + dur), b.platform, b.price, b.priceBRL,
+              b.services, b.modality, b.isRecurring, date, t, minToTime(timeToMin(t) + dur), b.platform, b.price, b.priceBRL, b.recurrenceFrequency,
             ))
           );
           forkJoin(createOps).subscribe({
@@ -1453,7 +1538,7 @@ export class AvailabilityComponent implements OnInit {
           const newSlotTimes = generateSlots(newStart, b.startTime, dur);
           const createOps = newSlotTimes.map(t =>
             this.apiService.createAvailability(this.buildSlotPayload(
-              b.services, b.modality, b.isRecurring, date, t, minToTime(timeToMin(t) + dur), b.platform, b.price, b.priceBRL,
+              b.services, b.modality, b.isRecurring, date, t, minToTime(timeToMin(t) + dur), b.platform, b.price, b.priceBRL, b.recurrenceFrequency,
             ))
           );
           forkJoin(createOps).subscribe({
@@ -1625,8 +1710,9 @@ export class AvailabilityComponent implements OnInit {
       services,
       modality: this.editorModality(),
       isRecurring,
+      recurrenceFrequency: isRecurring ? this.editorRecurrencePattern() : undefined,
       weekdays: isRecurring && weekday ? [weekday] : [],
-      startDate: isRecurring ? undefined : date,
+      startDate: date,
       startTime: this.editorStartTime(),
       endTime: this.editorEndTime(),
       sessionDuration: dur,
@@ -1646,6 +1732,7 @@ export class AvailabilityComponent implements OnInit {
           this.editorModality() !== Modality.LOCAL ? this.editorPlatform() : undefined,
           parsePriceInput(this.editorPrice(), this.decimalSeparator),
           parsePriceInput(this.editorPriceBRL(), this.decimalSeparator),
+          isRecurring ? this.editorRecurrencePattern() : undefined,
         ),
       )
     );
@@ -1679,6 +1766,7 @@ export class AvailabilityComponent implements OnInit {
     platform?: string,
     price?: number,
     priceBRL?: number,
+    recurrenceFrequency?: RecurrenceFrequency,
   ): AvailabilityPayload {
     return {
       professionalServiceIds: services.map(s => s.id),
@@ -1689,6 +1777,9 @@ export class AvailabilityComponent implements OnInit {
       priceBRL,
       endTime: slotEnd,
       isRecurring,
+      recurrenceFrequency: isRecurring
+        ? toBackendRecurrenceFrequency(recurrenceFrequency ?? RecurrenceFrequency.WEEKLY)
+        : undefined,
       modality: toBackendModality(modality),
     };
   }
@@ -1722,8 +1813,18 @@ export class AvailabilityComponent implements OnInit {
         group.push(av);
       } else {
         const last = group[group.length - 1];
+        const avFreq = normalizeRecurrenceFrequency(av.recurrenceFrequency);
+        const lastFreq = normalizeRecurrenceFrequency(last.recurrenceFrequency);
+        // Weekly recurrence only cares about the weekday - two weekly slots created
+        // on different calendar dates (but the same weekday) are still "the same day".
+        // Biweekly/monthly semantically depend on the anchor date (parity/week-of-month),
+        // so those must also share the same anchor to be considered the same block.
         const sameDay = av.isRecurring === last.isRecurring &&
-          (av.isRecurring ? av.dayOfWeek === last.dayOfWeek : av.startDate === last.startDate);
+          (av.isRecurring
+            ? av.dayOfWeek === last.dayOfWeek
+              && avFreq === lastFreq
+              && (avFreq === RecurrenceFrequency.WEEKLY || av.startDate === last.startDate)
+            : av.startDate === last.startDate);
         const sameModality = normalizeModality(av.modality) === normalizeModality(last.modality);
         if (sameDay && sameModality && av.startTime === last.endTime && this._sameServiceSet(av.services, last.services)) {
           group.push(av);
@@ -1751,8 +1852,9 @@ export class AvailabilityComponent implements OnInit {
       services: first.services,
       modality: first.modality ? normalizeModality(first.modality) : this.deriveModality(first.services),
       isRecurring: first.isRecurring,
+      recurrenceFrequency: first.isRecurring ? normalizeRecurrenceFrequency(first.recurrenceFrequency) : undefined,
       weekdays: first.isRecurring ? [dow] : [],
-      startDate: first.isRecurring ? undefined : first.startDate,
+      startDate: first.startDate,
       startTime: firstStart,
       endTime: stripSec(last.endTime),
       sessionDuration,
@@ -1773,41 +1875,49 @@ export class AvailabilityComponent implements OnInit {
     return b.every(s => ids.has(s.id));
   }
 
+  // Once a block has bookings, every field except Início/Fim (Intervalo de horas) is
+  // locked in the editor - so `existing` and `updated` only ever differ in start/end time
+  // here. Diffing the regenerated slot grid against the current slots (rather than only
+  // ever appending at the end) correctly handles growing/shrinking from either edge, and
+  // even both at once. validateHonorsBookings() has already rejected any change that would
+  // strand a booked slot outside the new grid, so every slot in `toRemove` is guaranteed free.
   private _syncBookedBlock(existing: TherapistBlock, updated: TherapistBlock, blockId: number): void {
-    const dur = updated.sessionDuration;
-    const date = updated.isRecurring && updated.weekdays[0]
-      ? this.dateForWeekday(updated.weekdays[0])
-      : (updated.startDate ?? '');
+    const dur = existing.sessionDuration;
+    const date = existing.isRecurring && existing.weekdays[0]
+      ? this.dateForWeekday(existing.weekdays[0])
+      : (existing.startDate ?? '');
 
-    const updateOps = existing.backendSlots.map(s =>
-      this.apiService.updateAvailability(s.backendId, this.buildSlotPayload(
-        updated.services, updated.modality, updated.isRecurring, date, s.slotTime, minToTime(timeToMin(s.slotTime) + dur), updated.platform, updated.price, updated.priceBRL,
-      ))
-    );
-    if (updateOps.length > 0) {
-      forkJoin(updateOps).subscribe({
+    const newSlotTimes = generateSlots(updated.startTime, updated.endTime, dur);
+    const newSlotSet = new Set(newSlotTimes);
+    const existingTimes = new Set(existing.backendSlots.map(s => s.slotTime));
+
+    const toRemove = existing.backendSlots.filter(s => !newSlotSet.has(s.slotTime));
+    const toAddTimes = newSlotTimes.filter(t => !existingTimes.has(t));
+
+    if (toRemove.length > 0) {
+      const deleteOps = toRemove.map(s => this.apiService.deleteAvailability(s.backendId));
+      forkJoin(deleteOps).subscribe({
+        next: () => this.blocks.update(bs => bs.map(b => b.id === blockId
+          ? { ...b, backendSlots: b.backendSlots.filter(s => newSlotSet.has(s.slotTime)) } : b)),
         error: () => this.blocks.update(bs => bs.map(b => b.id === blockId ? existing : b)),
       });
     }
 
-    const oldEndMin = timeToMin(existing.endTime);
-    const newEndMin = timeToMin(updated.endTime);
-    if (newEndMin > oldEndMin) {
-      const newSlotTimes = generateSlots(existing.endTime, updated.endTime, dur);
-      const createOps = newSlotTimes.map(t =>
+    if (toAddTimes.length > 0) {
+      const createOps = toAddTimes.map(t =>
         this.apiService.createAvailability(this.buildSlotPayload(
-          updated.services, updated.modality, updated.isRecurring, date, t, minToTime(timeToMin(t) + dur), updated.platform, updated.price, updated.priceBRL,
+          existing.services, existing.modality, existing.isRecurring, date, t, minToTime(timeToMin(t) + dur), existing.platform, existing.price, existing.priceBRL, existing.recurrenceFrequency,
         ))
       );
       forkJoin(createOps).subscribe({
         next: (results) => {
           const newSlots: BackendSlot[] = results.map((res, i) => ({
-            slotTime: newSlotTimes[i], backendId: res.id, isBooked: false,
+            slotTime: toAddTimes[i], backendId: res.id, isBooked: false,
           }));
-          this.blocks.update(bs => bs.map(b =>
-            b.id === blockId ? { ...b, backendSlots: [...b.backendSlots, ...newSlots] } : b,
-          ));
+          this.blocks.update(bs => bs.map(b => b.id === blockId
+            ? { ...b, backendSlots: [...b.backendSlots.filter(s => newSlotSet.has(s.slotTime)), ...newSlots] } : b));
         },
+        error: () => this.blocks.update(bs => bs.map(b => b.id === blockId ? existing : b)),
       });
     }
   }
@@ -1825,7 +1935,7 @@ export class AvailabilityComponent implements OnInit {
         if (slotTimes.length === 0) return;
         const createOps = slotTimes.map(t =>
           this.apiService.createAvailability(this.buildSlotPayload(
-            updated.services, updated.modality, updated.isRecurring, date, t, minToTime(timeToMin(t) + dur), updated.platform, updated.price, updated.priceBRL,
+            updated.services, updated.modality, updated.isRecurring, date, t, minToTime(timeToMin(t) + dur), updated.platform, updated.price, updated.priceBRL, updated.recurrenceFrequency,
           ))
         );
         forkJoin(createOps).subscribe({
@@ -1858,13 +1968,25 @@ export class AvailabilityComponent implements OnInit {
 
   appointmentsForBlock(block: TherapistBlock): Appointment[] {
     const backendIds = new Set(block.backendSlots.filter(s => s.backendId > 0).map(s => s.backendId));
+    const candidateDate = block.isRecurring && block.weekdays[0]
+      ? this.weekDays()[COL_TO_DOW.indexOf(block.weekdays[0])]
+      : null;
+
     return this.appointments().filter(a => {
-      if (backendIds.size > 0 && backendIds.has(a.availabilityId)) return true;
-      // Legacy fallback: match by day/time range
-      const sameDay = block.isRecurring
-        ? (a.isRecurring && BACKEND_DOW_MAP[a.dayOfWeek as unknown as string] === block.weekdays[0])
-        : (a.startDate === block.startDate);
-      return sameDay && a.startTime >= block.startTime && a.startTime < block.endTime;
+      const matches = backendIds.size > 0 && backendIds.has(a.availabilityId)
+        ? true
+        : (
+          // Legacy fallback: match by day/time range
+          (block.isRecurring
+            ? (a.isRecurring && BACKEND_DOW_MAP[a.dayOfWeek as unknown as string] === block.weekdays[0])
+            : (a.startDate === block.startDate))
+          && a.startTime >= block.startTime && a.startTime < block.endTime
+        );
+      if (!matches) return false;
+      // A recurring appointment (biweekly/monthly) only counts as active for
+      // weeks it actually occurs in - otherwise it'd look booked every week.
+      if (!a.isRecurring || !a.startDate || !candidateDate) return true;
+      return occursOnDate(a.recurrenceFrequency, new Date(a.startDate + 'T00:00:00'), candidateDate);
     });
   }
 
@@ -1891,6 +2013,10 @@ export class AvailabilityComponent implements OnInit {
 
   hasBookings(block: TherapistBlock): boolean {
     return this.bookedCount(block) > 0;
+  }
+
+  hasPendingProposal(block: TherapistBlock): boolean {
+    return this.appointmentsForBlock(block).some(a => a.status === 'PENDING');
   }
 
   lastBookedEndMin(block: TherapistBlock): number | null {
@@ -1958,13 +2084,6 @@ export class AvailabilityComponent implements OnInit {
     return new Set(this.appointmentsForBlock(block).map(a => a.professionalServiceId));
   }
 
-  bookedModalityFixed(block: TherapistBlock): boolean {
-    return this.appointmentsForBlock(block).some(a => {
-      const m = String(a.modality);
-      return m === 'LOCAL' || m === 'Presencial' || m === 'REMOTE' || m === 'Remoto';
-    });
-  }
-
   apptModalityLabel(appt: Appointment): string {
     const m = String(appt.modality);
     if (m === 'LOCAL' || m === 'Presencial') return 'presencial';
@@ -1977,6 +2096,17 @@ export class AvailabilityComponent implements OnInit {
     if (m === 'LOCAL' || m === 'Presencial') return 'Presencial';
     if (m === 'REMOTE' || m === 'Remoto') return 'Remoto';
     return 'Qualquer';
+  }
+
+  recurrenceLabel(isRecurring: boolean, frequency?: string): string {
+    if (!isRecurring) return 'Data única';
+    return normalizeRecurrenceFrequency(frequency);
+  }
+
+  // Compact single-word form for the small "rec" tag next to a slot row.
+  recurrenceTagLabel(isRecurring: boolean, frequency?: string): string {
+    if (!isRecurring) return 'única';
+    return normalizeRecurrenceFrequency(frequency).toLowerCase();
   }
 
   apptPriceDisplay(appt: Appointment): string {
@@ -2106,6 +2236,65 @@ export class AvailabilityComponent implements OnInit {
       },
       error: () => {
         this.snackbarService.openSnackBar({ message: 'Erro ao remover o horário. Tente novamente.' });
+      },
+    });
+  }
+
+  // ─ Recurring appointment proposals ──────────────────────────────────────────
+
+  openProposeDialog(event: Event, block: TherapistBlock, slotIndex: number): void {
+    event.stopPropagation();
+    const backendSlot = block.backendSlots[slotIndex];
+    if (!backendSlot || backendSlot.isBooked) return;
+
+    const professionalId = this.sessionService.user()?.id;
+    if (!professionalId) return;
+
+    const dowIdx = COL_TO_DOW.indexOf(block.weekdays[0]);
+    const dayLabelRaw = dowIdx >= 0 ? PT_DOW_LONG[dowIdx] : '';
+    const dayLabel = dayLabelRaw.charAt(0).toUpperCase() + dayLabelRaw.slice(1);
+    const slotEnd = minToTime(timeToMin(backendSlot.slotTime) + block.sessionDuration);
+
+    const ref = this.dialog.open(ProposeRecurringDialogComponent, {
+      width: '460px',
+      panelClass: 'care-dialog',
+      data: {
+        professionalId,
+        services: block.services.map(s => ({ id: s.id, name: this.serviceDisplayName(s.name) })),
+        slotModality: block.modality,
+        dayLabel,
+        timeLabel: `${backendSlot.slotTime}–${slotEnd}`,
+        recurrenceFrequencyLabel: normalizeRecurrenceFrequency(block.recurrenceFrequency),
+      } as ProposeRecurringDialogData,
+    });
+
+    ref.afterClosed().subscribe((result: ProposeRecurringDialogResult | null) => {
+      if (!result) return;
+      this._sendRecurringProposal(backendSlot.backendId, result);
+    });
+  }
+
+  private _sendRecurringProposal(availabilityId: number, result: ProposeRecurringDialogResult): void {
+    this.apiService.proposeRecurringAppointment({
+      availabilityId,
+      professionalServiceId: result.professionalServiceId,
+      clientId: result.clientId,
+      modality: toBackendModality(result.modality),
+    }).subscribe({
+      next: (appt) => {
+        this.appointments.update(list => [...list, appt]);
+        this.blocks.update(bs => bs.map(b => ({
+          ...b,
+          backendSlots: b.backendSlots.map(s =>
+            s.backendId === availabilityId ? { ...s, isBooked: true } : s,
+          ),
+        })));
+        this.snackbarService.openSnackBar({ message: 'Proposta enviada com sucesso.' });
+      },
+      error: () => {
+        this.snackbarService.openSnackBar({
+          message: 'Não foi possível enviar a proposta. Verifique os dados e tente novamente.',
+        });
       },
     });
   }

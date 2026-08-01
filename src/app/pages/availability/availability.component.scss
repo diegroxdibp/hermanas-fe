@@ -413,6 +413,26 @@ input[type="number"].field-value {
       font-weight: 600;
       font-variant-numeric: tabular-nums;
     }
+
+    app-styled-select {
+      flex: 1;
+      min-width: 0;
+    }
+
+    ::ng-deep app-styled-select .select-trigger {
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: 17px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      color: var(--color-primary-blue);
+    }
+
+    ::ng-deep app-styled-select .chev {
+      width: 14px;
+      height: 14px;
+    }
   }
 }
 
@@ -569,6 +589,7 @@ input[type="number"].field-value {
       &.presencial { background: var(--color-primary-purple); }
       &.remoto { background: var(--color-secondary-green); }
       &.any { background: var(--color-secondary-cyan); }
+      &.pending-ring { background: #fff; box-shadow: inset 0 0 0 2.5px #f0a500; }
     }
 
     .material-symbols-outlined {
@@ -968,6 +989,22 @@ input[type="number"].field-value {
       font-size: 22px;
       color: var(--color-primary-blue);
       line-height: 1.15;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      .be-pending-badge {
+        font-family: var(--font-sans);
+        font-style: normal;
+        font-weight: 700;
+        font-size: 11px;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+        color: #b25e00;
+        background: #fff3e0;
+        border-radius: var(--radius-pill);
+        padding: 3px 10px;
+      }
     }
 
     .be-sub {
@@ -1581,6 +1618,25 @@ input[type="number"].field-value {
 
 .av .block.full-booked { box-shadow: 0 1px 4px rgba(0,0,0,0.14), inset 0 0 0 1.5px rgba(255,255,255,0.5); }
 
+.av .block.has-pending { box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px #f0a500; }
+.av .block.has-pending.selected { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--color-primary-blue), 0 0 0 6.5px #f0a500; }
+
+// Biweekly/monthly blocks on a week they don't actually occur - dimmed, with a note,
+// rather than hidden, so the professional still sees where the recurring slot lives.
+.av .block.non-occurring,
+.m-block.non-occurring { opacity: 0.38; }
+.av .block .non-occurring-note,
+.m-block .non-occurring-note {
+  position: absolute; inset: 0; z-index: 3;
+  display: flex; align-items: center; justify-content: center;
+  padding: 4px 6px;
+  text-align: center;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.2px;
+  color: #fff;
+  background: rgba(0,0,0,0.45);
+  border-radius: inherit;
+}
+
 .av .block .b-band.booked { cursor: pointer; transition: filter 0.15s var(--ease-care); }
 .av .block .b-band.booked:hover { filter: brightness(0.93); }
 .av .block .b-band.booked.sel-slot::after {
@@ -1624,16 +1680,38 @@ input[type="number"].field-value {
 }
 .av .slot-row.booked:hover { background: rgba(86,176,147,0.16); }
 
-.av .slot-row .s-rm {
+.av .slot-row.pending {
+  background: rgba(178,94,0,0.08);
+}
+.av .slot-row.pending:hover { background: rgba(178,94,0,0.16); }
+
+.pending-tag {
+  display: inline-flex; align-items: center;
+  padding: 1px 7px; border-radius: var(--radius-pill);
+  background: #fff3e0; color: #b25e00;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.2px;
+}
+
+.av .slot-row .s-free-actions {
+  display: flex; align-items: center; gap: 2px;
+}
+
+.av .slot-row .s-rm,
+.av .slot-row .s-propose {
   background: none; border: none; cursor: pointer; padding: 4px;
   display: inline-flex; align-items: center; justify-content: center;
   border-radius: var(--radius-sm); color: var(--color-muted);
   transition: background 0.14s var(--ease-care), color 0.14s var(--ease-care);
 }
-.av .slot-row .s-rm .material-symbols-outlined { font-size: 16px; }
+.av .slot-row .s-rm .material-symbols-outlined,
+.av .slot-row .s-propose .material-symbols-outlined { font-size: 16px; }
 .av .slot-row .s-rm:hover {
   background: rgba(220, 38, 38, 0.09);
   color: #dc2626;
+}
+.av .slot-row .s-propose:hover {
+  background: rgba(34,50,110,0.09);
+  color: var(--color-primary-blue);
 }
 
 .av .book-notice {
@@ -1650,6 +1728,9 @@ input[type="number"].field-value {
   display: inline-block; margin-left: 6px; font-size: 10px; font-weight: 700; letter-spacing: 0.4px;
   color: var(--color-muted); padding: 1px 6px; border-radius: 999px;
   background: var(--color-surface-tint); vertical-align: middle; text-transform: uppercase;
+}
+.av .control-label .fixed-tag.editable-tag {
+  color: var(--color-secondary-green); background: color-mix(in srgb, var(--color-secondary-green) 15%, transparent);
 }
 .av .chip.booked-svc { opacity: 1; pointer-events: none; background: var(--color-primary-blue); color: #fff; border-color: var(--color-primary-blue); }
 .av .chip.booked-svc .bdot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-secondary-green); margin-left: 2px; display: inline-block; }

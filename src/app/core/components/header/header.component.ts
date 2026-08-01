@@ -125,7 +125,11 @@ export class HeaderComponent {
     if (!n.read) {
       this.notificationsService.markAsRead(n.id).subscribe();
     }
-    this.router.navigate(['/dashboard', 'notifications']);
+    if (n.link) {
+      this.router.navigateByUrl(n.link);
+    } else {
+      this.router.navigate(['/dashboard', 'notifications']);
+    }
   }
 
   markAllRead(): void {

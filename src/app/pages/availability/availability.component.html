@@ -35,11 +35,13 @@
               <span class="lg"><span class="sw any"></span>Qualquer</span>
               <span class="lg-sep"></span>
               <span class="lg">
-                <span class="material-symbols-outlined">event_repeat</span>Semanal
+                <span class="material-symbols-outlined">event_repeat</span>Data recorrente
               </span>
               <span class="lg">
                 <span class="material-symbols-outlined">push_pin</span>Data única
               </span>
+              <span class="lg-sep"></span>
+              <span class="lg"><span class="sw pending-ring"></span>Proposta pendente</span>
             </div>
           </div>
 
@@ -87,6 +89,8 @@
                       [class.conflicted]="conflictedBlockIds().has(block.id)"
                       [class.pinned]="hasBookings(block)"
                       [class.full-booked]="bookedCount(block) > 0 && bookedCount(block) === blockSlotCount(block)"
+                      [class.has-pending]="hasPendingProposal(block)"
+                      [class.non-occurring]="!isBlockOccurring(block, di)"
                       [class.dense]="blockIsDense(block)"
                       [style.top.px]="resizingTopBlockId() === block.id
                         ? blockResizeTopPx(block, resizeLiveStartTime())
@@ -132,6 +136,9 @@
                           </div>
                         }
                       </div>
+                      @if (!isBlockOccurring(block, di)) {
+                        <div class="non-occurring-note">Não ocorre esta semana</div>
+                      }
                       @if (resizingBlockId() === block.id && hasBookings(block) && lastBookedEndMin(block) !== null) {
                         <div class="resize-floor" [style.height.px]="resizeFloorHeightPx(block, resizeLiveEndTime())">
                           <span class="rf-lbl">mín.</span>
@@ -232,7 +239,12 @@
                 <span class="material-symbols-outlined">arrow_back</span>
                 Voltar ao bloco
               </button>
-              <div class="be-title">Sessão reservada</div>
+              <div class="be-title">
+                Sessão reservada
+                @if (appt.status === 'PENDING') {
+                  <span class="be-pending-badge">Pendente</span>
+                }
+              </div>
             </div>
             <div class="be-body">
               <div class="ad-patient">
@@ -253,7 +265,7 @@
                 </div>
                 <div class="ad-row">
                   <span class="material-symbols-outlined">{{ appt.isRecurring ? 'event_repeat' : 'push_pin' }}</span>
-                  <div><div class="ad-k">Recorrência</div><div class="ad-v">{{ appt.isRecurring ? 'Semanal' : 'Data única' }}</div></div>
+                  <div><div class="ad-k">Recorrência</div><div class="ad-v">{{ recurrenceLabel(appt.isRecurring, appt.recurrenceFrequency) }}</div></div>
                 </div>
                 <div class="ad-row">
                   <span class="material-symbols-outlined">location_on</span>
@@ -293,13 +305,15 @@
             </div>
             <div class="be-actions">
               <div class="ad-actions">
-                <button class="btn-resched" (click)="rescheduleAppointment()">
-                  <span class="material-symbols-outlined">edit_calendar</span>
-                  Reagendar sessão
-                </button>
+                @if (appt.status !== 'PENDING') {
+                  <button class="btn-resched" (click)="rescheduleAppointment()">
+                    <span class="material-symbols-outlined">edit_calendar</span>
+                    Reagendar sessão
+                  </button>
+                }
                 <button class="btn-cancel" (click)="cancelAppointment(appt)">
                   <span class="material-symbols-outlined">close</span>
-                  Cancelar sessão
+                  {{ appt.status === 'PENDING' ? 'Cancelar proposta' : 'Cancelar sessão' }}
                 </button>
               </div>
             </div>
@@ -315,7 +329,7 @@
                 <span class="material-symbols-outlined">
                   {{ editorFrequency() === 'weekly' ? 'event_repeat' : 'push_pin' }}
                 </span>
-                {{ editorFrequency() === 'weekly' ? 'Semanal' : 'Única' }}
+                {{ editorFrequency() === 'weekly' ? editorRecurrencePattern() : 'Única' }}
               </span>
             </div>
 
@@ -444,6 +458,7 @@
               [class.conflicted]="conflictedBlockIds().has(block.id)"
               [class.pinned]="hasBookings(block)"
               [class.full-booked]="bookedCount(block) > 0 && bookedCount(block) === blockSlotCount(block)"
+              [class.non-occurring]="!isBlockOccurring(block, selectedDayIndex())"
               [style.top.px]="blockTopPx(block, MOB_ROW_H)"
               [style.height.px]="resizingBlockId() === block.id
                 ? blockResizeHeightPx(block, resizeLiveEndTime(), MOB_ROW_H)
@@ -470,6 +485,9 @@
                   </div>
                 }
               </div>
+              @if (!isBlockOccurring(block, selectedDayIndex())) {
+                <div class="non-occurring-note">Não ocorre esta semana</div>
+              }
               <div class="b-resize-handle" (pointerdown)="startResize($event, block, MOB_ROW_H)">
                 <span class="grip"></span>
               </div>
@@ -525,7 +543,7 @@
     <div class="book-notice">
       <span class="material-symbols-outlined">event_available</span>
       <div class="bn-text">
-        <strong>{{ bookedCount(selectedBlock()!) }} sessão(ões) reservada(s)</strong> neste bloco. Para as proteger, alguns campos ficam fixos. Pode estender o horário e adicionar serviços livremente.
+        <strong>{{ bookedCount(selectedBlock()!) }} sessão(ões) reservada(s)</strong> neste bloco. Para as proteger, os restantes campos ficam fixos - só pode ajustar o Intervalo de horas (Início/Fim), tendo em conta eventuais conflitos.
       </div>
     </div>
   }
@@ -545,7 +563,7 @@
       </div>
       <div class="slot-list">
         @for (slot of bookedSlotsForBlock(selectedBlock()!); track slot.time; let si = $index) {
-          <div [class]="'slot-row ' + (slot.booked ? 'booked' : 'free')"
+          <div [class]="'slot-row ' + (slot.booked ? 'booked' : 'free') + (slot.appointment?.status === 'PENDING' ? ' pending' : '')"
                (click)="slot.booked && slot.appointment ? selectSlot($event, slot.appointment) : null"
                [style.cursor]="slot.booked && slot.appointment ? 'pointer' : 'default'">
             @if (slot.booked && slot.appointment) {
@@ -561,15 +579,18 @@
                   {{ slotServiceName(slot.appointment) }} · {{ selectedBlock()!.sessionDuration }} min
                   <span class="rec">
                     <span class="material-symbols-outlined">{{ slot.appointment.isRecurring ? 'event_repeat' : 'push_pin' }}</span>
-                    {{ slot.appointment.isRecurring ? 'semanal' : 'única' }}
+                    {{ recurrenceTagLabel(slot.appointment.isRecurring, slot.appointment.recurrenceFrequency) }}
                   </span>
+                  @if (slot.appointment.status === 'PENDING') {
+                    <span class="pending-tag">Pendente</span>
+                  }
                 </div>
               } @else {
                 <div class="s-name">Livre</div>
                 <div class="s-meta">
                   <span class="rec">
                     <span class="material-symbols-outlined">{{ selectedBlock()!.isRecurring ? 'event_repeat' : 'push_pin' }}</span>
-                    {{ selectedBlock()!.isRecurring ? 'semanal' : 'única' }}
+                    {{ recurrenceTagLabel(selectedBlock()!.isRecurring, selectedBlock()!.recurrenceFrequency) }}
                   </span>
                 </div>
               }
@@ -577,9 +598,16 @@
             @if (slot.booked && slot.appointment) {
               <span class="s-chev"><span class="material-symbols-outlined">chevron_right</span></span>
             } @else {
-              <button class="s-rm" (click)="removeSlot($event, selectedBlock()!, si)" title="Remover horário">
-                <span class="material-symbols-outlined">close</span>
-              </button>
+              <div class="s-free-actions">
+                @if (selectedBlock()!.isRecurring) {
+                  <button class="s-propose" (click)="openProposeDialog($event, selectedBlock()!, si)" title="Propor agendamento recorrente">
+                    <span class="material-symbols-outlined">send</span>
+                  </button>
+                }
+                <button class="s-rm" (click)="removeSlot($event, selectedBlock()!, si)" title="Remover horário">
+                  <span class="material-symbols-outlined">close</span>
+                </button>
+              </div>
             }
           </div>
         }
@@ -602,7 +630,7 @@
           <button
             class="chip"
             [class.on]="selectedServiceIds().has(svc.id)"
-            [disabled]="!isServiceEligible(svc)"
+            [disabled]="!isServiceEligible(svc) || (selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!))"
             (click)="toggleService(svc.id)"
           >
             <span class="material-symbols-outlined">check</span>
@@ -614,7 +642,7 @@
     @if (selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)) {
       <div class="hint">
         <span class="material-symbols-outlined">info</span>
-        Serviços com reservas (•) não podem ser removidos.
+        Este bloco tem sessões reservadas - os serviços ficam fixos.
       </div>
     }
     @if (serviceErrorMessage(); as err) {
@@ -623,16 +651,17 @@
   </div>
 
   <!-- Modalidade -->
-  <div class="be-section" [class.fixed]="selectedBlockId() !== null && selectedBlock() && bookedModalityFixed(selectedBlock()!)">
+  <div class="be-section" [class.fixed]="selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)">
     <label class="control-label">
       Modalidade <span class="req">*</span>
-      @if (selectedBlockId() !== null && selectedBlock() && bookedModalityFixed(selectedBlock()!)) {
+      @if (selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)) {
         <span class="fixed-tag">fixo</span>
       }
     </label>
     <div class="seg">
       <button
         [class.on]="editorModality() === Modality.ANY"
+        [disabled]="selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)"
         (click)="setEditorModality(Modality.ANY)"
       >
         Qualquer
@@ -640,6 +669,7 @@
       <button
         [class.on]="editorModality() === Modality.LOCAL"
         class="presencial"
+        [disabled]="selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)"
         (click)="setEditorModality(Modality.LOCAL)"
       >
         Presencial
@@ -647,19 +677,21 @@
       <button
         [class.on]="editorModality() === Modality.REMOTE"
         class="remoto"
+        [disabled]="selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)"
         (click)="setEditorModality(Modality.REMOTE)"
       >
         Remoto
       </button>
     </div>
     @if (editorModality() !== Modality.REMOTE) {
-      <div class="field" style="margin-top: 12px;" [class.has-error]="localErrorMessage()">
+      <div class="field" style="margin-top: 12px;" [class.has-error]="localErrorMessage()" @revealSection>
         <div class="field-inner">
           <span class="field-label">Local</span>
           <input
             class="field-value"
             type="text"
             [value]="editorLocal()"
+            [disabled]="selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)"
             (input)="editorLocal.set($any($event.target).value)"
             placeholder="Consultório · R. da Misericórdia 53"
           />
@@ -671,13 +703,14 @@
       }
     }
     @if (editorModality() !== Modality.LOCAL) {
-      <div class="field field-textarea" style="margin-top: 12px;" [class.has-error]="platformErrorMessage()">
+      <div class="field field-textarea" style="margin-top: 12px;" [class.has-error]="platformErrorMessage()" @revealSection>
         <div class="field-inner">
           <span class="field-label">Plataforma</span>
           <textarea
             class="field-value"
             rows="3"
             [value]="editorPlatform()"
+            [disabled]="selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)"
             (input)="editorPlatform.set($any($event.target).value)"
             placeholder="Partilhe orientações sobre a plataforma a usar, o envio do link e outros procedimentos."
           ></textarea>
@@ -691,13 +724,18 @@
   </div>
 
   <!-- Valor -->
-  <div class="be-section">
-    <label class="control-label">Valor</label>
+  <div class="be-section" [class.fixed]="selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)">
+    <label class="control-label">
+      Valor
+      @if (selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)) {
+        <span class="fixed-tag">fixo</span>
+      }
+    </label>
     <div class="money-row">
       <div class="money-col">
         <div class="field field-money" [class.has-error]="priceErrorMessage()">
           <div class="field-inner">
-            <span class="field-label">Valor por sessão</span>
+            <span class="field-label">Valor em Euro</span>
             <div class="money-input">
               @if (currencyIsPrefix) {
                 <span class="currency-affix">{{ currencySymbol }}</span>
@@ -708,6 +746,7 @@
                 inputmode="decimal"
                 autocomplete="off"
                 [value]="editorPrice()"
+                [disabled]="selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)"
                 (keydown)="onPriceKeydown($event)"
                 (input)="onPriceInput($event)"
                 [placeholder]="pricePlaceholder"
@@ -736,6 +775,7 @@
                 inputmode="decimal"
                 autocomplete="off"
                 [value]="editorPriceBRL()"
+                [disabled]="selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)"
                 (keydown)="onPriceKeydown($event)"
                 (input)="onPriceBRLInput($event)"
                 [placeholder]="pricePlaceholderBRL"
@@ -764,20 +804,37 @@
     <div class="seg">
       <button
         [class.on]="editorFrequency() === 'once'"
+        [disabled]="selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)"
         (click)="setEditorFrequency('once')"
       >
         Data única
       </button>
       <button
         [class.on]="editorFrequency() === 'weekly'"
+        [disabled]="selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)"
         (click)="setEditorFrequency('weekly')"
       >
-        Semanal
+        Data recorrente
       </button>
     </div>
 
     @if (editorFrequency() === 'weekly') {
-      <div style="margin-top: 14px;">
+      <div style="margin-top: 14px;" @revealSection>
+        <label class="control-label">Repete-se</label>
+        <div class="seg">
+          @for (pattern of RECURRENCE_PATTERNS; track pattern) {
+            <button
+              [class.on]="editorRecurrencePattern() === pattern"
+              [disabled]="selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)"
+              (click)="editorRecurrencePattern.set(pattern)"
+            >
+              {{ pattern }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <div style="margin-top: 14px;" @revealSection>
         <label class="control-label">
           Dias da semana
           @if (selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)) {
@@ -789,6 +846,7 @@
             <button
               class="weekday"
               [class.on]="selectedWeekdays().has(wd)"
+              [disabled]="selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)"
               (click)="toggleWeekday(wd)"
             >
               {{ PT_DOW_SHORT[i][0] }}
@@ -800,7 +858,7 @@
         }
       </div>
     } @else {
-      <div class="field date-field-wrap" style="margin-top: 14px;" [class.has-error]="dateErrorMessage()" (click)="edCalToggle($event)">
+      <div class="field date-field-wrap" style="margin-top: 14px;" [class.has-error]="dateErrorMessage()" (click)="edCalToggle($event)" @revealSection>
         <div class="field-inner">
           <span class="field-label">
             Data
@@ -854,39 +912,35 @@
 
   <!-- Horas -->
   <div class="be-section">
-    <label class="control-label">Intervalo de horas</label>
+    <label class="control-label">
+      Intervalo de horas
+      @if (selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)) {
+        <span class="fixed-tag editable-tag">ajustável</span>
+      }
+    </label>
     <div class="time-row">
-      <div class="time-field" [class.fixed]="selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)">
-        <span class="field-label">
-          Início
-          @if (selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)) {
-            <span class="fixed-tag">fixo</span>
-          }
-        </span>
+      <div class="time-field">
+        <span class="field-label">Início</span>
         <div class="time-value">
           <span class="material-symbols-outlined">schedule</span>
-          <select
+          <app-styled-select
+            inputId="ed-start-time"
+            [options]="editorStartTimeSelectOptions()"
             [value]="editorStartTime()"
-            (change)="setEditorStartTime($any($event.target).value)"
-          >
-            @for (h of editorStartTimeOptions(); track h) {
-              <option [value]="h">{{ h }}</option>
-            }
-          </select>
+            (valueChange)="setEditorStartTime($event)"
+          />
         </div>
       </div>
       <div class="time-field">
         <span class="field-label">Fim</span>
         <div class="time-value">
           <span class="material-symbols-outlined">schedule</span>
-          <select
+          <app-styled-select
+            inputId="ed-end-time"
+            [options]="editorEndTimeSelectOptions()"
             [value]="editorEndTime()"
-            (change)="editorEndTime.set($any($event.target).value)"
-          >
-            @for (h of editorEndTimeOptions(); track h) {
-              <option [value]="h">{{ h }}</option>
-            }
-          </select>
+            (valueChange)="editorEndTime.set($event)"
+          />
         </div>
       </div>
     </div>
@@ -901,6 +955,7 @@
       @for (dur of SESSION_DURATIONS; track dur) {
         <button
           [class.on]="editorSessionDuration() === dur"
+          [disabled]="selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)"
           (click)="setEditorSessionDuration(dur)"
         >
           @if (editorSessionDuration() === dur) {

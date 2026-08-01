@@ -13,6 +13,7 @@ export interface AvailabilityModel {
   endTime: string;
   isRecurring: boolean;
   dayOfWeek: DayOfWeek;
+  recurrenceFrequency?: 'WEEKLY' | 'BIWEEKLY' | 'MONTHLY';
   isBooked: boolean;
   modality: string;
   platform?: string;

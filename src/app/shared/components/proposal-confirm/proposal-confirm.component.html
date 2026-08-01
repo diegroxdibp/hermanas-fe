@@ -1,0 +1,50 @@
+<div class="panel">
+  <div class="panel-header">
+    <h2>Proposta de agendamento recorrente</h2>
+  </div>
+
+  <div class="body">
+    @if (loading()) {
+      <div class="state">
+        <p>A carregar proposta...</p>
+      </div>
+    } @else if (loadError()) {
+      <div class="state error">
+        <span class="material-symbols-outlined">error</span>
+        <p>{{ loadError() }}</p>
+      </div>
+    } @else if (appt(); as a) {
+      <div class="card">
+        <p class="lead">
+          <strong>{{ a.professionalName }}</strong> propôs uma sessão {{ frequencyLabel().toLowerCase() }} recorrente consigo.
+        </p>
+
+        <div class="rows">
+          <div class="row">
+            <span class="material-symbols-outlined">medical_services</span>
+            <div><div class="k">Serviço</div><div class="v">{{ serviceName() }}</div></div>
+          </div>
+          <div class="row">
+            <span class="material-symbols-outlined">event_repeat</span>
+            <div><div class="k">Dia e horário</div><div class="v">{{ dayLabel() }} · {{ timeLabel() }}</div></div>
+          </div>
+          <div class="row">
+            <span class="material-symbols-outlined">location_on</span>
+            <div><div class="k">Modalidade</div><div class="v">{{ modalityLabel() }}</div></div>
+          </div>
+        </div>
+
+        @if (alreadyResolved()) {
+          <p class="already">{{ respondError() ?? 'Esta proposta já foi respondida.' }}</p>
+        } @else {
+          <div class="actions">
+            <button class="btn-decline" [disabled]="responding()" (click)="decline()">Recusar</button>
+            <button class="btn-accept" [disabled]="responding()" (click)="accept()">
+              {{ responding() ? 'A processar...' : 'Aceitar' }}
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

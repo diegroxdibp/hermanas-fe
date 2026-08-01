@@ -4,7 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --proxy-config proxy.conf.js",
-    "build": "ng build && node -e \"require('fs').copyFileSync('dist/hermanas-fe/browser/index.html','dist/hermanas-fe/browser/404.html')\"",
+    "build": "ng build",
+    "postbuild": "node -e \"require('fs').copyFileSync('dist/care-fe/browser/index.html','dist/care-fe/browser/404.html')\"",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
@@ -24,7 +25,6 @@
     "@maskito/angular": "^3.2.1",
     "@maskito/core": "^3.2.1",
     "@maskito/kit": "^3.2.1",
-    "hermanas-fe": "file:",
     "moment": "^2.30.1",
     "ngx-owl-carousel-o": "^20.1.0",
     "rxjs": "~7.8.0",
@@ -37,6 +37,7 @@
     "@angular/compiler-cli": "^20.3.16",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
+    "supabase": "^2.110.0",
     "typescript": "~5.9.3",
     "webpack-bundle-analyzer": "^5.3.0"
   }

@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
-import { Pages } from '../../enums/pages.enum';
 import { NavigationService } from '../../services/navigation.service';
+import { ProfessionalSessionService } from '../../enums/professional-session-service.enum';
+
+// Backend's ProfessionalService.name is the enum KEY, not its display value.
+const SERVICE_KEY: keyof typeof ProfessionalSessionService = 'SUPERVISION';
 
 @Component({
   selector: 'app-supervision',
@@ -10,7 +13,8 @@ import { NavigationService } from '../../services/navigation.service';
 })
 export class SupervisionComponent {
   constructor(public navigationService: NavigationService) {}
-  navigateTo(page: Pages) {
-    this.navigationService.navigateTo(page);
+
+  navigateToScheduling(): void {
+    this.navigationService.navigateToScheduling(SERVICE_KEY);
   }
 }

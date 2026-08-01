@@ -20,6 +20,7 @@ import { Modality } from '../../shared/enums/modality.enum';
 import { Pages } from '../../shared/enums/pages.enum';
 import { ProfessionalService } from '../../shared/models/professional-service.model';
 import { ProfessionalSessionService } from '../../shared/enums/professional-session-service.enum';
+import { generateOccurrences } from '../../shared/utils/recurrence.util';
 import { filter } from 'rxjs';
 
 export interface DashSession {
@@ -250,12 +251,7 @@ export class DashboardPageComponent implements OnInit {
     base.setDate(base.getDate() + diff);
 
     const finalLimit = end < limit ? end : limit;
-    const dates: Date[] = [];
-    while (base <= finalLimit && dates.length < 10) {
-      dates.push(new Date(base));
-      base.setDate(base.getDate() + 7);
-    }
-    return dates;
+    return generateOccurrences(appt.recurrenceFrequency, start, base, finalLimit, 10);
   }
 
   private oneTimeDates(appt: Appointment): Date[] {
