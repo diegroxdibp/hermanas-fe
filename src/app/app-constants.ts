@@ -185,6 +185,7 @@ export const AppConstants = {
               'Análise Reichiana — abordagem psicanalítica com enfoque no corpo;',
               'Mindfulness — prática de atenção plena;',
               'Somatic Experiencing® — voltado à regulação do sistema nervoso autônomo e à renegociação de trauma;',
+              'Autorregulação para Profissionais — informações em breve',
               'Supervisão na abordagem Reichiana — destinada a profissionais.',
             ],
             outro: 'Os serviços podem mudar e estarão sempre atualizados na página principal (Home).',
