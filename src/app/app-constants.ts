@@ -138,7 +138,7 @@ export const AppConstants = {
         {
           question: 'Como faço um agendamento?',
           answer: {
-            intro: "No FAQ a pergunta “Como faço um agendamento?” está com o texto da resposta desformatado. Precisa alterar o texto para: O processo exige login primeiro. Depois pode clicar no botão “Agendar” no menu de navegação no topo da página e  escolher o serviço, a pessoa profissional e, então, visualizar a agenda (horários disponíveis, modalidade de atendimento e valor). \n" +
+            intro: "O processo exige login primeiro. Depois pode clicar no botão “Agendar” no menu de navegação no topo da página e  escolher o serviço, a pessoa profissional e, então, visualizar a agenda (horários disponíveis, modalidade de atendimento e valor). \n" +
               "O agendamento também pode ser feito através do perfil no botão \"+ Agendar Sessão\".\n",
           },
         } as FaqTopicItem,

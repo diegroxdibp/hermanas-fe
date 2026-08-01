@@ -89,11 +89,13 @@ export class ContactComponent {
     this.error = null;
     this.sending = true;
 
+    const user = this.sessionService.user();
+
     this.apiService
       .sendContactMessage({
         name: nome ?? '',
-        email: this.contactDetailsRequired ? email ?? null : null,
-        phone: this.buildPhoneNumber(),
+        email: this.contactDetailsRequired ? email ?? null : user?.email ?? null,
+        phone: this.contactDetailsRequired ? this.buildPhoneNumber() : user?.phone ?? null,
         subject: assunto ?? '',
         message: mensagem ?? '',
       })

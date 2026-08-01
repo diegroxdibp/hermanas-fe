@@ -152,6 +152,7 @@
 
 .faq__answer {
   overflow: hidden;
+  padding-left: 12px;
 
   p {
     margin: 0;
@@ -166,18 +167,20 @@
   ol.faq__steps {
     margin: 0;
     padding: 0 30px 14px 22px;
-    color: var(--color-secondary-indigo);
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 1.62;
 
-    // Overrides the site-wide `ul, li { display: flex; justify-content: center }`
-    // reset (styles.scss), which otherwise centers these steps horizontally.
+    // The site-wide `ul, li { ... }` reset (styles.scss) targets `li`
+    // directly, so it wins over inheriting these from the ol — every
+    // property the paragraphs use has to be repeated here explicitly to
+    // make the steps read as the same body text, just with a bullet.
     li {
       display: list-item;
-      justify-content: flex-start;
+      list-style: disc;
       text-align: left;
+      color: var(--color-secondary-indigo);
+      font-weight: 400;
+      font-size: 16px;
       font-style: normal;
+      line-height: 1.62;
       margin-bottom: 4px;
     }
   }
