@@ -16,10 +16,12 @@ import {getEnumKeyByValue} from '../../utils/getEnumKeyByValue';
 import { getBrowserCountry } from '../../utils/browser-country.util';
 import { CountryPhoneFieldComponent } from '../country-phone-field/country-phone-field.component';
 import { StyledSelectComponent, StyledSelectOption } from '../styled-select/styled-select.component';
+import { BirthdateCalendarComponent } from '../birthdate-calendar/birthdate-calendar.component';
+import { SnackbarService } from '../../services/snackbar.service';
 
 @Component({
   selector: 'app-dashboard-profile',
-  imports: [ReactiveFormsModule, MatDialogModule, CountryPhoneFieldComponent, StyledSelectComponent],
+  imports: [ReactiveFormsModule, MatDialogModule, CountryPhoneFieldComponent, StyledSelectComponent, BirthdateCalendarComponent],
   templateUrl: './dashboard-profile.component.html',
   styleUrl: './dashboard-profile.component.scss',
 })
@@ -29,11 +31,10 @@ export class DashboardProfileComponent implements OnInit {
   private readonly userService = inject(UserService);
   private readonly authService = inject(AuthService);
   private readonly dialog = inject(MatDialog);
+  private readonly snackbarService = inject(SnackbarService);
 
   readonly countries = Countries;
   readonly genders = Object.values(Genders);
-  readonly maxBirthdate = (() => { const d = new Date(); d.setFullYear(d.getFullYear() - 18); return d.toISOString().slice(0, 10); })();
-  readonly minDate = new Date(new Date().getFullYear() - 120, 0, 1).toISOString().slice(0, 10);
   readonly user = this.sessionService.user;
   readonly selectedCountry = signal<CountryModel>(getBrowserCountry());
 
@@ -163,6 +164,10 @@ export class DashboardProfileComponent implements OnInit {
   cancel(): void {
     const user = this.user();
     if (user) this.patchForm(user);
+  }
+
+  notifyWip(): void {
+    this.snackbarService.openSnackBar({ message: 'Funcionalidade em construção.' });
   }
 
   openDeleteDialog(): void {

@@ -1,0 +1,60 @@
+<div class="field-wrap">
+  <button
+    type="button"
+    class="filled-field"
+    [class.open]="calendarOpen()"
+    [attr.aria-labelledby]="labelId || null"
+    (click)="toggleCalendar()"
+  >
+    <span class="field-value" [class.placeholder]="!dateControl.value">
+      {{ selectedBirthdateLabel || 'dd/mm/aaaa' }}
+    </span>
+    <span class="material-symbols-outlined field-icon">calendar_today</span>
+  </button>
+
+  @if (calendarOpen()) {
+    <div class="calendar-popover">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="cal-header">
+        <button type="button" class="cal-nav" (click)="prevMonth()">
+          <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+        <div class="cal-select-wrap">
+          <select class="cal-select" [value]="calMonthIndex" (change)="onMonthChange($any($event.target).value)">
+            @for (m of months; track m; let i = $index) {
+              <option [value]="i">{{ m }}</option>
+            }
+          </select>
+          <select class="cal-select" [value]="calYear" (change)="onYearChange($any($event.target).value)">
+            @for (y of years; track y) {
+              <option [value]="y">{{ y }}</option>
+            }
+          </select>
+        </div>
+        <button type="button" class="cal-nav" (click)="nextMonth()">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </button>
+      </div>
+
+      <div class="cal-weekdays">
+        @for (wd of weekdays; track $index) {
+          <span class="cal-wd">{{ wd }}</span>
+        }
+      </div>
+
+      <div class="cal-grid">
+        @for (cell of calendarDays(); track cell.key) {
+          <button type="button"
+            class="cal-day"
+            [class.other-month]="!cell.inMonth"
+            [class.today]="isToday(cell.date)"
+            [class.selected]="dateControl.value === cell.key"
+            [disabled]="isOutOfRange(cell.key) || !cell.inMonth"
+            (click)="selectDate(cell.key)">
+            {{ cell.date.getDate() }}
+          </button>
+        }
+      </div>
+    </div>
+  }
+</div>

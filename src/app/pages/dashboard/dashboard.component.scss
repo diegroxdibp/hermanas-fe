@@ -36,11 +36,9 @@
   flex: 1;
   overflow: visible;
   flex-direction: column;
-  padding-bottom: 64px;
 
   @media (min-width: breakpoint.$breakpoint-sm) {
     flex-direction: row;
-    padding-bottom: 0;
   }
 
   @media (min-width: breakpoint.$breakpoint-md) { overflow: hidden; }

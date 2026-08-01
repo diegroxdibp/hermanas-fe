@@ -23,11 +23,11 @@
       }
     </div>
     <div class="avatar-actions">
-      <button type="button" class="btn-primary-sm">
+      <button type="button" class="btn-primary-sm" (click)="notifyWip()">
         <span class="material-symbols-outlined">file_upload</span>
         Alterar foto
       </button>
-      <button type="button" class="btn-outline-sm">Remover</button>
+      <button type="button" class="btn-outline-sm" (click)="notifyWip()">Remover</button>
       <span class="hint">JPG ou PNG, até 5 MB.</span>
     </div>
   </div>
@@ -45,8 +45,8 @@
     </div>
 
     <div class="field">
-      <label for="pf-birth">Data de nascimento:</label>
-      <input id="pf-birth" type="date" [formControl]="birthdateCtrl" [max]="maxBirthdate" [min]="minDate" />
+      <label id="pf-birth-label">Data de nascimento:</label>
+      <app-birthdate-calendar [dateControl]="birthdateCtrl" labelId="pf-birth-label" />
     </div>
 
     <div class="field">

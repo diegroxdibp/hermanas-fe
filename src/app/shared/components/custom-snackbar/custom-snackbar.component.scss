@@ -1,5 +1,6 @@
 .toast {
   width: 380px;
+  max-width: calc(100vw - 3em);
   background: var(--color-primary-blue);
   border-radius: var(--radius-lg);
   filter: drop-shadow(0 12px 28px rgba(34, 50, 110, 0.32));
