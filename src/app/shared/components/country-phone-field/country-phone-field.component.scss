@@ -13,13 +13,18 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: #fff;
-  overflow: hidden;
   transition: border-color 0.2s ease;
 
   &:focus-within { border-color: var(--color-primary-blue); }
+
+  &.is-error {
+    border-color: var(--color-error);
+    background: color-mix(in srgb, var(--color-error) 6%, white);
+  }
 }
 
 .dial-code {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -30,6 +35,7 @@
   background: transparent;
   border: none;
   border-right: 1px solid var(--color-border);
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
   padding: 13px 10px 13px 14px;
   white-space: nowrap;
   flex-shrink: 0;
@@ -40,6 +46,28 @@
 
   &.open { color: var(--color-primary-blue); }
 
+  &:focus-visible {
+    outline: none;
+
+    // Drawn as a 3-sided pseudo-element (not `outline`) sized to align exactly
+    // with the wrapper's own outer border edge/radius on this side, so the
+    // curve matches perfectly instead of a second, differently-sized rounded
+    // rect fighting the wrapper's real border. Stops flush at the button's
+    // own right edge so it never bleeds into the phone number input.
+    &::after {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      bottom: -1px;
+      right: 0;
+      border: 2px solid var(--color-primary-blue);
+      border-right: none;
+      border-radius: var(--radius-md) 0 0 var(--radius-md);
+      pointer-events: none;
+    }
+  }
+
   .chev {
     transition: transform 0.2s ease;
     flex-shrink: 0;
@@ -48,11 +76,37 @@
   &.open .chev { transform: rotate(180deg); }
 }
 
+.input-cell {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-width: 0;
+
+  &:has(input:focus-visible) {
+    // Mirror of .dial-code's ring: aligned with the wrapper's own outer edge
+    // on top/right/bottom, rounded only on the right (the wrapper's real
+    // corner there), and stops flush at the left where the prefix button
+    // begins - so it never bleeds into the prefix side.
+    &::after {
+      content: '';
+      position: absolute;
+      top: -1px;
+      right: -1px;
+      bottom: -1px;
+      left: 0;
+      border: 2px solid var(--color-primary-blue);
+      border-left: none;
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      pointer-events: none;
+    }
+  }
+}
+
 input {
   border: none !important;
   outline: none !important;
   padding: 13px 14px !important;
-  flex: 1;
+  width: 100%;
   min-width: 0;
   font-family: var(--font-sans);
   font-size: 16px;
@@ -68,14 +122,44 @@ input {
   left: 0;
   right: 0;
   width: 100%;
-  max-height: 280px;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
   background: #fff;
   border: 1px solid var(--color-border-soft, var(--color-border));
   border-radius: var(--radius-md);
   filter: var(--shadow-floating, drop-shadow(0 8px 24px rgba(34, 50, 110, 0.18)));
   z-index: 500;
   box-sizing: border-box;
+  overflow: hidden;
+}
+
+.dropdown-search {
+  width: 100%;
+  box-sizing: border-box;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  padding: 10px 14px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--color-primary-blue);
+  outline: none;
+  flex-shrink: 0;
+
+  &::placeholder { color: var(--color-muted); }
+
+  &:focus-visible { background: var(--color-surface-tint); }
+}
+
+.prefix-options {
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.no-results {
+  padding: 12px 14px;
+  font-size: 13.5px;
+  color: var(--color-muted);
+  font-family: var(--font-sans);
 }
 
 .prefix-option {
@@ -93,6 +177,13 @@ input {
   transition: background 0.15s ease;
 
   &:hover { background: var(--color-surface-tint); }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary-blue);
+    outline-offset: -2px;
+  }
+
+  &:last-child { border-radius: 0 0 var(--radius-md) var(--radius-md); }
 
   &.selected {
     background: var(--color-surface-tint);

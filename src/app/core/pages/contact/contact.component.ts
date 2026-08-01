@@ -39,8 +39,11 @@ export class ContactComponent {
 
   form = new FormGroup({
     nome: new FormControl('', Validators.required),
-    email: new FormControl(''),
-    telefone: new FormControl(''),
+    email: new FormControl(
+      '',
+      this.contactDetailsRequired ? [Validators.required, Validators.email] : [Validators.email],
+    ),
+    telefone: new FormControl('', this.contactDetailsRequired ? [Validators.required] : []),
     assunto: new FormControl('', Validators.required),
     mensagem: new FormControl('', Validators.required),
   });
@@ -66,10 +69,31 @@ export class ContactComponent {
 
   isError(field: string): boolean {
     const control = this.form.get(field);
-    if (field === 'email' || field === 'telefone') {
-      return this.contactDetailsRequired && !!control?.touched && !control?.value;
-    }
     return !!(control?.invalid && control?.touched);
+  }
+
+  // Maps ContactRequestDTO's backend validation messages back onto the
+  // matching form control, so a server-side rejection (e.g. a phone number
+  // that passes client-side checks but fails the backend's stricter
+  // libphonenumber validation) still shows up as a red/invalid field,
+  // not just as a floating error message.
+  private static readonly SERVER_ERROR_MARKERS: ReadonlyArray<[string, string]> = [
+    ['nome', 'nome é obrigatório'],
+    ['email', 'email inválido'],
+    ['telefone', 'telefone inválido'],
+    ['assunto', 'assunto é obrigatório'],
+    ['mensagem', 'mensagem é obrigatória'],
+  ];
+
+  private markServerErrors(message: string): void {
+    const lower = message.toLowerCase();
+    for (const [field, marker] of ContactComponent.SERVER_ERROR_MARKERS) {
+      if (lower.includes(marker)) {
+        const control = this.form.get(field);
+        control?.setErrors({ server: true });
+        control?.markAsTouched();
+      }
+    }
   }
 
   private buildPhoneNumber(): string | null {
@@ -80,10 +104,7 @@ export class ContactComponent {
 
   submit(): void {
     this.form.markAllAsTouched();
-    const detailsMissing =
-      this.contactDetailsRequired &&
-      (!this.form.get('email')?.value || !this.form.get('telefone')?.value);
-    if (this.form.invalid || detailsMissing) return;
+    if (this.form.invalid) return;
 
     const { nome, email, assunto, mensagem } = this.form.value;
     this.error = null;
@@ -110,7 +131,9 @@ export class ContactComponent {
         },
         error: (err) => {
           this.sending = false;
-          this.error = err.error?.error ?? 'Não foi possível enviar a mensagem. Tente novamente.';
+          const message: string = err.error?.error ?? 'Não foi possível enviar a mensagem. Tente novamente.';
+          this.error = message;
+          this.markServerErrors(message);
         },
       });
   }

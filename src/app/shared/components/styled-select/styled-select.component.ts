@@ -1,4 +1,15 @@
-import { Component, EventEmitter, HostListener, Input, Output, signal } from '@angular/core';
+import {
+  AfterViewChecked,
+  Component,
+  ElementRef,
+  EventEmitter,
+  HostListener,
+  Input,
+  Output,
+  ViewChild,
+  computed,
+  signal,
+} from '@angular/core';
 
 export interface StyledSelectOption {
   value: string;
@@ -16,32 +27,73 @@ export interface StyledSelectOption {
   templateUrl: './styled-select.component.html',
   styleUrl: './styled-select.component.scss',
 })
-export class StyledSelectComponent {
+export class StyledSelectComponent implements AfterViewChecked {
   @Input({ required: true }) options: StyledSelectOption[] = [];
   @Input() value: string | null = null;
   @Input() placeholder = 'Selecione';
   @Input() inputId = '';
+  @Input() searchPlaceholder = 'Pesquisar...';
 
   @Output() readonly valueChange = new EventEmitter<string>();
 
+  @ViewChild('searchInput') searchInputRef?: ElementRef<HTMLInputElement>;
+
   readonly dropdownOpen = signal(false);
+  readonly search = signal('');
+
+  readonly filteredOptions = computed(() => {
+    const q = this.search().trim().toLowerCase();
+    if (!q) return this.options;
+    return this.options.filter(
+      o => o.label.toLowerCase().includes(q) || (o.meta ?? '').toLowerCase().includes(q),
+    );
+  });
+
+  private focusPending = false;
+
+  constructor(private readonly elementRef: ElementRef<HTMLElement>) {}
 
   get selectedOption(): StyledSelectOption | undefined {
     return this.options.find(o => o.value === this.value);
   }
 
-  @HostListener('document:mousedown')
-  closeDropdown(): void {
+  ngAfterViewChecked(): void {
+    if (this.focusPending && this.searchInputRef) {
+      this.focusPending = false;
+      this.searchInputRef.nativeElement.focus();
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    if (!this.elementRef.nativeElement.contains(event.target as Node)) {
+      this.dropdownOpen.set(false);
+    }
+  }
+
+  @HostListener('keydown.escape')
+  onEscape(): void {
     this.dropdownOpen.set(false);
   }
 
-  toggleDropdown(event: Event): void {
-    event.stopPropagation();
-    this.dropdownOpen.update(v => !v);
+  @HostListener('focusout', ['$event'])
+  onFocusOut(event: FocusEvent): void {
+    const next = event.relatedTarget as Node | null;
+    if (!next || !this.elementRef.nativeElement.contains(next)) {
+      this.dropdownOpen.set(false);
+    }
   }
 
-  select(option: StyledSelectOption, event: Event): void {
-    event.stopPropagation();
+  toggleDropdown(): void {
+    const next = !this.dropdownOpen();
+    this.dropdownOpen.set(next);
+    if (next) {
+      this.search.set('');
+      this.focusPending = true;
+    }
+  }
+
+  select(option: StyledSelectOption): void {
     this.value = option.value;
     this.valueChange.emit(option.value);
     this.dropdownOpen.set(false);

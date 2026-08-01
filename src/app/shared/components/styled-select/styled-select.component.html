@@ -1,10 +1,12 @@
-<div class="styled-select-root" (mousedown)="$event.stopPropagation()">
+<div class="styled-select-root">
   <button
     type="button"
     class="select-trigger"
     [class.open]="dropdownOpen()"
     [id]="inputId"
-    (mousedown)="toggleDropdown($event)"
+    [attr.aria-expanded]="dropdownOpen()"
+    aria-haspopup="listbox"
+    (click)="toggleDropdown()"
   >
     <span class="trigger-label" [class.placeholder]="!selectedOption">{{ selectedOption?.label ?? placeholder }}</span>
     <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -13,20 +15,34 @@
   </button>
 
   @if (dropdownOpen()) {
-    <div class="select-dropdown">
-      @for (o of options; track o.value) {
-        <button
-          type="button"
-          class="select-option"
-          [class.selected]="o.value === value"
-          (mousedown)="select(o, $event)"
-        >
-          <span class="option-name">{{ o.label }}</span>
-          @if (o.meta) {
-            <span class="option-code">{{ o.meta }}</span>
-          }
-        </button>
-      }
+    <div class="select-dropdown" role="listbox">
+      <input
+        #searchInput
+        type="text"
+        class="dropdown-search"
+        [placeholder]="searchPlaceholder"
+        [value]="search()"
+        (input)="search.set($any($event.target).value)"
+      />
+      <div class="select-options">
+        @for (o of filteredOptions(); track o.value) {
+          <button
+            type="button"
+            class="select-option"
+            role="option"
+            [class.selected]="o.value === value"
+            [attr.aria-selected]="o.value === value"
+            (click)="select(o)"
+          >
+            <span class="option-name">{{ o.label }}</span>
+            @if (o.meta) {
+              <span class="option-code">{{ o.meta }}</span>
+            }
+          </button>
+        } @empty {
+          <div class="no-results">Nenhum resultado encontrado</div>
+        }
+      </div>
     </div>
   }
 </div>

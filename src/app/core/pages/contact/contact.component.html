@@ -34,6 +34,7 @@
             <app-country-phone-field
               [country]="selectedCountry"
               [phoneControl]="telefoneCtrl"
+              [invalid]="isError('telefone')"
               inputId="c-phone"
               placeholder="912 345 678"
               (prefixCountryChange)="onPhonePrefixChange($event)"
@@ -76,7 +77,7 @@
           e a
           <a [routerLink]="'/' + Pages.POLITICA_PRIVACIDADE">política de privacidade</a>.
         </p>
-        <p>Se quer agendar algum serviço, clique <a (click)="goToScheduling()"><strong>aqui</strong></a>.</p>
+        <p>Se quer agendar algum serviço, clique <button type="button" class="link-btn" (click)="goToScheduling()"><strong>aqui</strong></button>.</p>
       </div>
     </div>
   </form>

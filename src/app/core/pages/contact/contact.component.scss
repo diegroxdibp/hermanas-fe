@@ -94,6 +94,11 @@
   &::placeholder { color: var(--color-muted); }
 
   &:focus { border-color: var(--color-primary-blue); }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary-blue);
+    outline-offset: 2px;
+  }
 }
 
 textarea.field-input {
@@ -103,7 +108,8 @@ textarea.field-input {
 }
 
 .field.is-error .field-input {
-  border-color: var(--color-secondary-pink);
+  border-color: var(--color-error);
+  background: color-mix(in srgb, var(--color-error) 6%, white);
 }
 
 .phone-row {
@@ -125,9 +131,9 @@ textarea.field-input {
 .error-msg {
   font-family: var(--font-sans);
   font-size: 13.5px;
-  color: #c0392b;
+  color: var(--color-error);
   padding: 10px 14px;
-  background: rgba(192, 57, 43, 0.06);
+  background: color-mix(in srgb, var(--color-error) 6%, white);
   border-radius: var(--radius-sm);
 }
 
@@ -197,13 +203,27 @@ textarea.field-input {
     margin: 0;
   }
 
-  a {
+  a,
+  .link-btn {
+    display: inline;
     color: var(--color-primary-blue);
+    font-family: inherit;
+    font-size: inherit;
     font-weight: var(--fw-bold);
     font-style: italic;
     text-decoration: none;
+    background: none;
+    border: none;
+    padding: 2px 1px;
+    margin: 0 -1px;
     cursor: pointer;
 
     &:hover { color: var(--fg-accent); }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-primary-blue);
+      outline-offset: 1px;
+      border-radius: var(--radius-xs);
+    }
   }
 }

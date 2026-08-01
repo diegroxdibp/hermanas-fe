@@ -153,6 +153,7 @@
   --color-divider: #cfdfe2;          /* "or sign in with" line */
   --color-muted: #8897ad;            /* placeholder grey */
   --color-success: #23a25b;          /* password rule check */
+  --color-error: #c0392b;            /* form validation errors */
 
   /* ---- Semantic foreground ---- */
   --fg-1: var(--color-primary-blue);     /* primary text */

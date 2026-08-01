@@ -157,7 +157,7 @@ export const AppConstants = {
         {
           question: 'Como cancelar um agendamento?',
           answer: {
-            intro: 'Pelo perfil no botão “Agendamentos” no botão “Cancelar Sessão”.',
+            intro: 'Através do perfil no botão “Cancelar Sessão”.',
           },
         } as FaqTopicItem,
         {

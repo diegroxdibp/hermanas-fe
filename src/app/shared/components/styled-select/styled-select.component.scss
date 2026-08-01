@@ -29,6 +29,11 @@
   &:hover { border-color: var(--color-primary-blue); }
   &.open { border-color: var(--color-primary-blue); }
 
+  &:focus-visible {
+    outline: 2px solid var(--color-primary-blue);
+    outline-offset: 2px;
+  }
+
   .trigger-label {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -52,14 +57,44 @@
   left: 0;
   right: 0;
   width: 100%;
-  max-height: 280px;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
   background: #fff;
   border: 1px solid var(--color-border-soft, var(--color-border));
   border-radius: var(--radius-md);
   filter: var(--shadow-floating, drop-shadow(0 8px 24px rgba(34, 50, 110, 0.18)));
   z-index: 500;
   box-sizing: border-box;
+  overflow: hidden;
+}
+
+.dropdown-search {
+  width: 100%;
+  box-sizing: border-box;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  padding: 10px 14px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--color-primary-blue);
+  outline: none;
+  flex-shrink: 0;
+
+  &::placeholder { color: var(--color-muted); }
+
+  &:focus-visible { background: var(--color-surface-tint); }
+}
+
+.select-options {
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.no-results {
+  padding: 12px 14px;
+  font-size: 13.5px;
+  color: var(--color-muted);
+  font-family: var(--font-sans);
 }
 
 .select-option {
@@ -77,6 +112,13 @@
   transition: background 0.15s ease;
 
   &:hover { background: var(--color-surface-tint); }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary-blue);
+    outline-offset: -2px;
+  }
+
+  &:last-child { border-radius: 0 0 var(--radius-md) var(--radius-md); }
 
   &.selected {
     background: var(--color-surface-tint);
