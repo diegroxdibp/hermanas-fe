@@ -1,0 +1,96 @@
+@if (booking(); as b) {
+  <div class="confirm-page">
+    <div class="confirm-card">
+
+      <button type="button" class="back-link" (click)="back()">
+        <span translate="no" class="material-symbols-outlined">arrow_back</span>
+        <span>Voltar aos horários</span>
+      </button>
+
+      <h2 class="confirm-title">{{ copy().heading }}</h2>
+
+      <div class="confirm-body">
+
+        <!-- Left column -->
+        <div class="confirm-left">
+          @if (detail(); as d) {
+            <div class="detail-block">
+              <span translate="no" class="material-symbols-outlined detail-icon">{{ d.icon }}</span>
+              <div class="detail-body">
+                <span class="detail-label">{{ d.label }}</span>
+                <span class="detail-text" [class.to-agree]="d.body === 'a combinar'">{{ d.body }}</span>
+              </div>
+            </div>
+          }
+
+          @if (featureFlags.paymentsEnabled()) {
+            <app-payment-method-picker
+              labelId="confirm-payment-label"
+              [currency]="currency()"
+              [ngModel]="paymentMethod()"
+              (ngModelChange)="paymentMethod.set($event)"
+            />
+          } @else {
+            <div class="payment-notice">
+              <span class="notice-head">
+                <span translate="no" class="material-symbols-outlined notice-icon">payments</span>
+                <span class="notice-label">Pagamento</span>
+              </span>
+              <span class="notice-text">
+                Por agora, o pagamento é combinado diretamente com a profissional, antes ou depois
+                da sessão.
+              </span>
+            </div>
+          }
+        </div>
+
+        <!-- Resumo -->
+        <aside class="resumo">
+          <span class="resumo-heading">Resumo</span>
+
+          <div class="resumo-rows">
+            <div class="resumo-row">
+              <span class="resumo-label">Serviço</span>
+              <span class="resumo-value">{{ serviceName() }}</span>
+            </div>
+            <div class="resumo-row">
+              <span class="resumo-label">Profissional</span>
+              <span class="resumo-value">{{ professionalName() }}</span>
+            </div>
+            <div class="resumo-row">
+              <span class="resumo-label">Quando</span>
+              <span class="resumo-value">{{ whenLabel() }}</span>
+            </div>
+            <div class="resumo-row">
+              <span class="resumo-label">Modalidade</span>
+              <span class="resumo-value">{{ b.modality }}</span>
+            </div>
+          </div>
+
+          <div class="resumo-dock">
+            <div class="resumo-total">
+              <span class="total-label">{{ copy().totalLabel }}</span>
+              <span class="total-value" [class.to-agree]="!hasPrice()">{{ priceLabel() }}</span>
+            </div>
+
+            @if (error(); as err) {
+              <span class="confirm-error">{{ err }}</span>
+            }
+
+            <button
+              type="button"
+              class="confirm-btn"
+              [disabled]="submitting()"
+              (click)="confirm()"
+            >
+              <span>{{ submitting() ? 'A confirmar...' : actionLabel() }}</span>
+            </button>
+
+            <span class="fine-print">{{ copy().finePrint }}</span>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+  </div>
+}

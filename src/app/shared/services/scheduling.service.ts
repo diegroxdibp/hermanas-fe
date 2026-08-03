@@ -17,10 +17,28 @@ import { ProfessionalSessionService } from '../enums/professional-session-servic
 import { Professional } from '../models/get-professional-by-service-response.model';
 import { SchedulingFormModel } from '../models/input-configuration-objects/scheduling-form-controls.model';
 import { SchedulingSteps } from '../enums/scheduling-steps.enum';
+import { Modality } from '../enums/modality.enum';
+import { Currency } from '../enums/currency.enum';
+import { PaymentMethod } from '../enums/payment-method.enum';
 import {
   AvailabilityConfigurationObject,
   emptyAvailabilityConfiguration,
 } from '../models/input-configuration-objects/availability-configuration-object';
+
+/**
+ * Escolha feita no passo 1 e revista no passo 2.
+ *
+ * Guarda a moeda e o valor cobrados no momento: se a pessoa mudar a preferência
+ * de moeda entretanto, a sessão em revisão continua a valer o que foi mostrado.
+ */
+export interface PendingBooking {
+  availability: AvailabilityModel;
+  modality: Modality.LOCAL | Modality.REMOTE;
+  dayKey: string;
+  currency: Currency;
+  amount: number | null;
+  paymentMethod: PaymentMethod | null;
+}
 
 const dayNumberToEnum: { [key: number]: string } = {
   0: 'SUNDAY',
@@ -44,6 +62,16 @@ export class SchedulingService {
     emptyAvailabilityConfiguration,
   );
   ProfessionalSessionService = ProfessionalSessionService;
+
+  /**
+   * Seleção pendente entre a lista de horários e a confirmação. A rota de
+   * confirmação exige isto preenchido; sem ela volta-se à lista.
+   */
+  readonly pendingBooking = signal<PendingBooking | null>(null);
+
+  clearPendingBooking(): void {
+    this.pendingBooking.set(null);
+  }
 
   constructor(private readonly fb: FormBuilder) {
     this.schedulingForm = this.fb.group<SchedulingFormModel>({

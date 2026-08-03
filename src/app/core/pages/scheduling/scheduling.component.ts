@@ -22,6 +22,9 @@ import { emptyAvailabilityConfiguration } from '../../../shared/models/input-con
 import { parseDate, formatTime } from '../../../shared/utils/date-helper.util';
 import { detectBrowserTimezone, zonedWallTimeToInstant } from '../../../shared/utils/timezones.util';
 import { SessionService } from '../../../shared/services/session.service';
+import { Router } from '@angular/router';
+import { Currency, formatPrice } from '../../../shared/enums/currency.enum';
+import { Pages } from '../../../shared/enums/pages.enum';
 import { getBookableModalities } from '../../../shared/utils/modality-compatibility.util';
 
 const PT_MONTHS = [
@@ -40,6 +43,7 @@ export class SchedulingComponent implements OnDestroy {
   private readonly route = inject(ActivatedRoute);
   readonly schedulingService = inject(SchedulingService);
   private readonly sessionService = inject(SessionService);
+  private readonly router = inject(Router);
   private readonly elRef = inject(ElementRef);
   private readonly subs: Subscription[] = [];
 
@@ -51,7 +55,7 @@ export class SchedulingComponent implements OnDestroy {
   readonly calendarViewDate = signal<Date>(new Date());
   readonly expandedSlotId = signal<number | null>(null);
   readonly confirmedSlotId = signal<number | null>(null);
-  readonly slotModality = signal<Modality>(Modality.ANY);
+  readonly slotModality = signal<Modality | null>(null);
   readonly toast = signal<string | null>(null);
   private toastTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -134,7 +138,7 @@ export class SchedulingComponent implements OnDestroy {
       this.schedulingService.availabilityConfiguration.set(emptyAvailabilityConfiguration);
       this.expandedSlotId.set(null);
       this.confirmedSlotId.set(null);
-      this.slotModality.set(Modality.ANY);
+      this.slotModality.set(null);
     }));
   }
 
@@ -262,12 +266,84 @@ export class SchedulingComponent implements OnDestroy {
   toggleSlot(id: number): void {
     if (this.expandedSlotId() === id) {
       this.expandedSlotId.set(null);
-    } else {
-      this.expandedSlotId.set(id);
-      const slot = this.filteredSlots.find(s => s.id === id);
-      const allowed = slot ? this.allowedModalitiesFor(slot) : [Modality.ANY];
-      this.slotModality.set(allowed.includes(Modality.ANY) ? Modality.ANY : allowed[0]);
+      return;
     }
+    this.expandedSlotId.set(id);
+    const slot = this.filteredSlots.find(s => s.id === id);
+    const allowed = slot ? this.allowedModalitiesFor(slot) : [];
+    // Numa vaga que aceita as duas, nada vem pré-escolhido: quem marca tem de
+    // dizer como quer ser atendida antes de continuar.
+    this.slotModality.set(allowed.length === 1 ? allowed[0] : null);
+  }
+
+  /** Moeda de cobrança do perfil. Não há seletor de moeda neste fluxo. */
+  get displayCurrency(): Currency {
+    return this.sessionService.user()?.currency ?? Currency.EUR;
+  }
+
+  /** Valor na moeda do usuário. O cliente nunca converte. */
+  slotAmount(slot: AvailabilityModel): number | null {
+    const raw = this.displayCurrency === Currency.BRL ? slot.priceBRL : slot.price;
+    return raw && raw > 0 ? raw : null;
+  }
+
+  /**
+   * Preço formatado, ou o texto combinável. Nunca mostramos '0 €' nem
+   * escondemos a linha — a ausência de preço é uma informação, não um vazio.
+   */
+  slotPriceLabel(slot: AvailabilityModel, tight = false): string {
+    const amount = this.slotAmount(slot);
+    if (amount === null) return tight ? 'a combinar' : 'valor a combinar';
+    return formatPrice(amount, this.displayCurrency);
+  }
+
+  hasPrice(slot: AvailabilityModel): boolean {
+    return this.slotAmount(slot) !== null;
+  }
+
+  /** Texto de apoio da modalidade na linha fechada. */
+  modalityWords(slot: AvailabilityModel): Modality[] {
+    return this.allowedModalitiesFor(slot);
+  }
+
+  /** Endereço ou plataforma, conforme a modalidade escolhida. */
+  detailFor(slot: AvailabilityModel): { icon: string; label: string; body: string } | null {
+    const modality = this.slotModality();
+    if (!modality) return null;
+    if (modality === Modality.LOCAL) {
+      return { icon: 'place', label: 'Endereço', body: slot.address?.trim() || 'a combinar' };
+    }
+    return { icon: 'videocam', label: 'Plataforma', body: slot.platform?.trim() || 'a combinar' };
+  }
+
+  canContinue(): boolean {
+    return this.slotModality() !== null;
+  }
+
+  /**
+   * Guarda a escolha e segue para a revisão. Deixou de marcar diretamente: a
+   * confirmação passou a ser um passo próprio, que mais tarde recebe o
+   * pagamento sem reestruturar nada.
+   */
+  continuar(slot: AvailabilityModel): void {
+    const modality = this.slotModality();
+    const day = this.selectedDay;
+    if (!modality || modality === Modality.ANY || !day) return;
+
+    this.schedulingService.pendingBooking.set({
+      availability: slot,
+      modality,
+      dayKey: day,
+      currency: this.displayCurrency,
+      amount: this.slotAmount(slot),
+      paymentMethod: null,
+    });
+
+    const fc = this.schedulingService.schedulingForm.controls;
+    fc[SchedulingFormControls.SELECTED_MODALITY].setValue(modality);
+    fc[SchedulingFormControls.SELECTED_AVAILABILITY].setValue(slot);
+
+    this.router.navigate([Pages.SCHEDULING, 'confirmar']);
   }
 
   confirmSlot(slot: AvailabilityModel): void {

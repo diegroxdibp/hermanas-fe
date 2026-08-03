@@ -175,37 +175,70 @@
 
               <button type="button" class="slot-header" (click)="toggleSlot(slot.id)">
                 <span class="slot-time">{{ fmtTime(slot.startTime, slot.timeZone) }} – {{ fmtTime(slot.endTime, slot.timeZone) }}</span>
-                <span class="slot-date">{{ fmtDate(selectedDay) }}</span>
+
+                <span class="slot-affordances">
+                  @for (m of modalityWords(slot); track m; let last = $last) {
+                    <span class="afford">
+                      <span translate="no" class="material-symbols-outlined afford-icon">{{ m === Modality.LOCAL ? 'place' : 'videocam' }}</span>
+                      <span>{{ modalityWords(slot).length === 1 ? (m === Modality.LOCAL ? 'só presencial' : 'só remoto') : (m === Modality.LOCAL ? 'presencial' : 'remoto') }}</span>
+                    </span>
+                    @if (!last) {
+                      <span class="afford-sep" aria-hidden="true">·</span>
+                    }
+                  }
+                </span>
+
+                <span class="slot-price" [class.to-agree]="!hasPrice(slot)">{{ slotPriceLabel(slot) }}</span>
+
                 <span translate="no" class="material-symbols-outlined slot-chev"
                   [class.rotated]="expandedSlotId() === slot.id">expand_more</span>
               </button>
 
               <div class="slot-body" [class.expanded]="expandedSlotId() === slot.id">
                 <div class="slot-body-inner">
-                  <!-- Modality segmented control -->
-                  <div class="modality-seg">
-                    @for (m of modalities; track m) {
-                      <button type="button"
-                        class="mod-btn"
-                        [class.selected]="slotModality() === m"
-                        [disabled]="confirmedSlotId() === slot.id || !isModalityAllowed(m, slot)"
-                        (click)="slotModality.set(m)">
-                        @if (slotModality() === m) {
-                          <span translate="no" class="material-symbols-outlined mod-check">check</span>
-                        }
-                        {{ m }}
-                      </button>
-                    }
+                  <!-- Modality -->
+                  <div class="mod-field">
+                    <span class="mod-label">Como quer ser atendida</span>
+                    <div class="modality-seg">
+                      @for (m of allowedModalitiesFor(slot); track m) {
+                        <button type="button"
+                          class="mod-btn"
+                          [class.selected]="slotModality() === m"
+                          [disabled]="confirmedSlotId() === slot.id"
+                          (click)="slotModality.set(m)">
+                          @if (slotModality() === m) {
+                            <span translate="no" class="material-symbols-outlined mod-check">check</span>
+                          }
+                          <span>{{ m }}</span>
+                        </button>
+                      }
+                    </div>
                   </div>
 
-                  <!-- Agendar / Confirmado button -->
-                  <button type="button"
-                    class="agendar-btn"
-                    [class.is-confirmed]="confirmedSlotId() === slot.id"
-                    [disabled]="confirmedSlotId() === slot.id"
-                    (click)="confirmSlot(slot)">
-                    {{ confirmedSlotId() === slot.id ? 'Confirmado' : 'Agendar' }}
-                  </button>
+                  <!-- Address / platform -->
+                  @if (detailFor(slot); as detail) {
+                    <div class="slot-detail">
+                      <span translate="no" class="material-symbols-outlined detail-icon">{{ detail.icon }}</span>
+                      <div class="detail-body">
+                        <span class="detail-label">{{ detail.label }}</span>
+                        <span class="detail-text" [class.to-agree]="detail.body === 'a combinar'">{{ detail.body }}</span>
+                      </div>
+                    </div>
+                  }
+
+                  <!-- Footer -->
+                  <div class="slot-footer">
+                    <span class="slot-value">
+                      Valor da sessão ·
+                      <strong [class.to-agree]="!hasPrice(slot)">{{ slotPriceLabel(slot, true) }}</strong>
+                    </span>
+                    <button type="button"
+                      class="continuar-btn"
+                      [disabled]="!canContinue() || confirmedSlotId() === slot.id"
+                      (click)="continuar(slot)">
+                      <span>Continuar</span>
+                    </button>
+                  </div>
                 </div>
               </div>
 

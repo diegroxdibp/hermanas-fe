@@ -975,7 +975,7 @@ export class AvailabilityComponent implements OnInit {
           const slotStart = slotTimes[i] ?? s.slotTime;
           const slotEnd = minToTime(timeToMin(slotStart) + dur);
           return this.apiService.updateAvailability(s.backendId,
-            this.buildSlotPayload(block.services, block.modality, block.isRecurring, newDate, slotStart, slotEnd, block.platform, block.price, block.priceBRL, block.recurrenceFrequency),
+            this.buildSlotPayload(block.services, block.modality, block.isRecurring, newDate, slotStart, slotEnd, block.platform, block.local, block.price, block.priceBRL, block.recurrenceFrequency),
           );
         });
         forkJoin(updateOps).subscribe({
@@ -1429,7 +1429,7 @@ export class AvailabilityComponent implements OnInit {
           const newSlotTimes = generateSlots(b.endTime, newEnd, dur);
           const createOps = newSlotTimes.map(t =>
             this.apiService.createAvailability(this.buildSlotPayload(
-              b.services, b.modality, b.isRecurring, date, t, minToTime(timeToMin(t) + dur), b.platform, b.price, b.priceBRL, b.recurrenceFrequency,
+              b.services, b.modality, b.isRecurring, date, t, minToTime(timeToMin(t) + dur), b.platform, b.local, b.price, b.priceBRL, b.recurrenceFrequency,
             ))
           );
           forkJoin(createOps).subscribe({
@@ -1538,7 +1538,7 @@ export class AvailabilityComponent implements OnInit {
           const newSlotTimes = generateSlots(newStart, b.startTime, dur);
           const createOps = newSlotTimes.map(t =>
             this.apiService.createAvailability(this.buildSlotPayload(
-              b.services, b.modality, b.isRecurring, date, t, minToTime(timeToMin(t) + dur), b.platform, b.price, b.priceBRL, b.recurrenceFrequency,
+              b.services, b.modality, b.isRecurring, date, t, minToTime(timeToMin(t) + dur), b.platform, b.local, b.price, b.priceBRL, b.recurrenceFrequency,
             ))
           );
           forkJoin(createOps).subscribe({
@@ -1730,6 +1730,7 @@ export class AvailabilityComponent implements OnInit {
         this.buildSlotPayload(
           services, this.editorModality(), isRecurring, date, t, minToTime(timeToMin(t) + dur),
           this.editorModality() !== Modality.LOCAL ? this.editorPlatform() : undefined,
+          this.editorModality() !== Modality.REMOTE ? this.editorLocal() : undefined,
           parsePriceInput(this.editorPrice(), this.decimalSeparator),
           parsePriceInput(this.editorPriceBRL(), this.decimalSeparator),
           isRecurring ? this.editorRecurrencePattern() : undefined,
@@ -1764,6 +1765,7 @@ export class AvailabilityComponent implements OnInit {
     slotStart: string,
     slotEnd: string,
     platform?: string,
+    address?: string,
     price?: number,
     priceBRL?: number,
     recurrenceFrequency?: RecurrenceFrequency,
@@ -1773,6 +1775,9 @@ export class AvailabilityComponent implements OnInit {
       startDate: date,
       startTime: slotStart,
       platform: modality !== Modality.LOCAL ? platform : undefined,
+      // O campo 'Local' do editor era recolhido e validado, mas nunca chegava a
+      // ser enviado — a morada perdia-se ao guardar. Agora vai como 'address'.
+      address: modality !== Modality.REMOTE ? address : undefined,
       price,
       priceBRL,
       endTime: slotEnd,
@@ -1859,6 +1864,7 @@ export class AvailabilityComponent implements OnInit {
       endTime: stripSec(last.endTime),
       sessionDuration,
       platform: first.platform,
+      local: first.address,
       price: first.price,
       priceBRL: first.priceBRL,
     };
@@ -1906,7 +1912,7 @@ export class AvailabilityComponent implements OnInit {
     if (toAddTimes.length > 0) {
       const createOps = toAddTimes.map(t =>
         this.apiService.createAvailability(this.buildSlotPayload(
-          existing.services, existing.modality, existing.isRecurring, date, t, minToTime(timeToMin(t) + dur), existing.platform, existing.price, existing.priceBRL, existing.recurrenceFrequency,
+          existing.services, existing.modality, existing.isRecurring, date, t, minToTime(timeToMin(t) + dur), existing.platform, existing.local, existing.price, existing.priceBRL, existing.recurrenceFrequency,
         ))
       );
       forkJoin(createOps).subscribe({
@@ -1935,7 +1941,7 @@ export class AvailabilityComponent implements OnInit {
         if (slotTimes.length === 0) return;
         const createOps = slotTimes.map(t =>
           this.apiService.createAvailability(this.buildSlotPayload(
-            updated.services, updated.modality, updated.isRecurring, date, t, minToTime(timeToMin(t) + dur), updated.platform, updated.price, updated.priceBRL, updated.recurrenceFrequency,
+            updated.services, updated.modality, updated.isRecurring, date, t, minToTime(timeToMin(t) + dur), updated.platform, updated.local, updated.price, updated.priceBRL, updated.recurrenceFrequency,
           ))
         );
         forkJoin(createOps).subscribe({

@@ -1,0 +1,286 @@
+@use "assets/styles/breakpoints.scss" as breakpoint;
+
+/* Passo 2 do agendamento. O bloco de pagamento e o aviso tracejado são os dois
+   estados de um mesmo lugar no layout — quando a flag ligar, só troca o que
+   está lá dentro. */
+
+.confirm-page {
+  padding: 40px 24px 60px;
+  display: flex;
+  justify-content: center;
+
+  @media (max-width: 640px) {
+    padding: 20px 16px 130px; // espaço para a barra fixa no fundo
+  }
+}
+
+.confirm-card {
+  width: 100%;
+  max-width: 840px;
+  background: #fff;
+  border-radius: 12px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+  padding: 32px 40px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+
+  @media (max-width: 640px) {
+    padding: 20px 16px;
+    filter: none;
+    border-radius: 0;
+  }
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-weight: var(--fw-semibold);
+  font-size: 14px;
+  color: var(--color-primary-purple);
+
+  .material-symbols-outlined { font-size: 18px; }
+}
+
+.confirm-title {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-bold);
+  font-size: 27px;
+  line-height: 1.25;
+  color: var(--color-primary-blue);
+  margin: 0;
+
+  @media (max-width: 640px) { font-size: 25px; }
+}
+
+.confirm-body {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 28px;
+  align-items: start;
+
+  @media (max-width: 640px) {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+.confirm-left {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  @media (max-width: 640px) { order: 2; }
+}
+
+.detail-block {
+  display: flex;
+  gap: 12px;
+  padding: 16px 18px;
+  border-radius: 8px;
+  background: var(--color-surface-tint);
+}
+
+.detail-icon {
+  font-size: 20px;
+  line-height: 1;
+  color: var(--color-primary-purple);
+  flex-shrink: 0;
+}
+
+.detail-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.detail-label {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-semibold);
+  font-size: 13px;
+  color: var(--color-primary-blue);
+}
+
+.detail-text {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.55;
+  color: rgba(34, 50, 110, 0.85);
+  white-space: pre-line;
+}
+
+.to-agree {
+  font-style: italic;
+  font-weight: var(--fw-regular);
+  color: rgba(34, 50, 110, 0.6);
+}
+
+.payment-notice {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px dashed var(--color-border);
+  border-radius: 8px;
+  padding: 16px 18px;
+}
+
+.notice-head {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.notice-icon {
+  font-size: 18px;
+  line-height: 1;
+  color: var(--color-primary-purple);
+}
+
+.notice-label {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-semibold);
+  font-size: 13px;
+  color: var(--color-primary-blue);
+}
+
+.notice-text {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.55;
+  color: rgba(34, 50, 110, 0.85);
+}
+
+.resumo {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 20px;
+
+  @media (max-width: 640px) {
+    order: 1;
+    border: none;
+    padding: 0;
+  }
+}
+
+.resumo-heading {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-bold);
+  font-size: 12px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--color-primary-blue);
+}
+
+.resumo-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.resumo-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.resumo-label {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: rgba(34, 50, 110, 0.6);
+}
+
+.resumo-value {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  color: var(--color-primary-blue);
+}
+
+.resumo-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid var(--color-border);
+  padding-top: 14px;
+}
+
+.total-label {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: rgba(34, 50, 110, 0.6);
+}
+
+.total-value {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-bold);
+  font-size: 24px;
+  color: var(--color-primary-blue);
+}
+
+.confirm-error {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--color-primary-blue);
+}
+
+.confirm-btn {
+  width: 100%;
+  background: var(--color-primary-blue);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 20px;
+  font-family: var(--font-sans);
+  font-weight: var(--fw-semibold);
+  font-size: 16px;
+  cursor: pointer;
+  transition: opacity var(--dur-fast) ease;
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+}
+
+.fine-print {
+  text-align: center;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: rgba(34, 50, 110, 0.6);
+}
+
+.resumo-dock {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* No telemóvel a ação encosta ao fundo do ecrã para ficar sempre alcançável —
+   daí o padding-bottom generoso em .confirm-page, que impede o último bloco de
+   ficar por baixo desta barra. */
+@media (max-width: 640px) {
+  .resumo-dock {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 5;
+    background: #fff;
+    border-top: 1px solid var(--color-border);
+    padding: 14px 16px 20px;
+    gap: 10px;
+  }
+
+  .total-value { font-size: 22px; }
+}

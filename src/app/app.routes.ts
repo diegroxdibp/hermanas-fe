@@ -4,6 +4,7 @@ import { Pages } from './shared/enums/pages.enum';
 import { AccessGuard } from './auth/auth.guard';
 import { AuthOnlyGuard } from './auth/authOnly.guard';
 import { AvailabilityAccessGuard } from './auth/availability-access.guard';
+import { pendingBookingGuard } from './core/pages/scheduling/confirm/pending-booking.guard';
 import { HomeComponent } from './core/pages/home/home.component';
 
 export const routes: Routes = [
@@ -193,6 +194,17 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./core/pages/scheduling/scheduling.component').then(
             (m) => m.SchedulingComponent,
+          ),
+      },
+
+      {
+        // Passo 2 do agendamento. O guard devolve à lista quando não há
+        // seleção pendente — URL direto, refresh ou voltar após marcar.
+        path: `${Pages.SCHEDULING}/confirmar`,
+        canActivate: [pendingBookingGuard],
+        loadComponent: () =>
+          import('./core/pages/scheduling/confirm/confirm.component').then(
+            (m) => m.SchedulingConfirmComponent,
           ),
       },
 

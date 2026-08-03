@@ -834,3 +834,173 @@
   }
 }
 
+
+/* ---------------------------------------------------------------------------
+   Linha de horário — passo 1 do agendamento
+   A linha fechada passou a mostrar preço e modalidade para que se possa
+   comparar horários sem abrir cada um.
+   --------------------------------------------------------------------------- */
+
+.slot-time {
+  min-width: 196px;
+  flex: none;
+
+  @media (max-width: 640px) {
+    min-width: 0;
+    font-size: 16px;
+  }
+}
+
+.slot-affordances {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: rgba(34, 50, 110, 0.72);
+
+  @media (max-width: 640px) {
+    order: 3;
+    flex-basis: 100%;
+    font-size: 13px;
+    margin-top: 6px;
+  }
+}
+
+.afford {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.afford-icon {
+  font-size: 18px;
+  line-height: 1;
+  color: var(--color-primary-purple);
+
+  @media (max-width: 640px) { font-size: 16px; }
+}
+
+.afford-sep {
+  color: var(--color-border);
+}
+
+.slot-price {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-bold);
+  font-size: 18px;
+  line-height: 1;
+  color: var(--color-primary-blue);
+  flex: none;
+
+  @media (max-width: 640px) { font-size: 16px; }
+}
+
+/* Preço ou morada por combinar: continua visível, nunca vira '0 €'. */
+.to-agree {
+  font-style: italic;
+  font-weight: var(--fw-regular);
+  color: rgba(34, 50, 110, 0.6);
+}
+
+.mod-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mod-label {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: rgba(34, 50, 110, 0.72);
+}
+
+.slot-detail {
+  display: flex;
+  gap: 12px;
+  padding: 16px 18px;
+  border-radius: 8px;
+  background: var(--color-surface-tint);
+  animation: detail-fade var(--dur-fast) ease;
+}
+
+@keyframes detail-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.detail-icon {
+  font-size: 20px;
+  line-height: 1;
+  color: var(--color-primary-purple);
+  flex-shrink: 0;
+}
+
+.detail-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.detail-label {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-semibold);
+  font-size: 13px;
+  color: var(--color-primary-blue);
+}
+
+.detail-text {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.55;
+  color: rgba(34, 50, 110, 0.85);
+  white-space: pre-line;
+}
+
+.slot-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid var(--color-border);
+  padding-top: 16px;
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+}
+
+.slot-value {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: rgba(34, 50, 110, 0.6);
+
+  strong {
+    font-weight: var(--fw-bold);
+    color: var(--color-primary-blue);
+  }
+}
+
+.continuar-btn {
+  background: var(--color-primary-blue);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 13px 28px;
+  font-family: var(--font-sans);
+  font-weight: var(--fw-semibold);
+  font-size: 16px;
+  cursor: pointer;
+  transition: opacity var(--dur-fast) ease;
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+
+  @media (max-width: 640px) { width: 100%; }
+}

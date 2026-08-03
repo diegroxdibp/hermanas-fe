@@ -29,7 +29,10 @@ export function getBookableModalities(slotModality: string): Modality[] {
   const normalized = normalizeModality(slotModality);
   if (normalized === Modality.LOCAL) return [Modality.LOCAL];
   if (normalized === Modality.REMOTE) return [Modality.REMOTE];
-  return [Modality.ANY, Modality.LOCAL, Modality.REMOTE];
+  // ANY é uma propriedade da disponibilidade ("tanto faz"), não um resultado
+  // possível: quem marca resolve sempre para uma modalidade concreta, e é
+  // LOCAL ou REMOTE que segue para a API.
+  return [Modality.LOCAL, Modality.REMOTE];
 }
 
 // Backend expects the raw SessionModality enum name, not the Portuguese label.
