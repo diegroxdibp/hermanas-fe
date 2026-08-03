@@ -1,6 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { animate, style, transition, trigger } from '@angular/animations';
 import { ApiService } from '../../../services/api.service';
 import { SchedulingService } from '../../../../shared/services/scheduling.service';
 import { SchedulingFormControls } from '../../../../shared/enums/scheduling-form-controls.enum';
@@ -41,6 +42,17 @@ const COPY = {
   imports: [PaymentMethodPickerComponent, FormsModule],
   templateUrl: './confirm.component.html',
   styleUrl: './confirm.component.scss',
+  animations: [
+    // Aqui a modalidade já está fixa, então só há entrada — mas mantém-se o
+    // mesmo tempo e curva do bloco equivalente em Agendar, para que passar de
+    // um passo ao outro não pareça outra interface.
+    trigger('detailEnter', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(-4px)' }),
+        animate('200ms ease', style({ opacity: 1, transform: 'none' })),
+      ]),
+    ]),
+  ],
 })
 export class SchedulingConfirmComponent {
   private readonly apiService = inject(ApiService);

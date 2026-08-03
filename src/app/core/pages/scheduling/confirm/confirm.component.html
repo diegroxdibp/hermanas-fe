@@ -14,7 +14,7 @@
         <!-- Left column -->
         <div class="confirm-left">
           @if (detail(); as d) {
-            <div class="detail-block">
+            <div class="detail-block" [@detailEnter]>
               <span translate="no" class="material-symbols-outlined detail-icon">{{ d.icon }}</span>
               <div class="detail-body">
                 <span class="detail-label">{{ d.label }}</span>

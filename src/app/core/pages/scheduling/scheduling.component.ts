@@ -8,6 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { animate, style, transition, trigger } from '@angular/animations';
 import { take, Subscription } from 'rxjs';
 import { ApiService } from '../../services/api.service';
 import { SchedulingService } from '../../../shared/services/scheduling.service';
@@ -37,6 +38,26 @@ const PT_MONTHS = [
   imports: [],
   templateUrl: './scheduling.component.html',
   styleUrl: './scheduling.component.scss',
+  animations: [
+    // O bloco de Endereço/Plataforma aparece e troca de conteúdo conforme a
+    // modalidade escolhida. Sem isto o texto mudava de repente, e como os dois
+    // textos têm comprimentos diferentes a troca lia-se como um salto.
+    //
+    // Só opacidade: animar a altura entre uma morada e um parágrafo sobre a
+    // plataforma faria a caixa esticar e encolher a cada clique.
+    trigger('detailSwap', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(-4px)' }),
+        animate('200ms ease', style({ opacity: 1, transform: 'none' })),
+      ]),
+      // O elemento é reaproveitado quando se troca de modalidade, por isso a
+      // transição é disparada pela mudança de estado e não por :enter.
+      transition('* => *', [
+        style({ opacity: 0 }),
+        animate('200ms ease', style({ opacity: 1 })),
+      ]),
+    ]),
+  ],
 })
 export class SchedulingComponent implements OnDestroy {
   private readonly apiService = inject(ApiService);

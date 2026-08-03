@@ -922,18 +922,15 @@
   color: rgba(34, 50, 110, 0.72);
 }
 
+// A entrada e a troca entre Endereço e Plataforma são feitas pelo trigger
+// 'detailSwap' no componente: uma keyframe CSS só dispara na primeira
+// renderização, e aqui o elemento é reaproveitado ao mudar de modalidade.
 .slot-detail {
   display: flex;
   gap: 12px;
   padding: 16px 18px;
   border-radius: 8px;
   background: var(--color-surface-tint);
-  animation: detail-fade var(--dur-fast) ease;
-}
-
-@keyframes detail-fade {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
 
 .detail-icon {

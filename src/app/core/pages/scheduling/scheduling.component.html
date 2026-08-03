@@ -217,7 +217,7 @@
 
                   <!-- Address / platform -->
                   @if (detailFor(slot); as detail) {
-                    <div class="slot-detail">
+                    <div class="slot-detail" [@detailSwap]="slotModality()">
                       <span translate="no" class="material-symbols-outlined detail-icon">{{ detail.icon }}</span>
                       <div class="detail-body">
                         <span class="detail-label">{{ detail.label }}</span>
