@@ -12,11 +12,11 @@
           [routerLinkActiveOptions]="{ exact: true }"
           routerLinkActive="active"
         >
-          <span class="material-symbols-outlined">event_note</span>
+          <span translate="no" class="material-symbols-outlined">event_note</span>
           <span>Agendamentos</span>
         </a>
 <!--        <a class="sidebar-link-disabled">-->
-<!--          <span class="material-symbols-outlined">forum</span>-->
+<!--          <span translate="no" class="material-symbols-outlined">forum</span>-->
 <!--          <span>Mensagens</span>-->
 <!--          <span class="badge">2</span>-->
 <!--        </a>-->
@@ -24,7 +24,7 @@
           [routerLink]="['notifications']"
           routerLinkActive="active"
         >
-          <span class="material-symbols-outlined">notifications</span>
+          <span translate="no" class="material-symbols-outlined">notifications</span>
           <span>Notificações</span>
           @if (notificationService.unreadCount() > 0) {
             <span class="badge">{{ notificationService.unreadCount() }}</span>
@@ -34,11 +34,11 @@
           [routerLink]="['profile']"
           routerLinkActive="active"
         >
-          <span class="material-symbols-outlined">person</span>
+          <span translate="no" class="material-symbols-outlined">person</span>
           <span>Perfil</span>
         </a>
 <!--        <a class="sidebar-link-disabled">-->
-<!--          <span class="material-symbols-outlined">receipt_long</span>-->
+<!--          <span translate="no" class="material-symbols-outlined">receipt_long</span>-->
 <!--          <span>Faturação</span>-->
 <!--        </a>-->
       </nav>
@@ -61,7 +61,7 @@
             </div>
             @if(appointments().length){
               <button class="cta-schedule" [routerLink]="'/' + Pages.SCHEDULING">
-                <span class="material-symbols-outlined">add</span>
+                <span translate="no" class="material-symbols-outlined">add</span>
                 Agendar sessão
               </button>
             }
@@ -87,11 +87,11 @@
                 <div class="with">{{ s.service }}</div>
                 <div class="meta-row">
                   <span class="meta">
-                    <span class="material-symbols-outlined">schedule</span>
+                    <span translate="no" class="material-symbols-outlined">schedule</span>
                     {{ s.startTime }}&nbsp;–&nbsp;{{ s.endTime }}
                   </span>
                   <span class="meta">
-                    <span class="material-symbols-outlined">location_on</span>
+                    <span translate="no" class="material-symbols-outlined">location_on</span>
                     {{ s.mode }}
                   </span>
                 </div>
@@ -100,7 +100,7 @@
               <!-- Actions -->
               <div class="actions">
                 <button class="btn-reschedule" (click)="rescheduleSession()">
-                  <span class="material-symbols-outlined">event_repeat</span>
+                  <span translate="no" class="material-symbols-outlined">event_repeat</span>
                   Reagendar
                 </button>
                 <button class="btn-cancel" (click)="cancelSession(s)">Cancelar sessão</button>
@@ -108,10 +108,10 @@
             </div>
           } @else {
             <div class="empty-card">
-              <span class="material-symbols-outlined empty-icon">event_available</span>
+              <span translate="no" class="material-symbols-outlined empty-icon">event_available</span>
               <p>Não tem sessões agendadas.</p>
               <a class="cta-schedule" [routerLink]="'/' + Pages.SCHEDULING">
-                <span class="material-symbols-outlined">add</span>
+                <span translate="no" class="material-symbols-outlined">add</span>
                 Agendar sessão
               </a>
             </div>
@@ -126,14 +126,14 @@
                   [class.on]="activeView() === 'list'"
                   (click)="setView('list')"
                 >
-                  <span class="material-symbols-outlined">list</span>
+                  <span translate="no" class="material-symbols-outlined">list</span>
                   Lista
                 </button>
                 <button
                   [class.on]="activeView() === 'calendar'"
                   (click)="setView('calendar')"
                 >
-                  <span class="material-symbols-outlined">calendar_month</span>
+                  <span translate="no" class="material-symbols-outlined">calendar_month</span>
                   Calendário
                 </button>
               </div>
@@ -182,14 +182,14 @@
       [routerLinkActiveOptions]="{ exact: true }"
       routerLinkActive="active"
     >
-      <span class="material-symbols-outlined">event_note</span>
+      <span translate="no" class="material-symbols-outlined">event_note</span>
       <span>Agendamentos</span>
     </a>
     <a
       [routerLink]="['notifications']"
       routerLinkActive="active"
     >
-      <span class="material-symbols-outlined">notifications</span>
+      <span translate="no" class="material-symbols-outlined">notifications</span>
       @if (notificationService.unreadCount() > 0) {
         <span class="badge">{{ notificationService.unreadCount() }}</span>
       }
@@ -199,7 +199,7 @@
       [routerLink]="['profile']"
       routerLinkActive="active"
     >
-      <span class="material-symbols-outlined">person</span>
+      <span translate="no" class="material-symbols-outlined">person</span>
       <span>Perfil</span>
     </a>
   </nav>

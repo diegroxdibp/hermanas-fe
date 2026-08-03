@@ -14,7 +14,7 @@
   <div class="list">
     @if (notificationService.notifications().length === 0) {
       <div class="empty">
-        <span class="material-symbols-outlined">notifications_off</span>
+        <span translate="no" class="material-symbols-outlined">notifications_off</span>
         <p>Não tem notificações.</p>
       </div>
     }
@@ -22,7 +22,7 @@
     @for (n of notificationService.notifications(); track n.id) {
       <div class="item" [class.unread]="!n.read" (click)="markAsRead(n)">
         <div class="icon-wrap" [class]="typeClass(n.type)">
-          <span class="material-symbols-outlined">{{ typeIcon(n.type) }}</span>
+          <span translate="no" class="material-symbols-outlined">{{ typeIcon(n.type) }}</span>
         </div>
         <div class="content">
           <p class="message">{{ n.message }}</p>

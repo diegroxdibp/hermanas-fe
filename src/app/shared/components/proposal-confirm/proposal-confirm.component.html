@@ -10,7 +10,7 @@
       </div>
     } @else if (loadError()) {
       <div class="state error">
-        <span class="material-symbols-outlined">error</span>
+        <span translate="no" class="material-symbols-outlined">error</span>
         <p>{{ loadError() }}</p>
       </div>
     } @else if (appt(); as a) {
@@ -21,15 +21,15 @@
 
         <div class="rows">
           <div class="row">
-            <span class="material-symbols-outlined">medical_services</span>
+            <span translate="no" class="material-symbols-outlined">medical_services</span>
             <div><div class="k">Serviço</div><div class="v">{{ serviceName() }}</div></div>
           </div>
           <div class="row">
-            <span class="material-symbols-outlined">event_repeat</span>
+            <span translate="no" class="material-symbols-outlined">event_repeat</span>
             <div><div class="k">Dia e horário</div><div class="v">{{ dayLabel() }} · {{ timeLabel() }}</div></div>
           </div>
           <div class="row">
-            <span class="material-symbols-outlined">location_on</span>
+            <span translate="no" class="material-symbols-outlined">location_on</span>
             <div><div class="k">Modalidade</div><div class="v">{{ modalityLabel() }}</div></div>
           </div>
         </div>

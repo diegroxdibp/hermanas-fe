@@ -9,7 +9,7 @@
     <span class="field-value" [class.placeholder]="!dateControl.value">
       {{ selectedBirthdateLabel || 'dd/mm/aaaa' }}
     </span>
-    <span class="material-symbols-outlined field-icon">calendar_today</span>
+    <span translate="no" class="material-symbols-outlined field-icon">calendar_today</span>
   </button>
 
   @if (calendarOpen()) {
@@ -17,7 +17,7 @@
       <div class="sheet-handle" aria-hidden="true"></div>
       <div class="cal-header">
         <button type="button" class="cal-nav" (click)="prevMonth()">
-          <span class="material-symbols-outlined">chevron_left</span>
+          <span translate="no" class="material-symbols-outlined">chevron_left</span>
         </button>
         <div class="cal-select-wrap">
           <select class="cal-select" [value]="calMonthIndex" (change)="onMonthChange($any($event.target).value)">
@@ -32,7 +32,7 @@
           </select>
         </div>
         <button type="button" class="cal-nav" (click)="nextMonth()">
-          <span class="material-symbols-outlined">chevron_right</span>
+          <span translate="no" class="material-symbols-outlined">chevron_right</span>
         </button>
       </div>
 

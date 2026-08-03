@@ -22,7 +22,7 @@
             {{ selectedService ? serviceName(selectedService.name) : 'Selecione' }}
           </span>
         </div>
-        <span class="material-symbols-outlined field-icon">expand_more</span>
+        <span translate="no" class="material-symbols-outlined field-icon">expand_more</span>
       </button>
 
       @if (openDropdown() === 'service') {
@@ -59,15 +59,15 @@
           <span class="field-label">Escolha um profissional <span class="req">*</span></span>
           <span class="field-value" [class.placeholder]="!selectedProfessional">
             @if (!selectedService) {
-              Escolha um serviço primeiro
+              <span>Escolha um serviço primeiro</span>
             } @else if (selectedProfessional) {
-              {{ selectedProfessional.name }}
+              <span>{{ selectedProfessional.name }}</span>
             } @else {
-              Selecione
+              <span>Selecione</span>
             }
           </span>
         </div>
-        <span class="material-symbols-outlined field-icon">expand_more</span>
+        <span translate="no" class="material-symbols-outlined field-icon">expand_more</span>
       </button>
 
       @if (openDropdown() === 'professional') {
@@ -84,7 +84,7 @@
               (click)="selectProfessional(prof)">
               <span class="option-name">{{ prof.name }}</span>
               @if (selectedProfessional?.id === prof.id) {
-                <span class="material-symbols-outlined option-check">check</span>
+                <span translate="no" class="material-symbols-outlined option-check">check</span>
               }
             </button>
           }
@@ -99,7 +99,7 @@
           @if (selectedProfessional.picture) {
             <img [src]="selectedProfessional.picture" [alt]="selectedProfessional.name" class="prof-img" referrerpolicy="no-referrer" />
           } @else {
-            <span class="material-symbols-outlined prof-placeholder">person</span>
+            <span translate="no" class="material-symbols-outlined prof-placeholder">person</span>
           }
         </div>
         <div class="prof-info">
@@ -126,7 +126,7 @@
               {{ selectedDay ? fmtDate(selectedDay) : 'dd/mm/aaaa' }}
             </span>
           </div>
-          <span class="material-symbols-outlined field-icon">calendar_today</span>
+          <span translate="no" class="material-symbols-outlined field-icon">calendar_today</span>
         </button>
 
         @if (openDropdown() === 'date') {
@@ -134,11 +134,11 @@
             <div class="sheet-handle" aria-hidden="true"></div>
             <div class="cal-header">
               <button type="button" class="cal-nav" (click)="prevMonth()">
-                <span class="material-symbols-outlined">chevron_left</span>
+                <span translate="no" class="material-symbols-outlined">chevron_left</span>
               </button>
               <span class="cal-month-label">{{ monthLabel() }}</span>
               <button type="button" class="cal-nav" (click)="nextMonth()">
-                <span class="material-symbols-outlined">chevron_right</span>
+                <span translate="no" class="material-symbols-outlined">chevron_right</span>
               </button>
             </div>
 
@@ -176,7 +176,7 @@
               <button type="button" class="slot-header" (click)="toggleSlot(slot.id)">
                 <span class="slot-time">{{ fmtTime(slot.startTime) }} – {{ fmtTime(slot.endTime) }}</span>
                 <span class="slot-date">{{ fmtDate(selectedDay) }}</span>
-                <span class="material-symbols-outlined slot-chev"
+                <span translate="no" class="material-symbols-outlined slot-chev"
                   [class.rotated]="expandedSlotId() === slot.id">expand_more</span>
               </button>
 
@@ -191,7 +191,7 @@
                         [disabled]="confirmedSlotId() === slot.id || !isModalityAllowed(m, slot)"
                         (click)="slotModality.set(m)">
                         @if (slotModality() === m) {
-                          <span class="material-symbols-outlined mod-check">check</span>
+                          <span translate="no" class="material-symbols-outlined mod-check">check</span>
                         }
                         {{ m }}
                       </button>

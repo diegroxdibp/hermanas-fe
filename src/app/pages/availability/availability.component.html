@@ -22,11 +22,11 @@
             <div class="wk-nav">
               <button class="today-btn" (click)="goToToday()">Hoje</button>
               <button (click)="prevWeek()">
-                <span class="material-symbols-outlined">chevron_left</span>
+                <span translate="no" class="material-symbols-outlined">chevron_left</span>
               </button>
               <span class="wk-label">{{ weekLabel() }}</span>
               <button (click)="nextWeek()">
-                <span class="material-symbols-outlined">chevron_right</span>
+                <span translate="no" class="material-symbols-outlined">chevron_right</span>
               </button>
             </div>
             <div class="legend">
@@ -35,10 +35,10 @@
               <span class="lg"><span class="sw any"></span>Qualquer</span>
               <span class="lg-sep"></span>
               <span class="lg">
-                <span class="material-symbols-outlined">event_repeat</span>Data recorrente
+                <span translate="no" class="material-symbols-outlined">event_repeat</span>Data recorrente
               </span>
               <span class="lg">
-                <span class="material-symbols-outlined">push_pin</span>Data única
+                <span translate="no" class="material-symbols-outlined">push_pin</span>Data única
               </span>
               <span class="lg-sep"></span>
               <span class="lg"><span class="sw pending-ring"></span>Proposta pendente</span>
@@ -122,7 +122,7 @@
                             <div class="bd-row">
                               <span class="bd-time">{{ slot.time }}</span>
                               <span class="bd-rec" [class.unica]="slot.appointment ? !slot.appointment.isRecurring : !block.isRecurring">
-                                <span class="material-symbols-outlined">
+                                <span translate="no" class="material-symbols-outlined">
                                   {{ (slot.appointment ? slot.appointment.isRecurring : block.isRecurring) ? 'event_repeat' : 'push_pin' }}
                                 </span>
                               </span>
@@ -163,7 +163,7 @@
                       <div class="b-top">
                         <span class="b-time">{{ preview.startTime }}–{{ preview.endTime }}</span>
                         @if (preview.hasConflict) {
-                          <span class="material-symbols-outlined" style="font-size:13px">warning</span>
+                          <span translate="no" class="material-symbols-outlined" style="font-size:13px">warning</span>
                         }
                       </div>
                       <div class="b-resize-handle" (pointerdown)="startPreviewResize($event, preview)">
@@ -211,7 +211,7 @@
                             <div class="bd-row">
                               <span class="bd-time">{{ time }}</span>
                               <span class="bd-rec" [class.unica]="!mvBlk.isRecurring">
-                                <span class="material-symbols-outlined">{{ mvBlk.isRecurring ? 'event_repeat' : 'push_pin' }}</span>
+                                <span translate="no" class="material-symbols-outlined">{{ mvBlk.isRecurring ? 'event_repeat' : 'push_pin' }}</span>
                               </span>
                             </div>
                             <span class="bd-name">{{ mvBlk.backendSlots[gi]?.isBooked ? 'reservado' : 'livre' }}</span>
@@ -226,7 +226,7 @@
           </div>
 
           <div class="cal-hint">
-            <span class="material-symbols-outlined">touch_app</span>
+            <span translate="no" class="material-symbols-outlined">touch_app</span>
             Clique ou arraste numa célula vazia para criar um bloco. Clique num bloco existente para o editar.
           </div>
         </div>
@@ -236,7 +236,7 @@
           <aside class="block-editor appt-detail">
             <div class="be-head" style="display:block">
               <button class="be-back" (click)="clearSelectedAppointment()">
-                <span class="material-symbols-outlined">arrow_back</span>
+                <span translate="no" class="material-symbols-outlined">arrow_back</span>
                 Voltar ao bloco
               </button>
               <div class="be-title">
@@ -256,48 +256,48 @@
               </div>
               <div class="ad-rows">
                 <div class="ad-row">
-                  <span class="material-symbols-outlined">medical_services</span>
+                  <span translate="no" class="material-symbols-outlined">medical_services</span>
                   <div><div class="ad-k">Serviço</div><div class="ad-v">{{ slotServiceName(appt) }}</div></div>
                 </div>
                 <div class="ad-row">
-                  <span class="material-symbols-outlined">schedule</span>
+                  <span translate="no" class="material-symbols-outlined">schedule</span>
                   <div><div class="ad-k">Horário</div><div class="ad-v">{{ apptDateLabel(appt) }} · {{ appt.startTime }}–{{ appt.endTime }}</div></div>
                 </div>
                 <div class="ad-row">
-                  <span class="material-symbols-outlined">{{ appt.isRecurring ? 'event_repeat' : 'push_pin' }}</span>
+                  <span translate="no" class="material-symbols-outlined">{{ appt.isRecurring ? 'event_repeat' : 'push_pin' }}</span>
                   <div><div class="ad-k">Recorrência</div><div class="ad-v">{{ recurrenceLabel(appt.isRecurring, appt.recurrenceFrequency) }}</div></div>
                 </div>
                 <div class="ad-row">
-                  <span class="material-symbols-outlined">location_on</span>
+                  <span translate="no" class="material-symbols-outlined">location_on</span>
                   <div><div class="ad-k">Modalidade</div><div class="ad-v">
                     @if (apptModalityLabel(appt)) {
                       <span [class]="'ad-pill ' + apptModalityLabel(appt)">{{ apptModalityDisplay(appt) }}</span>
                     } @else {
-                      {{ apptModalityDisplay(appt) }}
+                      <span>{{ apptModalityDisplay(appt) }}</span>
                     }
                   </div></div>
                 </div>
                 @if (appt.platform) {
                   <div class="ad-row">
-                    <span class="material-symbols-outlined">videocam</span>
+                    <span translate="no" class="material-symbols-outlined">videocam</span>
                     <div><div class="ad-k">Plataforma</div><div class="ad-v">{{ appt.platform }}</div></div>
                   </div>
                 }
                 @if (appt.price != null) {
                   <div class="ad-row">
-                    <span class="material-symbols-outlined">payments</span>
+                    <span translate="no" class="material-symbols-outlined">payments</span>
                     <div><div class="ad-k">Valor</div><div class="ad-v">{{ apptPriceDisplay(appt) }}</div></div>
                   </div>
                 }
                 @if (appt.priceBRL != null) {
                   <div class="ad-row">
-                    <span class="material-symbols-outlined">payments</span>
+                    <span translate="no" class="material-symbols-outlined">payments</span>
                     <div><div class="ad-k">Valor em Reais</div><div class="ad-v">{{ apptPriceBRLDisplay(appt) }}</div></div>
                   </div>
                 }
                 @if (appt.clientEmail) {
                   <div class="ad-row">
-                    <span class="material-symbols-outlined">mail</span>
+                    <span translate="no" class="material-symbols-outlined">mail</span>
                     <div><div class="ad-k">Contacto</div><div class="ad-v">{{ appt.clientEmail }}</div></div>
                   </div>
                 }
@@ -307,12 +307,12 @@
               <div class="ad-actions">
                 @if (appt.status !== 'PENDING') {
                   <button class="btn-resched" (click)="rescheduleAppointment()">
-                    <span class="material-symbols-outlined">edit_calendar</span>
+                    <span translate="no" class="material-symbols-outlined">edit_calendar</span>
                     Reagendar sessão
                   </button>
                 }
                 <button class="btn-cancel" (click)="cancelAppointment(appt)">
-                  <span class="material-symbols-outlined">close</span>
+                  <span translate="no" class="material-symbols-outlined">close</span>
                   {{ appt.status === 'PENDING' ? 'Cancelar proposta' : 'Cancelar sessão' }}
                 </button>
               </div>
@@ -326,7 +326,7 @@
                 <div class="be-sub">{{ editorSubtitle() }}</div>
               </div>
               <span class="be-chip">
-                <span class="material-symbols-outlined">
+                <span translate="no" class="material-symbols-outlined">
                   {{ editorFrequency() === 'weekly' ? 'event_repeat' : 'push_pin' }}
                 </span>
                 {{ editorFrequency() === 'weekly' ? editorRecurrencePattern() : 'Única' }}
@@ -339,20 +339,20 @@
 
             <div class="be-actions">
               <button class="btn-add" (click)="saveBlock()">
-                <span class="material-symbols-outlined">check</span>
+                <span translate="no" class="material-symbols-outlined">check</span>
                 Guardar disponibilidade
               </button>
               @if (selectedBlockId() !== null) {
                 @if (selectedBlock() && hasBookings(selectedBlock()!)) {
                   <div class="remove-guard">
-                    <span class="material-symbols-outlined">event_busy</span>
+                    <span translate="no" class="material-symbols-outlined">event_busy</span>
                     <div class="rg-text">
                       <strong>Este bloco não pode ser removido.</strong> Tem {{ bookedCount(selectedBlock()!) }} sessão(ões) reservada(s) — cancele ou reagende essas sessões primeiro.
                     </div>
                   </div>
                 } @else {
                   <button class="btn-remove" (click)="removeBlock()">
-                    <span class="material-symbols-outlined">delete</span>
+                    <span translate="no" class="material-symbols-outlined">delete</span>
                     Remover bloco
                   </button>
                 }
@@ -385,17 +385,17 @@
               aria-label="Navegação semanal"
               (click)="mobileWeekNavOpen.set(!mobileWeekNavOpen())"
             >
-              <span class="material-symbols-outlined">calendar_view_week</span>
+              <span translate="no" class="material-symbols-outlined">calendar_view_week</span>
             </button>
             @if (mobileWeekNavOpen()) {
               <div class="m-week-pop">
                 <button class="wp-arrow" (click)="prevWeek()">
-                  <span class="material-symbols-outlined">chevron_left</span>
+                  <span translate="no" class="material-symbols-outlined">chevron_left</span>
                 </button>
                 <button class="wp-today" (click)="goToToday(); mobileWeekNavOpen.set(false)">Hoje</button>
                 <span class="wp-label">{{ weekLabel() }}</span>
                 <button class="wp-arrow" (click)="nextWeek()">
-                  <span class="material-symbols-outlined">chevron_right</span>
+                  <span translate="no" class="material-symbols-outlined">chevron_right</span>
                 </button>
               </div>
             }
@@ -440,7 +440,7 @@
               <div class="mb-top">
                 <span class="mb-time">{{ preview.startTime }} – {{ preview.endTime }}</span>
                 @if (preview.hasConflict) {
-                  <span class="material-symbols-outlined" style="font-size:13px">warning</span>
+                  <span translate="no" class="material-symbols-outlined" style="font-size:13px">warning</span>
                 }
               </div>
               <div class="b-resize-handle" (pointerdown)="startPreviewResize($event, preview, MOB_ROW_H)">
@@ -471,7 +471,7 @@
                     <div class="bd-row">
                       <span class="bd-time">{{ slot.time }}</span>
                       <span class="bd-rec" [class.unica]="slot.appointment ? !slot.appointment.isRecurring : !block.isRecurring">
-                        <span class="material-symbols-outlined">
+                        <span translate="no" class="material-symbols-outlined">
                           {{ (slot.appointment ? slot.appointment.isRecurring : block.isRecurring) ? 'event_repeat' : 'push_pin' }}
                         </span>
                       </span>
@@ -498,7 +498,7 @@
 
       <!-- FAB -->
       <button class="m-fab" aria-label="Nova disponibilidade" (click)="openSheet()">
-        <span class="material-symbols-outlined">add</span>
+        <span translate="no" class="material-symbols-outlined">add</span>
       </button>
 
       <!-- Bottom sheet -->
@@ -509,7 +509,7 @@
           <div class="sh-head">
             <h3>Nova disponibilidade</h3>
             <button class="sh-close" (click)="closeSheet()">
-              <span class="material-symbols-outlined">close</span>
+              <span translate="no" class="material-symbols-outlined">close</span>
             </button>
           </div>
           <div class="sh-body">
@@ -518,14 +518,14 @@
           <div class="sh-foot">
             @if (selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)) {
               <div class="remove-guard" style="margin-bottom:10px">
-                <span class="material-symbols-outlined">event_busy</span>
+                <span translate="no" class="material-symbols-outlined">event_busy</span>
                 <div class="rg-text">
                   <strong>Não pode ser removido</strong> enquanto tiver sessões reservadas.
                 </div>
               </div>
             }
             <button class="btn-add" (click)="saveBlock()">
-              <span class="material-symbols-outlined">check</span>
+              <span translate="no" class="material-symbols-outlined">check</span>
               Guardar disponibilidade
             </button>
           </div>
@@ -541,7 +541,7 @@
   <!-- Reservas notice -->
   @if (selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)) {
     <div class="book-notice">
-      <span class="material-symbols-outlined">event_available</span>
+      <span translate="no" class="material-symbols-outlined">event_available</span>
       <div class="bn-text">
         <strong>{{ bookedCount(selectedBlock()!) }} sessão(ões) reservada(s)</strong> neste bloco. Para as proteger, os restantes campos ficam fixos - só pode ajustar o Intervalo de horas (Início/Fim), tendo em conta eventuais conflitos.
       </div>
@@ -555,9 +555,9 @@
         <label class="control-label" style="margin:0">Sessões geradas</label>
         <span [class]="'ss-count' + (bookedCount(selectedBlock()!) === 0 ? ' none' : '')">
           @if (bookedCount(selectedBlock()!) === 0) {
-            {{ blockSlotCount(selectedBlock()!) }} livres
+            <span>{{ blockSlotCount(selectedBlock()!) }} livres</span>
           } @else {
-            {{ bookedCount(selectedBlock()!) }} de {{ blockSlotCount(selectedBlock()!) }} reservadas
+            <span>{{ bookedCount(selectedBlock()!) }} de {{ blockSlotCount(selectedBlock()!) }} reservadas</span>
           }
         </span>
       </div>
@@ -578,7 +578,7 @@
                 <div class="s-meta">
                   {{ slotServiceName(slot.appointment) }} · {{ selectedBlock()!.sessionDuration }} min
                   <span class="rec">
-                    <span class="material-symbols-outlined">{{ slot.appointment.isRecurring ? 'event_repeat' : 'push_pin' }}</span>
+                    <span translate="no" class="material-symbols-outlined">{{ slot.appointment.isRecurring ? 'event_repeat' : 'push_pin' }}</span>
                     {{ recurrenceTagLabel(slot.appointment.isRecurring, slot.appointment.recurrenceFrequency) }}
                   </span>
                   @if (slot.appointment.status === 'PENDING') {
@@ -589,23 +589,23 @@
                 <div class="s-name">Livre</div>
                 <div class="s-meta">
                   <span class="rec">
-                    <span class="material-symbols-outlined">{{ selectedBlock()!.isRecurring ? 'event_repeat' : 'push_pin' }}</span>
+                    <span translate="no" class="material-symbols-outlined">{{ selectedBlock()!.isRecurring ? 'event_repeat' : 'push_pin' }}</span>
                     {{ recurrenceTagLabel(selectedBlock()!.isRecurring, selectedBlock()!.recurrenceFrequency) }}
                   </span>
                 </div>
               }
             </div>
             @if (slot.booked && slot.appointment) {
-              <span class="s-chev"><span class="material-symbols-outlined">chevron_right</span></span>
+              <span class="s-chev"><span translate="no" class="material-symbols-outlined">chevron_right</span></span>
             } @else {
               <div class="s-free-actions">
                 @if (selectedBlock()!.isRecurring) {
                   <button class="s-propose" (click)="openProposeDialog($event, selectedBlock()!, si)" title="Propor agendamento recorrente">
-                    <span class="material-symbols-outlined">send</span>
+                    <span translate="no" class="material-symbols-outlined">send</span>
                   </button>
                 }
                 <button class="s-rm" (click)="removeSlot($event, selectedBlock()!, si)" title="Remover horário">
-                  <span class="material-symbols-outlined">close</span>
+                  <span translate="no" class="material-symbols-outlined">close</span>
                 </button>
               </div>
             }
@@ -633,7 +633,7 @@
             [disabled]="!isServiceEligible(svc) || (selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!))"
             (click)="toggleService(svc.id)"
           >
-            <span class="material-symbols-outlined">check</span>
+            <span translate="no" class="material-symbols-outlined">check</span>
             {{ serviceDisplayName(svc.name) }}
           </button>
         }
@@ -641,7 +641,7 @@
     </div>
     @if (selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)) {
       <div class="hint">
-        <span class="material-symbols-outlined">info</span>
+        <span translate="no" class="material-symbols-outlined">info</span>
         Este bloco tem sessões reservadas - os serviços ficam fixos.
       </div>
     }
@@ -696,7 +696,7 @@
             placeholder="Consultório · R. da Misericórdia 53"
           />
         </div>
-        <span class="material-symbols-outlined field-icon">location_on</span>
+        <span translate="no" class="material-symbols-outlined field-icon">location_on</span>
       </div>
       @if (localErrorMessage(); as err) {
         <span class="field-error">{{ err }}</span>
@@ -715,7 +715,7 @@
             placeholder="Partilhe orientações sobre a plataforma a usar, o envio do link e outros procedimentos."
           ></textarea>
         </div>
-        <span class="material-symbols-outlined field-icon">videocam</span>
+        <span translate="no" class="material-symbols-outlined field-icon">videocam</span>
       </div>
       @if (platformErrorMessage(); as err) {
         <span class="field-error">{{ err }}</span>
@@ -870,17 +870,17 @@
             {{ editorDate() ? edCalFmtDate(editorDate()) : 'dd/mm/aaaa' }}
           </span>
         </div>
-        <span class="material-symbols-outlined field-icon">calendar_today</span>
+        <span translate="no" class="material-symbols-outlined field-icon">calendar_today</span>
 
         @if (edCalOpen()) {
           <div class="ed-cal-popover" (click)="$event.stopPropagation()">
             <div class="cal-header">
               <button type="button" class="cal-nav" (click)="edCalPrevMonth()">
-                <span class="material-symbols-outlined">chevron_left</span>
+                <span translate="no" class="material-symbols-outlined">chevron_left</span>
               </button>
               <span class="cal-month-label">{{ edCalMonthLabel() }}</span>
               <button type="button" class="cal-nav" (click)="edCalNextMonth()">
-                <span class="material-symbols-outlined">chevron_right</span>
+                <span translate="no" class="material-symbols-outlined">chevron_right</span>
               </button>
             </div>
             <div class="cal-weekdays">
@@ -922,7 +922,7 @@
       <div class="time-field">
         <span class="field-label">Início</span>
         <div class="time-value">
-          <span class="material-symbols-outlined">schedule</span>
+          <span translate="no" class="material-symbols-outlined">schedule</span>
           <app-styled-select
             inputId="ed-start-time"
             [options]="editorStartTimeSelectOptions()"
@@ -934,7 +934,7 @@
       <div class="time-field">
         <span class="field-label">Fim</span>
         <div class="time-value">
-          <span class="material-symbols-outlined">schedule</span>
+          <span translate="no" class="material-symbols-outlined">schedule</span>
           <app-styled-select
             inputId="ed-end-time"
             [options]="editorEndTimeSelectOptions()"
@@ -959,7 +959,7 @@
           (click)="setEditorSessionDuration(dur)"
         >
           @if (editorSessionDuration() === dur) {
-            <span class="material-symbols-outlined">check</span>
+            <span translate="no" class="material-symbols-outlined">check</span>
           }
           {{ dur }} min
         </button>
@@ -967,14 +967,14 @@
     </div>
     @if (selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!)) {
       <div class="hint">
-        <span class="material-symbols-outlined">info</span>
+        <span translate="no" class="material-symbols-outlined">info</span>
         A duração só muda quando não há sessões reservadas.
       </div>
     }
 
     @if (generatedSlots().length > 0 && !(selectedBlockId() !== null && selectedBlock() && hasBookings(selectedBlock()!))) {
       <div class="hint">
-        <span class="material-symbols-outlined">info</span>
+        <span translate="no" class="material-symbols-outlined">info</span>
         Gera {{ generatedSlots().length }} sessões agendáveis:
       </div>
       <div class="slots-preview">

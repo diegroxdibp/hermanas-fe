@@ -8,7 +8,7 @@
       <div class="user-email">{{ userEmail() }}</div>
     </div>
     <button class="close-btn" (click)="close()" aria-label="Fechar menu">
-      <span class="material-symbols-outlined">close</span>
+      <span translate="no" class="material-symbols-outlined">close</span>
     </button>
   </div>
 }
@@ -16,7 +16,7 @@
 @if (!navbarService.showUserMenu()) {
   <div class="close-row">
     <button class="close-btn" (click)="close()" aria-label="Fechar menu">
-      <span class="material-symbols-outlined">close</span>
+      <span translate="no" class="material-symbols-outlined">close</span>
     </button>
   </div>
 }
@@ -29,9 +29,9 @@
     (click)="go(item.destination)"
     (keydown.enter)="go(item.destination)"
     (keydown.space)="$event.preventDefault(); go(item.destination)">
-    <span class="material-symbols-outlined icon">{{ item.icon }}</span>
+    <span translate="no" class="material-symbols-outlined icon">{{ item.icon }}</span>
     <span class="label">{{ item.name }}</span>
-    <span class="material-symbols-outlined chev">chevron_right</span>
+    <span translate="no" class="material-symbols-outlined chev">chevron_right</span>
   </a>
 }
 
@@ -46,12 +46,12 @@
        (click)="go(row.page)"
        (keydown.enter)="go(row.page)"
        (keydown.space)="$event.preventDefault(); go(row.page)">
-      <span class="material-symbols-outlined icon">{{ row.icon }}</span>
+      <span translate="no" class="material-symbols-outlined icon">{{ row.icon }}</span>
       <span class="label">{{ row.label }}</span>
       @if (row.showBadge && notificationService.unreadCount() > 0) {
         <span class="badge">{{ notificationService.unreadCount() }}</span>
       }
-      <span class="material-symbols-outlined chev">chevron_right</span>
+      <span translate="no" class="material-symbols-outlined chev">chevron_right</span>
     </a>
   }
 
@@ -62,7 +62,7 @@
     (click)="logout()"
     (keydown.enter)="logout()"
     (keydown.space)="$event.preventDefault(); logout()">
-    <span class="material-symbols-outlined icon">logout</span>
+    <span translate="no" class="material-symbols-outlined icon">logout</span>
     <span class="label">Terminar sessão</span>
   </a>
 }
@@ -75,8 +75,8 @@
     (click)="signIn()"
     (keydown.enter)="signIn()"
     (keydown.space)="$event.preventDefault(); signIn()">
-    <span class="material-symbols-outlined icon">login</span>
+    <span translate="no" class="material-symbols-outlined icon">login</span>
     <span class="label">Entrar</span>
-    <span class="material-symbols-outlined chev">chevron_right</span>
+    <span translate="no" class="material-symbols-outlined chev">chevron_right</span>
   </a>
 }

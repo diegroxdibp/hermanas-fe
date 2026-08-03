@@ -11,20 +11,20 @@
       @if (user()?.picture) {
         <img [src]="user()!.picture" alt="Foto de perfil" class="avatar-img" referrerpolicy="no-referrer" />
         <div class="avatar-overlay">
-          <span class="material-symbols-outlined">photo_camera</span>
+          <span translate="no" class="material-symbols-outlined">photo_camera</span>
           <span class="overlay-label">Alterar</span>
         </div>
       } @else {
         <span class="avatar-initials">{{ userInitials() }}</span>
         <div class="avatar-overlay">
-          <span class="material-symbols-outlined">photo_camera</span>
+          <span translate="no" class="material-symbols-outlined">photo_camera</span>
           <span class="overlay-label">Alterar</span>
         </div>
       }
     </div>
     <div class="avatar-actions">
       <button type="button" class="btn-primary-sm" (click)="notifyWip()">
-        <span class="material-symbols-outlined">file_upload</span>
+        <span translate="no" class="material-symbols-outlined">file_upload</span>
         Alterar foto
       </button>
       <button type="button" class="btn-outline-sm" (click)="notifyWip()">Remover</button>

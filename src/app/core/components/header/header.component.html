@@ -90,7 +90,7 @@
               {{ firstName() }}
               <small>Paciente</small>
             </div>
-            <span class="material-symbols-outlined chevron">expand_more</span>
+            <span translate="no" class="material-symbols-outlined chevron">expand_more</span>
           </button>
 
           @if (isUserMenuOpen) {
@@ -100,11 +100,11 @@
                 <span class="menu-user-email">{{ userEmail() }}</span>
               </div>
               <button class="dropdown-item" (click)="closeMenus(); navigateTo(navigationService.Pages.DASHBOARD)">
-                <span class="material-symbols-outlined">person</span>
+                <span translate="no" class="material-symbols-outlined">person</span>
                 <span>Conta</span>
               </button>
               <button class="dropdown-item dropdown-item--danger" (click)="logOut()">
-                <span class="material-symbols-outlined">logout</span>
+                <span translate="no" class="material-symbols-outlined">logout</span>
                 <span>Terminar sessão</span>
               </button>
             </div>
