@@ -393,3 +393,70 @@ app-country-phone-field {
     width: auto;
   }
 }
+
+// ─────────────────────────────────────────────────────────────
+// ANEXAR ao final de dashboard-profile.component.scss
+// (nada do CSS existente precisa mudar)
+// ─────────────────────────────────────────────────────────────
+
+.prefs {
+  margin-top: 36px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-surface-tint);
+
+  .prefs-label {
+    display: block;
+    font-family: typography.$sourceSans;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    margin-bottom: 8px;
+  }
+
+  > .muted {
+    margin-bottom: 22px !important;
+  }
+}
+
+.prefs-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 22px 24px;
+
+  @media (min-width: breakpoint.$breakpoint-xs) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .hint {
+    font-family: typography.$sourceSans;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--color-muted);
+  }
+}
+
+.pref-example {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 2px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-tint);
+}
+
+.pref-example-label {
+  font-family: typography.$sourceSans;
+  font-size: 12.5px;
+  color: var(--color-muted);
+}
+
+.pref-example-value {
+  margin-left: auto;
+  font-family: typography.$sourceSans;
+  font-size: 15px;
+  font-weight: 700;
+  color: palette.$primaryColorBlue;
+}

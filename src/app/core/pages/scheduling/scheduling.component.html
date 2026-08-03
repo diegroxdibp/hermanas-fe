@@ -174,7 +174,7 @@
               [class.confirmed]="confirmedSlotId() === slot.id">
 
               <button type="button" class="slot-header" (click)="toggleSlot(slot.id)">
-                <span class="slot-time">{{ fmtTime(slot.startTime) }} – {{ fmtTime(slot.endTime) }}</span>
+                <span class="slot-time">{{ fmtTime(slot.startTime, slot.timeZone) }} – {{ fmtTime(slot.endTime, slot.timeZone) }}</span>
                 <span class="slot-date">{{ fmtDate(selectedDay) }}</span>
                 <span translate="no" class="material-symbols-outlined slot-chev"
                   [class.rotated]="expandedSlotId() === slot.id">expand_more</span>

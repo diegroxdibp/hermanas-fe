@@ -80,6 +80,52 @@
     </div>
   </div>
 
+  <!-- Preferências -->
+  <div class="prefs">
+    <span class="prefs-label">Preferências</span>
+    <p class="muted">Definem como você é cobrado e em que horário as sessões aparecem para você.</p>
+
+    <div class="prefs-grid">
+      <div class="field">
+        <label id="pf-currency-label">Moeda de cobrança:</label>
+        <app-currency-toggle
+          labelId="pf-currency-label"
+          [value]="currencyCtrl.value"
+          (valueChange)="currencyCtrl.setValue($event)"
+        />
+        <span class="hint">
+          As sessões são cobradas nesta moeda. Cada profissional define o valor em euro e em real —
+          você vê apenas o da sua moeda.
+        </span>
+        <div class="pref-example">
+          <span class="pref-example-label">Análise Corporal Reichiana</span>
+          <span class="pref-example-value">{{ samplePrice() }}</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label id="pf-timezone-label">Fuso horário:</label>
+        <app-styled-select
+          inputId="pf-timezone"
+          searchPlaceholder="Pesquisar fuso..."
+          [options]="timezoneOptions"
+          [value]="timezoneCtrl.value"
+          (valueChange)="timezoneCtrl.setValue($event)"
+        />
+        <span class="hint">
+          Detectamos o seu fuso automaticamente. Todos os horários da CARE — agenda, confirmações e
+          lembretes — aparecem neste fuso.
+        </span>
+        @if (nextSessionPreview(); as preview) {
+          <div class="pref-example">
+            <span class="pref-example-label">Sua próxima sessão</span>
+            <span class="pref-example-value">{{ preview }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
   <!-- Save bar -->
   <div class="save-bar">
     @if (saveSuccess()) {

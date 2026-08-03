@@ -1,0 +1,18 @@
+<div class="currency-toggle" role="radiogroup" [attr.aria-labelledby]="labelId() || null">
+  @for (currency of currencies; track currency) {
+    <button
+      type="button"
+      class="currency-option"
+      role="radio"
+      [class.selected]="currency === value()"
+      [attr.aria-checked]="currency === value()"
+      (click)="select(currency)"
+    >
+      <span class="symbol">{{ meta[currency].symbol }}</span>
+      <span class="names">
+        <span class="name">{{ meta[currency].name }}</span>
+        <span class="code">{{ currency }}</span>
+      </span>
+    </button>
+  }
+</div>

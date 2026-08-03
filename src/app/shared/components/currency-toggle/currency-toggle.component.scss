@@ -1,0 +1,69 @@
+@use "assets/styles/palette.scss" as palette;
+@use "assets/styles/typography.scss" as typography;
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.currency-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.currency-option {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+  font-family: typography.$sourceSans;
+  transition: border-color 0.2s ease, background 0.2s ease;
+
+  &:hover { border-color: palette.$primaryColorBlue; }
+
+  &:focus-visible {
+    outline: 2px solid palette.$primaryColorBlue;
+    outline-offset: 2px;
+  }
+
+  // Anel interno em vez de aumentar a espessura da borda: o campo não muda de
+  // tamanho ao ser selecionado. Mesmo recurso já usado no dia "hoje" do
+  // calendário de nascimento.
+  &.selected {
+    border-color: palette.$primaryColorBlue;
+    box-shadow: inset 0 0 0 1px palette.$primaryColorBlue;
+    background: var(--color-surface-tint);
+  }
+
+  .symbol {
+    width: 20px;
+    flex-shrink: 0;
+    text-align: center;
+    font-size: 19px;
+    font-weight: 700;
+    color: palette.$primaryColorBlue;
+  }
+
+  .names {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.25;
+  }
+
+  .name {
+    font-size: 15px;
+    font-weight: 600;
+    color: palette.$primaryColorBlue;
+  }
+
+  .code {
+    font-size: 12.5px;
+    color: var(--color-muted);
+  }
+}

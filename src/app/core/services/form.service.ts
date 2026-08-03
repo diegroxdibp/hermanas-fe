@@ -15,6 +15,8 @@ import { User } from '../../auth/user.model';
 import { ProfessionalModel } from '../../shared/models/professional.model';
 import { Modality } from '../../shared/enums/modality.enum';
 import { getBrowserCountry } from '../../shared/utils/browser-country.util';
+import { Currency, currencyForCountry } from '../../shared/enums/currency.enum';
+import { detectBrowserTimezone } from '../../shared/utils/timezones.util';
 
 @Injectable({
   providedIn: 'root',
@@ -65,6 +67,14 @@ export class FormService {
         this.fb.control<CountryModel>(getBrowserCountry()),
       [FormControlsNames.PHONE]: this.fb.control(''),
       [FormControlsNames.GENDER]: this.fb.control(''),
+      [FormControlsNames.CURRENCY]: this.fb.control<Currency>(
+        currencyForCountry(getBrowserCountry().code),
+        [Validators.required],
+      ),
+      // O fuso não é perguntado no onboarding — é detectado e enviado no payload.
+      [FormControlsNames.TIMEZONE]: this.fb.control<string>(
+        detectBrowserTimezone(),
+      ),
     });
 
     this.profileForm = this.fb.group({
@@ -86,6 +96,13 @@ export class FormService {
       [FormControlsNames.PHONE_PROFILE]: this.fb.control(''),
       [FormControlsNames.GENDER_PROFILE]: this.fb.control(''),
       [FormControlsNames.BIO_PROFILE]: this.fb.control(''),
+      [FormControlsNames.CURRENCY_PROFILE]: this.fb.control<Currency>(
+        Currency.EUR,
+        [Validators.required],
+      ),
+      [FormControlsNames.TIMEZONE_PROFILE]: this.fb.control<string>(
+        detectBrowserTimezone(),
+      ),
     });
   }
 
@@ -140,11 +157,21 @@ export class FormService {
       throw new Error('Selecione o seu género.');
     }
 
+    const currency = this.onboardingForm.get(FormControlsNames.CURRENCY)?.value;
+    if (!currency) {
+      throw new Error('Selecione a moeda de cobrança.');
+    }
+    const timeZone =
+      this.onboardingForm.get(FormControlsNames.TIMEZONE)?.value ??
+      detectBrowserTimezone();
+
     const payload: OnboardingPayload = {
       name,
       birthDate,
       phone,
       gender: gender,
+      currency,
+      timeZone,
     };
 
     return payload;

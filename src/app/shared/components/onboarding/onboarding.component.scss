@@ -154,3 +154,60 @@ form {
   &:hover { opacity: 0.88; }
 }
 
+
+// ─────────────────────────────────────────────────────────────
+// ANEXAR ao final de onboarding.component.scss
+// ─────────────────────────────────────────────────────────────
+
+.label-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--color-muted);
+  transition: color 0.2s ease;
+
+  &:hover,
+  &.on { color: palette.$primaryColorPurple; }
+
+  &:focus-visible {
+    outline: 2px solid palette.$primaryColorBlue;
+    outline-offset: 2px;
+    border-radius: 999px;
+  }
+
+  .material-symbols-outlined { font-size: 18px; }
+}
+
+.info-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 11px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-tint);
+  font-family: typography.$sourceSans;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-secondary-indigo);
+
+  .material-symbols-outlined {
+    font-size: 17px;
+    color: palette.$primaryColorPurple;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  strong { font-weight: 600; }
+}

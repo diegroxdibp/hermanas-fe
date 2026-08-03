@@ -18,10 +18,24 @@ import { CountryPhoneFieldComponent } from '../country-phone-field/country-phone
 import { StyledSelectComponent, StyledSelectOption } from '../styled-select/styled-select.component';
 import { BirthdateCalendarComponent } from '../birthdate-calendar/birthdate-calendar.component';
 import { SnackbarService } from '../../services/snackbar.service';
+import { CurrencyToggleComponent } from '../currency-toggle/currency-toggle.component';
+import { Currency, formatPrice } from '../../enums/currency.enum';
+import {
+  allTimezones,
+  detectBrowserTimezone,
+  timezoneLabel,
+  timezoneOffsetLabel,
+} from '../../utils/timezones.util';
+
+/** Valores de exemplo da seção Preferências (o preço real vem do serviço). */
+const SAMPLE_PRICE: Record<Currency, number> = {
+  [Currency.EUR]: 60,
+  [Currency.BRL]: 320,
+};
 
 @Component({
   selector: 'app-dashboard-profile',
-  imports: [ReactiveFormsModule, MatDialogModule, CountryPhoneFieldComponent, StyledSelectComponent, BirthdateCalendarComponent],
+  imports: [ReactiveFormsModule, MatDialogModule, CountryPhoneFieldComponent, StyledSelectComponent, BirthdateCalendarComponent, CurrencyToggleComponent],
   templateUrl: './dashboard-profile.component.html',
   styleUrl: './dashboard-profile.component.scss',
 })
@@ -85,7 +99,63 @@ export class DashboardProfileComponent implements OnInit {
     return (v && typeof v === 'object' ? v : getBrowserCountry()) as CountryModel;
   }
 
+  /** Redesenha os exemplos da seção Preferências quando o formulário muda. */
+  private readonly prefsTick = signal(0);
+
+  readonly timezoneOptions: StyledSelectOption[] = allTimezones().map((t) => ({
+    value: t.value,
+    label: t.city,
+    meta: timezoneOffsetLabel(t.value),
+  }));
+
+  readonly samplePrice = computed(() => {
+    this.prefsTick();
+    const currency = (this.currencyCtrl.value as Currency) ?? Currency.EUR;
+    return formatPrice(SAMPLE_PRICE[currency], currency);
+  });
+
+  /**
+   * Reformata a próxima sessão no fuso selecionado. O backend devolve um
+   * instante em UTC, então basta escolher o fuso de exibição.
+   */
+  readonly nextSessionPreview = computed(() => {
+    this.prefsTick();
+    const timeZone = this.timezoneCtrl.value || detectBrowserTimezone();
+    const next = this.sessionService.user()?.nextAppointmentAt;
+    if (!next) return '';
+    const date = new Date(next);
+    if (Number.isNaN(date.getTime())) return '';
+    const day = new Intl.DateTimeFormat('pt-BR', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      timeZone,
+    }).format(date);
+    const time = new Intl.DateTimeFormat('pt-BR', {
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone,
+    }).format(date);
+    return `${day.replace(/\.$/, '')} · ${time}`;
+  });
+
+  get currencyCtrl(): FormControl {
+    return this.formService.profileForm.get(FormControlsNames.CURRENCY_PROFILE) as FormControl;
+  }
+
+  get timezoneCtrl(): FormControl {
+    return this.formService.profileForm.get(FormControlsNames.TIMEZONE_PROFILE) as FormControl;
+  }
+
+  /** Rótulo pronto ('Lisboa (GMT+1)') para reuso em outras telas. */
+  get timezoneLabel(): string {
+    return timezoneLabel(this.timezoneCtrl.value || detectBrowserTimezone());
+  }
+
   ngOnInit(): void {
+    this.formService.profileForm.valueChanges.subscribe(() =>
+      this.prefsTick.update((n) => n + 1),
+    );
     this.userService.getProfile().subscribe({
       next: (user) => this.patchForm(user),
     });
@@ -105,6 +175,10 @@ export class DashboardProfileComponent implements OnInit {
       [FormControlsNames.BIO_PROFILE]: user.bio ?? '',
       [FormControlsNames.PHONE_PREFIX_PROFILE]: country,
       [FormControlsNames.PHONE_PROFILE]: localNumber,
+      // Sem preferência guardada ainda: moeda pelo país do telefone, fuso pelo navegador.
+      [FormControlsNames.CURRENCY_PROFILE]:
+        user.currency ?? (country.code?.toLowerCase() === 'br' ? Currency.BRL : Currency.EUR),
+      [FormControlsNames.TIMEZONE_PROFILE]: user.timeZone ?? detectBrowserTimezone(),
     });
     this.formService.profileForm.enable();
   }
@@ -148,6 +222,8 @@ export class DashboardProfileComponent implements OnInit {
       phone,
       gender: getEnumKeyByValue(Genders, this.genderCtrl.value) as Genders,
       bio: this.formService.profileForm.get(FormControlsNames.BIO_PROFILE)?.value ?? '',
+      currency: (this.currencyCtrl.value as Currency) ?? Currency.EUR,
+      timeZone: this.timezoneCtrl.value || detectBrowserTimezone(),
     };
 
     this.userService.updateProfile(payload).subscribe({

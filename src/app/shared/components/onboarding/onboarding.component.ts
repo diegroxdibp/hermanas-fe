@@ -13,10 +13,13 @@ import { getBrowserCountry } from '../../utils/browser-country.util';
 import { CountryPhoneFieldComponent } from '../country-phone-field/country-phone-field.component';
 import { StyledSelectComponent, StyledSelectOption } from '../styled-select/styled-select.component';
 import { BirthdateCalendarComponent } from '../birthdate-calendar/birthdate-calendar.component';
+import { CurrencyToggleComponent } from '../currency-toggle/currency-toggle.component';
+import { currencyForCountry } from '../../enums/currency.enum';
+import { detectBrowserTimezone } from '../../utils/timezones.util';
 
 @Component({
   selector: 'app-onboarding',
-  imports: [ReactiveFormsModule, CountryPhoneFieldComponent, StyledSelectComponent, BirthdateCalendarComponent],
+  imports: [ReactiveFormsModule, CountryPhoneFieldComponent, StyledSelectComponent, BirthdateCalendarComponent, CurrencyToggleComponent],
   templateUrl: './onboarding.component.html',
   styleUrl: './onboarding.component.scss',
 })
@@ -59,19 +62,49 @@ export class OnboardingComponent implements OnInit {
 
   readonly selectedCountry = signal<CountryModel>(getBrowserCountry());
 
+  /** A nota informativa começa aberta na primeira visita. */
+  readonly showCurrencyInfo = signal(true);
+
+  /**
+   * Verdadeiro depois que a pessoa toca no seletor de moeda: a partir daí,
+   * trocar o país não sobrescreve mais a escolha feita à mão.
+   */
+  private currencyTouched = false;
+
+  get currencyCtrl(): FormControl {
+    return this.formService.onboardingForm.get(FormControlsNames.CURRENCY) as FormControl;
+  }
+
+  get timezoneCtrl(): FormControl {
+    return this.formService.onboardingForm.get(FormControlsNames.TIMEZONE) as FormControl;
+  }
+
   ngOnInit(): void {
     const initial = getBrowserCountry();
     this.selectedCountry.set(initial);
+    // O reset limpa tudo o que não for indicado aqui, por isso a moeda e o
+    // fuso precisam de ser semeados junto com o prefixo.
     this.formService.onboardingForm.reset({
       [FormControlsNames.PHONE_PREFIX]: initial,
+      [FormControlsNames.CURRENCY]: currencyForCountry(initial.code),
+      [FormControlsNames.TIMEZONE]: detectBrowserTimezone(),
     });
+
+    this.currencyCtrl.valueChanges.subscribe(() => (this.currencyTouched = true));
   }
 
   onCountryChange(code: string): void {
     const c = Countries.find(x => x.code === code);
     if (c) {
       this.selectedCountry.set(c);
+      if (!this.currencyTouched) {
+        this.currencyCtrl.setValue(currencyForCountry(c.code), { emitEvent: false });
+      }
     }
+  }
+
+  toggleCurrencyInfo(): void {
+    this.showCurrencyInfo.update(v => !v);
   }
 
   onPhonePrefixChange(country: CountryModel): void {

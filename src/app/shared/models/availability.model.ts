@@ -17,6 +17,13 @@ export interface AvailabilityModel {
   isBooked: boolean;
   modality: string;
   platform?: string;
+  /** Morada em texto livre para sessões presenciais. */
+  address?: string;
+  /**
+   * Fuso IANA em que startTime/endTime foram escritos pela pessoa profissional.
+   * Sem ele a hora de parede não é convertível.
+   */
+  timeZone?: string;
   price?: number;
   priceBRL?: number;
   services: ProfessionalService[];

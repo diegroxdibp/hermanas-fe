@@ -20,6 +20,8 @@ import { Professional } from '../../../shared/models/get-professional-by-service
 import { ProfessionalService } from '../../../shared/models/professional-service.model';
 import { emptyAvailabilityConfiguration } from '../../../shared/models/input-configuration-objects/availability-configuration-object';
 import { parseDate, formatTime } from '../../../shared/utils/date-helper.util';
+import { detectBrowserTimezone, zonedWallTimeToInstant } from '../../../shared/utils/timezones.util';
+import { SessionService } from '../../../shared/services/session.service';
 import { getBookableModalities } from '../../../shared/utils/modality-compatibility.util';
 
 const PT_MONTHS = [
@@ -37,6 +39,7 @@ export class SchedulingComponent implements OnDestroy {
   private readonly apiService = inject(ApiService);
   private readonly route = inject(ActivatedRoute);
   readonly schedulingService = inject(SchedulingService);
+  private readonly sessionService = inject(SessionService);
   private readonly elRef = inject(ElementRef);
   private readonly subs: Subscription[] = [];
 
@@ -182,8 +185,25 @@ export class SchedulingComponent implements OnDestroy {
     return ProfessionalSessionService[name as keyof typeof ProfessionalSessionService] || name;
   }
 
-  fmtTime(t: string): string {
-    return formatTime(t);
+  /**
+   * Hora do slot já no fuso do paciente, em 24h.
+   *
+   * A pessoa profissional escreve '14:00' no relógio dela; quem marca a partir
+   * do Brasil tem de ver a hora dela, não o número cru — é essa confusão que
+   * faz alguém aparecer com horas de diferença.
+   */
+  fmtTime(t: string, timeZone?: string): string {
+    if (!timeZone || !this.selectedDay) return formatTime(t);
+
+    const instant = zonedWallTimeToInstant(this.selectedDay, t, timeZone);
+    if (!instant) return formatTime(t);
+
+    return new Intl.DateTimeFormat('pt-BR', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: this.sessionService.user()?.timeZone || detectBrowserTimezone(),
+    }).format(instant);
   }
 
   fmtDate(key: string | null): string {
