@@ -65,6 +65,9 @@ export class OnboardingComponent implements OnInit {
   /** A nota informativa começa aberta na primeira visita. */
   readonly showCurrencyInfo = signal(true);
 
+  /** Verdadeiro enquanto o PUT está em curso, para travar cliques repetidos. */
+  readonly submitting = signal(false);
+
   /**
    * Verdadeiro depois que a pessoa toca no seletor de moeda: a partir daí,
    * trocar o país não sobrescreve mais a escolha feita à mão.
@@ -113,19 +116,37 @@ export class OnboardingComponent implements OnInit {
 
   submit(event: Event): void {
     event.preventDefault();
+    // Sem isto, cada clique repetido dispara outro PUT. O primeiro grava e os
+    // seguintes vão atrás, o que enchia o separador de rede de chamadas iguais.
+    if (this.submitting()) return;
+
     this.error = null;
     try {
       const payload = this.formService.onboardingPayload();
+      this.submitting.set(true);
       this.userService.onboarding(payload).subscribe({
         next: (res: OnboardingResponse) => {
-          this.sessionService.updateUser(res);
-          this.router.navigate(['/dashboard']);
+          // Uma resposta 200 aqui significa que o perfil ficou completo no
+          // servidor. Marcamos a sessão como tal em vez de depender do corpo
+          // trazer o campo: se não trouxer, o AccessGuard devolve a pessoa a
+          // /onboarding e ela fica presa sem qualquer mensagem.
+          this.sessionService.updateUser({ ...res, profileCompleted: true });
+
+          this.router.navigate(['/dashboard']).then((ok) => {
+            this.submitting.set(false);
+            if (!ok) {
+              this.error =
+                'O perfil foi guardado, mas não foi possível abrir o painel. Recarregue a página.';
+            }
+          });
         },
         error: (err: any) => {
+          this.submitting.set(false);
           this.error = err.error?.error ?? 'Erro ao guardar perfil. Tente novamente.';
         },
       });
     } catch (e: any) {
+      this.submitting.set(false);
       this.error = e.message ?? 'Dados inválidos.';
     }
   }

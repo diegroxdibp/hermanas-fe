@@ -32,12 +32,21 @@ export class LoginComponent {
     return this.formService.authForm.get(FormControlsNames.PASSWORD) as FormControl;
   }
 
+  /** Trava cliques repetidos enquanto o pedido está em curso. */
+  submitting = false;
+
   signIn(event: Event): void {
     event.preventDefault();
+    if (this.submitting) return;
     this.error = null;
+    this.submitting = true;
     this.authService.signIn(this.formService.signInPayload()).subscribe({
-      next: () => this.router.navigate(['/dashboard']),
+      next: () => {
+        this.submitting = false;
+        this.router.navigate(['/dashboard']);
+      },
       error: (err) => {
+        this.submitting = false;
         this.error =
           err.status === 401
             ? (err.error?.error ?? 'Email ou senha incorretos.')

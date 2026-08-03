@@ -92,7 +92,9 @@
     }
 
     <div class="actions">
-      <button type="submit" class="btn-primary">Continuar</button>
+      <button type="submit" class="btn-primary" [disabled]="submitting()">
+        {{ submitting() ? 'A guardar...' : 'Continuar' }}
+      </button>
     </div>
   </form>
 </div>

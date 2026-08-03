@@ -73,13 +73,22 @@ export class RegisterComponent {
     this.showConfirmPassword = !this.showConfirmPassword;
   }
 
+  /** Trava cliques repetidos: o segundo criava a conta duas vezes e voltava com
+   * "já existe uma conta com este email" para uma conta acabada de criar. */
+  submitting = false;
+
   signUp(event: Event): void {
     event.preventDefault();
-    if (!this.canSubmit) return;
+    if (!this.canSubmit || this.submitting) return;
     this.error = null;
+    this.submitting = true;
     this.authService.signUp(this.formService.signUpPayload()).subscribe({
-      next: () => this.router.navigate(['/onboarding']),
+      next: () => {
+        this.submitting = false;
+        this.router.navigate(['/onboarding']);
+      },
       error: (err) => {
+        this.submitting = false;
         this.error = err.error?.error ?? 'Erro ao criar conta. Tente novamente.';
       },
     });

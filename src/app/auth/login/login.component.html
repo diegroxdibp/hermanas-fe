@@ -51,7 +51,7 @@
       <div class="error-msg">{{ error }}</div>
     }
 
-    <button type="submit" class="btn-primary">Entrar</button>
+    <button type="submit" class="btn-primary" [disabled]="submitting">{{ submitting ? 'A entrar...' : 'Entrar' }}</button>
 
     <div class="divider"><span>Ou entre com</span></div>
 

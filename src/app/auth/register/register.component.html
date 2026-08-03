@@ -109,7 +109,7 @@
       <div class="error-msg">{{ error }}</div>
     }
 
-    <button type="submit" class="btn-primary" [disabled]="!canSubmit">Cadastrar</button>
+    <button type="submit" class="btn-primary" [disabled]="!canSubmit || submitting">{{ submitting ? 'A criar...' : 'Cadastrar' }}</button>
 
     <div class="divider"><span>Ou cadastre-se com</span></div>
 
