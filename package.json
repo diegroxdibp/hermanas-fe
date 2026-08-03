@@ -6,6 +6,10 @@
     "start": "ng serve --proxy-config proxy.conf.js",
     "build": "ng build",
     "postbuild": "node -e \"require('fs').copyFileSync('dist/care-fe/browser/index.html','dist/care-fe/browser/404.html')\"",
+    "build:staging": "ng build --configuration staging",
+    "postbuild:staging": "node -e \"require('fs').copyFileSync('dist/care-fe/browser/index.html','dist/care-fe/browser/404.html')\"",
+    "deploy:staging": "npm run build:staging && wrangler deploy --env staging",
+    "deploy:prod": "npm run build && wrangler deploy",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
