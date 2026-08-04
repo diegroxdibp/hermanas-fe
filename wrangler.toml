@@ -7,7 +7,7 @@ not_found_handling = "single-page-application"
 
 [env.staging]
 name = "care-staging"
-workers_dev = true
+workers_dev = false
 
 [[env.staging.routes]]
 pattern = "staging.careclinica.com"

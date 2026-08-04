@@ -4,20 +4,22 @@
 // caching, but neither evicts what's already cached — a stale shell keeps
 // pointing the browser at the previous bundle (and its baked-in apiUrl)
 // until something purges it. Staging moved off the shared workers.dev
-// domain onto staging.careclinica.com specifically so this could use
-// Cloudflare's real zone-wide Purge Cache API instead of the workaround
-// below, which only evicts whichever edge PoP happens to answer each
-// request and was confirmed to leave other PoPs stale.
+// domain onto staging.careclinica.com (workers_dev is now disabled in
+// wrangler.toml — that old URL served a stale, prod-configured bundle
+// indefinitely once this script started purging only the real zone)
+// specifically so this could use Cloudflare's real zone-wide Purge Cache
+// API instead of the workaround below, which only evicts whichever edge
+// PoP happens to answer each request and was confirmed to leave other
+// PoPs stale.
 //
 // With CLOUDFLARE_CACHE_PURGE_API_TOKEN (Zone > Cache Purge > Edit on
 // careclinica.com) and CLOUDFLARE_ZONE_ID set as real environment
-// variables on this machine
-// — this is a local deploy-time credential, not something a running service
-// can hand back, so it belongs in the OS environment rather than in Fly or
-// Worker secrets — this purges the whole zone instantly. Without them, it
-// falls back to hitting every route with Cache-Control: no-cache, which
-// only reliably fixes whichever PoP is closest to wherever this script
-// runs.
+// variables on this machine — this is a local deploy-time credential, not
+// something a running service can hand back, so it belongs in the OS
+// environment rather than in Fly or Worker secrets — this purges the whole
+// zone instantly. Without them, it falls back to hitting every route with
+// Cache-Control: no-cache, which only reliably fixes whichever PoP is
+// closest to wherever this script runs.
 //
 // Routes for the fallback are read from the Pages enum instead of
 // duplicated here, so they can't silently drift out of sync the way the
@@ -26,10 +28,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-const STAGING_URLS = [
-  'https://staging.careclinica.com',
-  'https://care-staging.diegrox-rox.workers.dev',
-];
+const STAGING_URLS = ['https://staging.careclinica.com'];
 const ENUM_PATH = fileURLToPath(new URL('../src/app/shared/enums/pages.enum.ts', import.meta.url));
 
 function resolveRoutes() {
