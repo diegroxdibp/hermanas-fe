@@ -4,19 +4,22 @@
 # index.html é quem diz quais são. Quando a edge serve um index.html antigo, o
 # browser carrega o bundle anterior mesmo com o novo já publicado — foi o que
 # fez o staging continuar a chamar a API de produção depois do deploy.
-/
-  Cache-Control: no-cache
+# Tem de apanhar todos os caminhos, não só a raiz: sendo uma SPA, /auth/signup
+# e companhia devolvem o mesmo index.html mas são guardados na edge com chaves
+# próprias. Uma regra só para "/" deixava as rotas profundas a servir o shell
+# anterior, que foi exatamente o que manteve o registo a chamar produção.
+/*
+  Cache-Control: no-store, must-revalidate
+  CDN-Cache-Control: no-store
+  Pragma: no-cache
 
-/index.html
-  Cache-Control: no-cache
-
-/404.html
-  Cache-Control: no-cache
-
-# Os restantes ficheiros têm hash no nome, portanto podem ser guardados para
-# sempre: um conteúdo novo traz sempre um nome novo.
+# Os ficheiros com hash no nome podem ser guardados para sempre: um conteúdo
+# novo traz sempre um nome novo. Vêm depois para prevalecer sobre a regra acima.
 /*.js
   Cache-Control: public, max-age=31536000, immutable
 
 /*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/*
   Cache-Control: public, max-age=31536000, immutable
