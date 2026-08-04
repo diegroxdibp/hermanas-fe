@@ -3,14 +3,11 @@
 // deploy` uploads new content and the _headers no-store rule stops *future*
 // caching, but neither evicts what's already cached — a stale shell keeps
 // pointing the browser at the previous bundle (and its baked-in apiUrl)
-// until something purges it. Staging moved off the shared workers.dev
-// domain onto staging.careclinica.com (workers_dev is now disabled in
-// wrangler.toml — that old URL served a stale, prod-configured bundle
-// indefinitely once this script started purging only the real zone)
-// specifically so this could use Cloudflare's real zone-wide Purge Cache
-// API instead of the workaround below, which only evicts whichever edge
-// PoP happens to answer each request and was confirmed to leave other
-// PoPs stale.
+// until something purges it. Both staging and prod live on the
+// careclinica.com zone (staging.careclinica.com / careclinica.com), so one
+// zone-wide purge via Cloudflare's real Purge Cache API covers both —
+// shared by deploy:staging and deploy:prod rather than duplicated per
+// environment.
 //
 // With CLOUDFLARE_CACHE_PURGE_API_TOKEN (Zone > Cache Purge > Edit on
 // careclinica.com) and CLOUDFLARE_ZONE_ID set as real environment
@@ -19,7 +16,9 @@
 // environment rather than in Fly or Worker secrets — this purges the whole
 // zone instantly. Without them, it falls back to hitting every route with
 // Cache-Control: no-cache, which only reliably fixes whichever PoP is
-// closest to wherever this script runs.
+// closest to wherever this script runs (confirmed insufficient for the
+// well-known / and /auth/signup paths during today's staging incident —
+// use the real API token if at all possible).
 //
 // Routes for the fallback are read from the Pages enum instead of
 // duplicated here, so they can't silently drift out of sync the way the
@@ -28,7 +27,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-const STAGING_URLS = ['https://staging.careclinica.com'];
+const SHELL_URLS = ['https://staging.careclinica.com', 'https://careclinica.com'];
 const ENUM_PATH = fileURLToPath(new URL('../src/app/shared/enums/pages.enum.ts', import.meta.url));
 
 function resolveRoutes() {
@@ -98,7 +97,7 @@ async function purgeViaRevalidation() {
   );
 
   const routes = resolveRoutes();
-  const urls = STAGING_URLS.flatMap((base) => routes.map((path) => `${base}${path}`));
+  const urls = SHELL_URLS.flatMap((base) => routes.map((path) => `${base}${path}`));
   console.log(`Revalidating ${urls.length} URLs...`);
 
   const results = await Promise.all(urls.map(revalidate));

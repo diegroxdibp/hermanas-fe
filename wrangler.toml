@@ -1,5 +1,10 @@
 name = "care"
 compatibility_date = "2026-06-12"
+workers_dev = false
+
+[[routes]]
+pattern = "careclinica.com"
+custom_domain = true
 
 [assets]
 directory = "dist/care-fe/browser"
