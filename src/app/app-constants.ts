@@ -71,7 +71,7 @@ export const AppConstants = {
         {
           name: 'Somatic Experiencing®',
           description:
-            'A Somatic Experiencing® (SE®) é uma prática centrada na regulação do sistema nervoso e na elaboração de experiências traumáticas através do corpo. Por meio de intervenções seguras e graduais, a SE® possibilita a renegociação das respostas traumáticas, reduzindo sintomas de diversas naturezas e fortalecendo a capacidade natural de autorregulação do organismo.',
+            'A Somatic Experiencing® (SE) é uma prática centrada na regulação do sistema nervoso e na elaboração de experiências traumáticas através do corpo. Por meio de intervenções seguras e graduais, a SE possibilita a renegociação das respostas traumáticas, reduzindo sintomas de diversas naturezas e fortalecendo a capacidade natural de autorregulação do organismo.',
           knowMorePage: Pages.SOMATIC_EXPERIENCE,
           sessionService: 'SOMATIC_EXPERIENCE',
         },

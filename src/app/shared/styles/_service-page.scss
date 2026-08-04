@@ -16,8 +16,12 @@
 // Caps and centers a portrait image inside <content>, matching the
 // about page's .bio-pic treatment.
 @mixin portrait {
-  max-width: 320px;
-  margin: 0 auto;
+  max-width: 500px;
+  margin: 1em auto;
+
+  @media (min-width: breakpoint.$breakpoint-sm) {
+    margin: 2.5em auto;
+  }
 
   img {
     width: 100%;

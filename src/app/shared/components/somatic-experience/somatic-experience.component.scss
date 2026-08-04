@@ -4,6 +4,10 @@
   @include service-page.host;
 }
 
+.bio-pic {
+  @include service-page.portrait;
+}
+
 .agendar {
   @include service-page.cta-button;
 }
