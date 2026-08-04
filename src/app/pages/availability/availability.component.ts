@@ -11,7 +11,11 @@ import {
 } from '@angular/core';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { MatDialog } from '@angular/material/dialog';
-import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
+import {
+  ConfirmDialogComponent,
+  ConfirmDialogData,
+  ConfirmDialogResult,
+} from '../../shared/components/confirm-dialog/confirm-dialog.component';
 import {
   ProposeRecurringDialogComponent,
   ProposeRecurringDialogData,
@@ -670,19 +674,6 @@ export class AvailabilityComponent implements OnInit {
             startTime: stripSec(a.startTime),
             endTime: stripSec(a.endTime),
           })));
-          this.apiService.getClientUsers().subscribe({
-            next: (clients) => {
-              const nameMap = new Map(clients.map(c => [c.id, c.name]));
-              this.appointments.update(list =>
-                list.map(a => ({
-                  ...a,
-                  clientName: nameMap.get(a.clientId) ?? a.clientName,
-                  clientEmail: clients.find(c => c.id === a.clientId)?.email ?? a.clientEmail,
-                }))
-              );
-            },
-            error: () => {},
-          });
         },
         error: () => {},
       });
@@ -2150,11 +2141,23 @@ export class AvailabilityComponent implements OnInit {
   }
 
   cancelAppointment(appt: Appointment): void {
-    this.confirmDelete(() => this._doCancelAppointment(appt));
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      width: '440px',
+      panelClass: 'care-dialog',
+      data: {
+        title: 'Confirmar cancelamento',
+        message: 'Deseja realmente cancelar este agendamento? Essa ação não poderá ser desfeita.',
+        justificationLabel: 'Justificativa do cancelamento:',
+        justificationPlaceholder: 'Explique o motivo do cancelamento para a pessoa cliente.',
+      } satisfies ConfirmDialogData,
+    });
+    ref.afterClosed().subscribe((result: ConfirmDialogResult | false) => {
+      if (result) this._doCancelAppointment(appt, result.justification);
+    });
   }
 
-  private _doCancelAppointment(appt: Appointment): void {
-    this.apiService.deleteAppointment(appt.id).subscribe({
+  private _doCancelAppointment(appt: Appointment, justification: string): void {
+    this.apiService.deleteAppointment(appt.id, justification).subscribe({
       next: () => {
         this.appointments.update(list => list.filter(a => a.id !== appt.id));
         this.blocks.update(bs => bs.map(b => ({
