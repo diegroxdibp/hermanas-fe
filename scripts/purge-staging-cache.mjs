@@ -1,22 +1,35 @@
 #!/usr/bin/env node
-// Cloudflare's edge caches the SPA shell (index.html) per pathname. A fresh
-// `wrangler deploy` uploads new content and the _headers no-store rule stops
-// *future* caching, but neither evicts what a path already has cached — a
-// stale shell there keeps pointing the browser at the previous bundle (and
-// its baked-in apiUrl) until something revalidates that exact path. A
-// request with Cache-Control: no-cache forces Cloudflare to revalidate
-// against the Worker instead of serving the cached copy, which is what
-// actually evicts the stale entry. Confirmed manually after the deploy that
-// shipped this script: /, /auth/signup and others stayed on the previous
-// bundle until each was hit with this header, one at a time.
+// Cloudflare's edge caches the SPA shell (index.html). A fresh `wrangler
+// deploy` uploads new content and the _headers no-store rule stops *future*
+// caching, but neither evicts what's already cached — a stale shell keeps
+// pointing the browser at the previous bundle (and its baked-in apiUrl)
+// until something purges it. Staging moved off the shared workers.dev
+// domain onto staging.careclinica.com specifically so this could use
+// Cloudflare's real zone-wide Purge Cache API instead of the workaround
+// below, which only evicts whichever edge PoP happens to answer each
+// request and was confirmed to leave other PoPs stale.
 //
-// Routes are read from the Pages enum instead of duplicated here, so this
-// can't silently drift out of sync the way the deploy config itself did.
+// With CLOUDFLARE_CACHE_PURGE_API_TOKEN (Zone > Cache Purge > Edit on
+// careclinica.com) and CLOUDFLARE_ZONE_ID set as real environment
+// variables on this machine
+// — this is a local deploy-time credential, not something a running service
+// can hand back, so it belongs in the OS environment rather than in Fly or
+// Worker secrets — this purges the whole zone instantly. Without them, it
+// falls back to hitting every route with Cache-Control: no-cache, which
+// only reliably fixes whichever PoP is closest to wherever this script
+// runs.
+//
+// Routes for the fallback are read from the Pages enum instead of
+// duplicated here, so they can't silently drift out of sync the way the
+// deploy config itself did.
 
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-const STAGING_URL = process.env.STAGING_URL ?? 'https://care-staging.diegrox-rox.workers.dev';
+const STAGING_URLS = [
+  'https://staging.careclinica.com',
+  'https://care-staging.diegrox-rox.workers.dev',
+];
 const ENUM_PATH = fileURLToPath(new URL('../src/app/shared/enums/pages.enum.ts', import.meta.url));
 
 function resolveRoutes() {
@@ -47,24 +60,61 @@ function resolveRoutes() {
   return [...routes].map((route) => `/${route}`);
 }
 
-async function revalidate(path) {
-  const url = `${STAGING_URL}${path}`;
+async function purgeViaApi(token, zoneId) {
+  console.log(`Purging Cloudflare zone ${zoneId} via API...`);
+  const res = await fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}/purge_cache`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ purge_everything: true }),
+  });
+  const body = await res.json();
+
+  if (!res.ok || !body.success) {
+    console.error('✗ Purge API call failed:', JSON.stringify(body.errors ?? body));
+    return false;
+  }
+  console.log('✓ Zone cache purged.');
+  return true;
+}
+
+async function revalidate(url) {
   try {
     const res = await fetch(url, { headers: { 'Cache-Control': 'no-cache' } });
-    console.log(`${res.ok ? '✓' : '✗'} ${path} (${res.status})`);
+    console.log(`${res.ok ? '✓' : '✗'} ${url} (${res.status})`);
     return res.ok;
   } catch (err) {
-    console.log(`✗ ${path} (${err.message})`);
+    console.log(`✗ ${url} (${err.message})`);
     return false;
   }
 }
 
-const routes = resolveRoutes();
-console.log(`Purging edge cache for ${routes.length} routes on ${STAGING_URL}...`);
+async function purgeViaRevalidation() {
+  console.warn(
+    'CLOUDFLARE_CACHE_PURGE_API_TOKEN/CLOUDFLARE_ZONE_ID not set in the environment — ' +
+      'falling back to per-route revalidation. This only fixes the edge PoP this script ' +
+      'happens to hit, not the whole network.',
+  );
 
-const results = await Promise.all(routes.map(revalidate));
-const failed = results.filter((ok) => !ok).length;
+  const routes = resolveRoutes();
+  const urls = STAGING_URLS.flatMap((base) => routes.map((path) => `${base}${path}`));
+  console.log(`Revalidating ${urls.length} URLs...`);
 
-if (failed > 0) {
-  console.warn(`${failed}/${routes.length} routes failed to revalidate — check them manually.`);
+  const results = await Promise.all(urls.map(revalidate));
+  const failed = results.filter((ok) => !ok).length;
+  if (failed > 0) {
+    console.warn(`${failed}/${urls.length} requests failed — check them manually.`);
+  }
+  return failed === 0;
 }
+
+const { CLOUDFLARE_CACHE_PURGE_API_TOKEN, CLOUDFLARE_ZONE_ID } = process.env;
+
+const ok =
+  CLOUDFLARE_CACHE_PURGE_API_TOKEN && CLOUDFLARE_ZONE_ID
+    ? await purgeViaApi(CLOUDFLARE_CACHE_PURGE_API_TOKEN, CLOUDFLARE_ZONE_ID)
+    : await purgeViaRevalidation();
+
+if (!ok) process.exitCode = 1;
