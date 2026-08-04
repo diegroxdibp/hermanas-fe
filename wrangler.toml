@@ -9,5 +9,5 @@ not_found_handling = "single-page-application"
 name = "care-staging"
 
 [env.staging.assets]
-directory = "dist/care-fe/browser"
+directory = "dist/care-fe-staging/browser"
 not_found_handling = "single-page-application"

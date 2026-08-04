@@ -7,8 +7,9 @@
     "build": "ng build",
     "postbuild": "node -e \"require('fs').copyFileSync('dist/care-fe/browser/index.html','dist/care-fe/browser/404.html')\"",
     "build:staging": "ng build --configuration staging",
-    "postbuild:staging": "node -e \"require('fs').copyFileSync('dist/care-fe/browser/index.html','dist/care-fe/browser/404.html')\"",
-    "deploy:staging": "npm run build:staging && npx wrangler deploy --env staging",
+    "postbuild:staging": "node -e \"require('fs').copyFileSync('dist/care-fe-staging/browser/index.html','dist/care-fe-staging/browser/404.html')\"",
+    "deploy:staging": "npm run build:staging && npx wrangler deploy --env staging && npm run purge:staging",
+    "purge:staging": "node scripts/purge-staging-cache.mjs",
     "deploy:prod": "npm run build && npx wrangler deploy",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"

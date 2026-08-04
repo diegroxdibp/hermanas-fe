@@ -73,6 +73,7 @@
                 "sourceMap": false
             },
             "staging": {
+              "outputPath": "dist/care-fe-staging",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
