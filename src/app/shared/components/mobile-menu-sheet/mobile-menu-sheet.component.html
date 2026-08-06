@@ -40,16 +40,16 @@
     <a class="row"
        [style.--row-delay.s]="0.12 + (navigationService.visibleNavigationItems().length + i) * 0.04"
        tabindex="0"
-       [attr.aria-label]="row.ariaLabel && notificationService.unreadCount() > 0
-         ? row.ariaLabel + ', ' + notificationService.unreadCount() + ' não lidas'
+       [attr.aria-label]="row.ariaLabel && row.badgeCount && row.badgeCount()! > 0
+         ? row.ariaLabel + ', ' + row.badgeCount!() + ' não lidas'
          : null"
        (click)="go(row.page)"
        (keydown.enter)="go(row.page)"
        (keydown.space)="$event.preventDefault(); go(row.page)">
       <span translate="no" class="material-symbols-outlined icon">{{ row.icon }}</span>
       <span class="label">{{ row.label }}</span>
-      @if (row.showBadge && notificationService.unreadCount() > 0) {
-        <span class="badge">{{ notificationService.unreadCount() }}</span>
+      @if (row.showBadge && row.badgeCount && row.badgeCount()! > 0) {
+        <span class="badge">{{ row.badgeCount!() }}</span>
       }
       <span translate="no" class="material-symbols-outlined chev">chevron_right</span>
     </a>

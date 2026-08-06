@@ -1,5 +1,8 @@
-import { Component, ElementRef, HostListener, Input, computed, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, Input, OnInit, computed, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { MaskitoDirective } from '@maskito/angular';
+import { maskitoDateOptionsGenerator } from '@maskito/kit';
+import { StyledSelectComponent, StyledSelectOption } from '../styled-select/styled-select.component';
 
 const PT_MONTHS = [
   'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
@@ -11,11 +14,11 @@ const PT_MONTHS = [
 // the rest of the design system instead of the browser's own date UI.
 @Component({
   selector: 'app-birthdate-calendar',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, MaskitoDirective, StyledSelectComponent],
   templateUrl: './birthdate-calendar.component.html',
   styleUrl: './birthdate-calendar.component.scss',
 })
-export class BirthdateCalendarComponent {
+export class BirthdateCalendarComponent implements OnInit {
   @Input({ required: true }) dateControl!: FormControl;
   @Input() labelId = '';
 
@@ -29,6 +32,17 @@ export class BirthdateCalendarComponent {
     return d;
   })();
 
+  readonly dateMask = maskitoDateOptionsGenerator({
+    mode: 'dd/mm/yyyy',
+    separator: '/',
+    min: this.oldestBirthdate,
+    max: this.youngestBirthdate,
+  });
+
+  // Free-text mirror of dateControl (kept in sync both ways) so the field can
+  // be typed into directly instead of only picked via the calendar popover.
+  readonly typedControl = new FormControl('');
+
   readonly years = (() => {
     const from = this.oldestBirthdate.getFullYear();
     const to = this.youngestBirthdate.getFullYear();
@@ -36,6 +50,16 @@ export class BirthdateCalendarComponent {
     for (let y = to; y >= from; y--) list.push(y);
     return list;
   })();
+
+  readonly monthOptions: StyledSelectOption[] = this.months.map((m, i) => ({
+    value: String(i),
+    label: m,
+  }));
+
+  readonly yearOptions: StyledSelectOption[] = this.years.map(y => ({
+    value: String(y),
+    label: String(y),
+  }));
 
   readonly calendarOpen = signal(false);
   readonly calendarViewDate = signal<Date>(this.youngestBirthdate);
@@ -67,10 +91,6 @@ export class BirthdateCalendarComponent {
     return days;
   });
 
-  get selectedBirthdateLabel(): string {
-    return this.dateControl.value ? this.fmtDate(this.dateControl.value) : '';
-  }
-
   get calMonthIndex(): number {
     return this.calendarViewDate().getMonth();
   }
@@ -81,9 +101,20 @@ export class BirthdateCalendarComponent {
 
   constructor(private readonly elementRef: ElementRef<HTMLElement>) {}
 
+  ngOnInit(): void {
+    this.syncTypedFromControl(this.dateControl.value);
+
+    this.dateControl.valueChanges.subscribe(value => this.syncTypedFromControl(value));
+    this.typedControl.valueChanges.subscribe(value => this.onTypedValueChange(value));
+  }
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event): void {
-    if (!this.elementRef.nativeElement.contains(event.target as Node)) {
+    // Selecting a month/year option removes that button from the DOM
+    // (via the styled-select's own @if) while the click is still bubbling,
+    // so `contains(event.target)` would see a detached node and report a
+    // false negative. composedPath() is captured before that mutation.
+    if (!event.composedPath().includes(this.elementRef.nativeElement)) {
       this.calendarOpen.set(false);
     }
   }
@@ -93,11 +124,34 @@ export class BirthdateCalendarComponent {
     this.calendarOpen.set(false);
   }
 
+  // Selecting a month/year option removes that button from the DOM as part
+  // of the same click, so the browser resets focus to <body> and reports
+  // focusout with relatedTarget = null — indistinguishable from a real
+  // click outside. Flagging the mousedown that starts the interaction (which
+  // fires before the option is removed) lets focusout ignore that one case.
+  private interactingInside = false;
+
+  @HostListener('mousedown')
+  onMouseDownInside(): void {
+    this.interactingInside = true;
+    // A removed option's cascading blur/focusout (relatedTarget null) can
+    // land a render cycle after the click that removed it, so wait a full
+    // paint cycle (double rAF) rather than a single macrotask before
+    // clearing the guard.
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        this.interactingInside = false;
+      }),
+    );
+  }
+
   @HostListener('focusout', ['$event'])
   onFocusOut(event: FocusEvent): void {
+    if (this.interactingInside) return;
     const next = event.relatedTarget as Node | null;
     if (!next || !this.elementRef.nativeElement.contains(next)) {
       this.calendarOpen.set(false);
+      this.syncTypedFromControl(this.dateControl.value);
     }
   }
 
@@ -155,5 +209,35 @@ export class BirthdateCalendarComponent {
     const m = (date.getMonth() + 1).toString().padStart(2, '0');
     const d = date.getDate().toString().padStart(2, '0');
     return `${y}-${m}-${d}`;
+  }
+
+  private syncTypedFromControl(key: string | null | undefined): void {
+    const formatted = this.fmtDate(key ?? null);
+    if (this.typedControl.value !== formatted) {
+      this.typedControl.setValue(formatted, { emitEvent: false });
+    }
+    if (key) {
+      const [y, m, d] = key.split('-').map(Number);
+      this.calendarViewDate.set(new Date(y, m - 1, d));
+    }
+  }
+
+  private onTypedValueChange(value: string | null): void {
+    const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(value ?? '');
+    if (!match) return;
+
+    const day = Number(match[1]);
+    const month = Number(match[2]);
+    const year = Number(match[3]);
+    const date = new Date(year, month - 1, day);
+    const isRealDate =
+      date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
+    if (!isRealDate || date < this.oldestBirthdate || date > this.youngestBirthdate) return;
+
+    this.calendarViewDate.set(new Date(year, month - 1, 1));
+    const key = this.toKey(date);
+    if (this.dateControl.value !== key) {
+      this.dateControl.setValue(key);
+    }
   }
 }

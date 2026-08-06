@@ -8,6 +8,7 @@ export enum Pages {
   DASHBOARD = 'dashboard',
   DASHBOARD_PROFILE = `${Pages.DASHBOARD}/profile`,
   DASHBOARD_SCHEDULE = `${Pages.DASHBOARD}/schedule`,
+  DASHBOARD_MESSAGES = `${Pages.DASHBOARD}/messages`,
   ABOUT = 'about',
   BIO = 'bio',
   SERVICES = 'services',

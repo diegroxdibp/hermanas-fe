@@ -186,6 +186,14 @@ export const routes: Routes = [
                 './shared/components/proposal-confirm/proposal-confirm.component'
               ).then((m) => m.ProposalConfirmComponent),
           },
+
+          {
+            path: 'messages',
+            loadComponent: () =>
+              import(
+                './shared/components/dashboard-messages/dashboard-messages.component'
+              ).then((m) => m.DashboardMessagesComponent),
+          },
         ],
       },
 

@@ -22,4 +22,8 @@ export interface Appointment {
   price?: number;
   priceBRL?: number;
   status: 'PENDING' | 'CONFIRMED';
+  address?: string;
+  notes?: string;
+  /** Hoje sempre um elemento — a única pessoa profissional da marcação. */
+  professionals?: { id: number; name: string; role?: string }[];
 }

@@ -1,16 +1,25 @@
 <div class="field-wrap">
-  <button
-    type="button"
-    class="filled-field"
-    [class.open]="calendarOpen()"
-    [attr.aria-labelledby]="labelId || null"
-    (click)="toggleCalendar()"
-  >
-    <span class="field-value" [class.placeholder]="!dateControl.value">
-      {{ selectedBirthdateLabel || 'dd/mm/aaaa' }}
-    </span>
-    <span translate="no" class="material-symbols-outlined field-icon">calendar_today</span>
-  </button>
+  <div class="filled-field" [class.open]="calendarOpen()">
+    <input
+      type="text"
+      class="field-input"
+      [class.placeholder]="!dateControl.value"
+      [attr.aria-labelledby]="labelId || null"
+      [formControl]="typedControl"
+      [maskito]="dateMask"
+      placeholder="dd/mm/aaaa"
+      autocomplete="off"
+      inputmode="numeric"
+    />
+    <button
+      type="button"
+      class="field-icon-btn"
+      [attr.aria-label]="calendarOpen() ? 'Fechar calendário' : 'Abrir calendário'"
+      (click)="toggleCalendar()"
+    >
+      <span translate="no" class="material-symbols-outlined field-icon">calendar_today</span>
+    </button>
+  </div>
 
   @if (calendarOpen()) {
     <div class="calendar-popover">
@@ -20,16 +29,19 @@
           <span translate="no" class="material-symbols-outlined">chevron_left</span>
         </button>
         <div class="cal-select-wrap">
-          <select class="cal-select" [value]="calMonthIndex" (change)="onMonthChange($any($event.target).value)">
-            @for (m of months; track m; let i = $index) {
-              <option [value]="i">{{ m }}</option>
-            }
-          </select>
-          <select class="cal-select" [value]="calYear" (change)="onYearChange($any($event.target).value)">
-            @for (y of years; track y) {
-              <option [value]="y">{{ y }}</option>
-            }
-          </select>
+          <app-styled-select
+            class="cal-select month-select"
+            [options]="monthOptions"
+            [value]="calMonthIndex.toString()"
+            (valueChange)="onMonthChange($event)"
+          />
+          <app-styled-select
+            class="cal-select year-select"
+            [options]="yearOptions"
+            [value]="calYear.toString()"
+            searchPlaceholder="Buscar ano..."
+            (valueChange)="onYearChange($event)"
+          />
         </div>
         <button type="button" class="cal-nav" (click)="nextMonth()">
           <span translate="no" class="material-symbols-outlined">chevron_right</span>

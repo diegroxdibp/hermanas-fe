@@ -5,6 +5,7 @@ import { NavigationBarService } from '../../services/navigation-bar.service';
 import { SessionService } from '../../services/session.service';
 import { ScreenSizeService } from '../../services/screen-size.service';
 import { NotificationService } from '../../../core/services/notification.service';
+import { MessageService } from '../../../core/services/message.service';
 import { Pages } from '../../enums/pages.enum';
 
 interface NavRow {
@@ -13,6 +14,8 @@ interface NavRow {
   page: Pages;
   showBadge?: boolean;
   ariaLabel?: string;
+  /** De onde vem a contagem do badge — cada linha pode ter a sua própria fonte. */
+  badgeCount?: () => number;
 }
 
 @Component({
@@ -30,6 +33,7 @@ export class MobileMenuSheetComponent {
   readonly navigationService = inject(NavigationService);
   readonly navbarService = inject(NavigationBarService);
   readonly notificationService = inject(NotificationService);
+  readonly messageService = inject(MessageService);
   readonly Pages = Pages;
 
   constructor() {
@@ -56,11 +60,20 @@ export class MobileMenuSheetComponent {
 
   readonly userRows: NavRow[] = [
     {
+      label: 'Mensagens',
+      icon: 'forum',
+      page: Pages.DASHBOARD_MESSAGES,
+      showBadge: true,
+      ariaLabel: 'Mensagens',
+      badgeCount: () => this.messageService.unreadCount(),
+    },
+    {
       label: 'Notificações',
       icon: 'notifications',
       page: Pages.DASHBOARD,
       showBadge: true,
       ariaLabel: 'Notificações',
+      badgeCount: () => this.notificationService.unreadCount(),
     },
     { label: 'Conta', icon: 'person', page: Pages.DASHBOARD_PROFILE },
   ];

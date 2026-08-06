@@ -302,6 +302,24 @@
                   </div>
                 }
               </div>
+
+              <div class="ad-notes">
+                <label class="ad-notes-label" for="ad-notes-input">Notas para a pessoa cliente</label>
+                <textarea
+                  id="ad-notes-input"
+                  class="ad-notes-input"
+                  rows="4"
+                  maxlength="2000"
+                  [value]="notesDraft()"
+                  (input)="notesDraft.set($any($event.target).value)"
+                  placeholder="Ex.: traga roupa confortável, chegue 10 minutos antes..."
+                ></textarea>
+                <div class="ad-notes-actions">
+                  <button class="btn-save-notes" [disabled]="notesSaving()" (click)="saveNotes(appt)">
+                    {{ notesSaving() ? 'A guardar…' : 'Guardar notas' }}
+                  </button>
+                </div>
+              </div>
             </div>
             <div class="be-actions">
               <div class="ad-actions">

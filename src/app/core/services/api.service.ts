@@ -177,6 +177,14 @@ export class ApiService {
     );
   }
 
+  updateAppointmentNotes(id: number, notes: string): Observable<Appointment> {
+    return this.http.patch<Appointment>(
+      `${environment.apiUrl}/api/appointments/${id}/notes`,
+      { notes },
+      { withCredentials: true },
+    );
+  }
+
   sendContactMessage(payload: ContactPayload): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(
       `${environment.apiUrl}/api/contact`,

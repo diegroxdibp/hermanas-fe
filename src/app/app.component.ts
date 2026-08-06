@@ -13,6 +13,7 @@ import { LoadingService } from './core/services/loading.service';
 import { ErrorService } from './core/services/error.service';
 import { FooterComponent } from './core/components/footer/footer.component';
 import { NotificationService } from './core/services/notification.service';
+import { MessageService } from './core/services/message.service';
 import { SessionService } from './shared/services/session.service';
 
 @Component({
@@ -33,6 +34,7 @@ export class AppComponent {
   readonly errorService = inject(ErrorService);
   router = inject(Router);
   private readonly notificationService = inject(NotificationService);
+  private readonly messageService = inject(MessageService);
   private readonly sessionService = inject(SessionService);
 
   constructor() {
@@ -53,8 +55,10 @@ export class AppComponent {
     effect(() => {
       if (this.sessionService.user()?.profileCompleted) {
         this.notificationService.connect();
+        this.messageService.connect();
       } else {
         this.notificationService.disconnect();
+        this.messageService.disconnect();
       }
     });
   }

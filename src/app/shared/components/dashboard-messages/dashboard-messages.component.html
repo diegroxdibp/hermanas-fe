@@ -1,0 +1,97 @@
+<div class="container">
+  <div class="head">
+    <h2>Mensagens</h2>
+    <div class="subtitle">As conversas ficam ligadas a uma sessão. A profissional responde no horário que tiver disponível.</div>
+  </div>
+
+  <div class="msg-card">
+    <div class="thread-list">
+      @for (t of messageService.threads(); track t.id; let i = $index) {
+        <div
+          class="thread-item"
+          [class.active]="t.id === selectedThreadId()"
+          [class.unread]="t.unreadCount > 0"
+          role="button"
+          tabindex="0"
+          (click)="selectThread(t.id)"
+          (keydown.enter)="selectThread(t.id)"
+          (keydown.space)="$event.preventDefault(); selectThread(t.id)"
+        >
+          <span [class]="'avatar c' + (i % 3)">
+            {{ (t.otherParticipant?.name ?? '?').charAt(0).toUpperCase() }}
+          </span>
+          <div class="thread-body">
+            <div class="thread-top">
+              <div class="thread-name">{{ t.otherParticipant?.name ?? 'Conversa' }}</div>
+              @if (t.lastMessage) {
+                <div class="thread-time">{{ timeLabel(t.lastMessage.createdAt) }}</div>
+              }
+            </div>
+            <div class="thread-preview">{{ t.lastMessage?.body ?? t.contextLabel }}</div>
+          </div>
+          @if (t.unreadCount > 0) {
+            <span class="dot"></span>
+          }
+        </div>
+      } @empty {
+        <div class="empty-threads">
+          <span translate="no" class="material-symbols-outlined">forum</span>
+          <p>Ainda não tem conversas.</p>
+        </div>
+      }
+    </div>
+
+    <div class="conversation">
+      @if (selectedThread(); as thread) {
+        <div class="conv-header">
+          <span [class]="'avatar c0'">{{ (thread.otherParticipant?.name ?? '?').charAt(0).toUpperCase() }}</span>
+          <div class="conv-header-body">
+            <div class="conv-name">{{ thread.otherParticipant?.name ?? 'Conversa' }}</div>
+            <div class="conv-context">{{ thread.contextLabel }}</div>
+          </div>
+          @if (thread.appointmentId) {
+            <button type="button" class="btn-view-session" (click)="goToSession(thread)">
+              <span translate="no" class="material-symbols-outlined">event_note</span>
+              Ver sessão
+            </button>
+          }
+        </div>
+
+        <div class="conv-body">
+          @for (group of dayGroups(); track group.label) {
+            <div class="day-sep">{{ group.label }}</div>
+            @for (m of group.messages; track m.id) {
+              <div class="bubble" [class.sent]="isMine(m)" [class.received]="!isMine(m)">
+                <div class="bubble-text">{{ m.body }}</div>
+                <div class="bubble-time">{{ timeLabel(m.createdAt) }}</div>
+              </div>
+            }
+          }
+        </div>
+
+        <div class="composer">
+          <textarea
+            class="composer-input"
+            rows="1"
+            placeholder="Escreva uma mensagem…"
+            [value]="draft()"
+            (input)="draft.set($any($event.target).value)"
+            (keydown.enter)="$event.preventDefault(); send()"
+          ></textarea>
+          <button type="button" class="btn-send" [disabled]="!draft().trim() || sending()" (click)="send()">
+            <span translate="no" class="material-symbols-outlined">send</span>
+          </button>
+        </div>
+      } @else {
+        <div class="empty-conversation">
+          <span translate="no" class="material-symbols-outlined">forum</span>
+          <p>Selecione uma conversa para ver as mensagens.</p>
+        </div>
+      }
+    </div>
+  </div>
+
+  <p class="disclaimer">
+    As mensagens não substituem o acompanhamento clínico. Em caso de urgência, contacte os serviços de emergência.
+  </p>
+</div>

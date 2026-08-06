@@ -15,11 +15,16 @@
           <span translate="no" class="material-symbols-outlined">event_note</span>
           <span>Agendamentos</span>
         </a>
-<!--        <a class="sidebar-link-disabled">-->
-<!--          <span translate="no" class="material-symbols-outlined">forum</span>-->
-<!--          <span>Mensagens</span>-->
-<!--          <span class="badge">2</span>-->
-<!--        </a>-->
+        <a
+          [routerLink]="['messages']"
+          routerLinkActive="active"
+        >
+          <span translate="no" class="material-symbols-outlined">forum</span>
+          <span>Mensagens</span>
+          @if (messageService.unreadCount() > 0) {
+            <span class="badge">{{ messageService.unreadCount() }}</span>
+          }
+        </a>
         <a
           [routerLink]="['notifications']"
           routerLinkActive="active"
@@ -83,17 +88,64 @@
 
               <!-- Info -->
               <div class="info">
-                <h3>{{ s.who }}</h3>
-                <div class="with">{{ s.service }}</div>
-                <div class="meta-row">
-                  <span class="meta">
+                <!-- Row 1: título + meta -->
+                <div class="row1">
+                  <div class="row1-title">
+                    <h3>{{ s.who }}</h3>
+                    <div class="with">{{ s.service }}</div>
+                  </div>
+                  <div class="row1-meta">
+                    <span class="meta">
+                      <span translate="no" class="material-symbols-outlined">schedule</span>
+                      {{ s.startTime }}&nbsp;–&nbsp;{{ s.endTime }}
+                    </span>
+                    <span class="meta">
+                      <span translate="no" class="material-symbols-outlined">location_on</span>
+                      {{ s.mode }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Row 2: Endereço / Plataforma -->
+                <div class="row2">
+                  <span translate="no" class="material-symbols-outlined row2-icon">
+                    {{ s.mode === 'Remoto' ? 'videocam' : 'place' }}
+                  </span>
+                  <div class="row2-body">
+                    <div class="ad-k">{{ s.mode === 'Remoto' ? 'Plataforma' : 'Endereço' }}</div>
+                    <div class="ad-v row2-value" [class.to-agree]="!(s.mode === 'Remoto' ? s.platform : s.address)">
+                      {{ (s.mode === 'Remoto' ? s.platform : s.address) || 'a combinar' }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Row 3: Duração + Valor -->
+                <div class="row3">
+                  <div class="row3-item">
                     <span translate="no" class="material-symbols-outlined">schedule</span>
-                    {{ s.startTime }}&nbsp;–&nbsp;{{ s.endTime }}
-                  </span>
-                  <span class="meta">
-                    <span translate="no" class="material-symbols-outlined">location_on</span>
-                    {{ s.mode }}
-                  </span>
+                    <div><div class="ad-k">Duração</div><div class="ad-v">{{ s.duration }}</div></div>
+                  </div>
+                  <div class="row3-item">
+                    <span translate="no" class="material-symbols-outlined">payments</span>
+                    <div><div class="ad-k">Valor</div><div class="ad-v" [class.to-agree]="!s.price">{{ s.price || 'a combinar' }}</div></div>
+                  </div>
+                </div>
+
+                <!-- Row 4: profissional -->
+                <div class="row4">
+                  <span [class]="'ad-av c' + 0">{{ s.professionals[0].initials }}</span>
+                  <div class="row4-body">
+                    <div class="ad-k">Profissional</div>
+                    <div class="ad-v">{{ s.professionals[0].name }}</div>
+                  </div>
+                  <button
+                    class="btn-message"
+                    [attr.aria-label]="'Mensagem para ' + s.professionals[0].name"
+                    (click)="openThread(s)"
+                  >
+                    <span translate="no" class="material-symbols-outlined">forum</span>
+                    Mensagem
+                  </button>
                 </div>
               </div>
 
@@ -118,43 +170,202 @@
           }
 
           <!-- Upcoming sessions -->
-          @if (upcomingSessions().length > 0) {
+          @if (hasOtherSessions()) {
             <div class="section-head">
               <h2>Próximas sessões</h2>
-              <div class="view-toggle" role="tablist">
+              <div class="section-controls">
                 <button
-                  [class.on]="activeView() === 'list'"
-                  (click)="setView('list')"
+                  type="button"
+                  class="past-toggle"
+                  [class.on]="hidePastSessions()"
+                  [attr.aria-pressed]="hidePastSessions()"
+                  (click)="togglePastVisibility()"
                 >
-                  <span translate="no" class="material-symbols-outlined">list</span>
-                  Lista
+                  <span translate="no" class="material-symbols-outlined">
+                    {{ hidePastSessions() ? 'visibility' : 'visibility_off' }}
+                  </span>
+                  {{ hidePastSessions() ? 'Mostrar passadas' : 'Ocultar passadas' }}
                 </button>
-                <button
-                  [class.on]="activeView() === 'calendar'"
-                  (click)="setView('calendar')"
-                >
-                  <span translate="no" class="material-symbols-outlined">calendar_month</span>
-                  Calendário
-                </button>
+                <div class="view-toggle" role="tablist">
+                  <button
+                    [class.on]="activeView() === 'list'"
+                    (click)="setView('list')"
+                  >
+                    <span translate="no" class="material-symbols-outlined">list</span>
+                    Lista
+                  </button>
+                  <button
+                    [class.on]="activeView() === 'calendar'"
+                    (click)="setView('calendar')"
+                  >
+                    <span translate="no" class="material-symbols-outlined">calendar_month</span>
+                    Calendário
+                  </button>
+                </div>
               </div>
             </div>
 
+            @if (activeView() === 'calendar') {
+              <div class="week-card">
+                <div class="week-header">
+                  <button type="button" class="week-nav" (click)="prevWeek()" aria-label="Semana anterior">
+                    <span translate="no" class="material-symbols-outlined">chevron_left</span>
+                  </button>
+                  <div class="week-label">{{ weekLabel() }}</div>
+                  <button type="button" class="week-nav" (click)="nextWeek()" aria-label="Próxima semana">
+                    <span translate="no" class="material-symbols-outlined">chevron_right</span>
+                  </button>
+                </div>
+
+                <div class="week-grid-outer">
+                  <div class="week-grid">
+                    @for (day of weekDays(); track day.getTime()) {
+                      <button
+                        type="button"
+                        class="week-day"
+                        [class.selected]="selectedDay() === dateKey(day)"
+                        (click)="selectDay(dateKey(day))"
+                      >
+                        <div class="week-dow">{{ dowAbr(day) }}</div>
+                        <div class="week-daynum" [class.today]="isToday(day)">{{ day.getDate() }}</div>
+                        @for (s of sessionsForDay(dateKey(day)); track s.appointmentId) {
+                          <div class="day-session" [class.remoto]="s.mode === 'Remoto'">
+                            <div class="s-time">{{ s.startTime }}</div>
+                            <div class="s-service">{{ s.service }}</div>
+                            <div class="s-who">{{ s.who }}</div>
+                          </div>
+                        }
+                      </button>
+                    }
+                  </div>
+                </div>
+
+                <div class="week-legend">
+                  <span class="legend-item"><span class="dot presencial"></span>Presencial</span>
+                  <span class="legend-item"><span class="dot remoto"></span>Remoto</span>
+                  <span class="legend-hint">Escolha um dia para ver os detalhes em baixo.</span>
+                </div>
+              </div>
+            }
+
             <div class="upcoming-card">
               <div class="up-list">
-                @for (s of upcomingSessions(); track $index) {
-                  <div class="row">
-                    <div class="when">
-                      <div class="dow">{{ s.dow }}</div>
-                      <div class="num">{{ s.day }}<small>{{ s.month }}</small></div>
+                @for (s of upcomingSessions(); track s.appointmentId) {
+                  <div class="row-wrap">
+                    <div
+                      class="row"
+                      [class.open]="openSessionId() === s.appointmentId"
+                      [class.past]="isPast(s.date)"
+                      role="button"
+                      tabindex="0"
+                      [attr.aria-expanded]="openSessionId() === s.appointmentId"
+                      [attr.aria-controls]="'panel-' + s.appointmentId"
+                      (click)="toggleSession(s.appointmentId)"
+                      (keydown.enter)="toggleSession(s.appointmentId)"
+                      (keydown.space)="$event.preventDefault(); toggleSession(s.appointmentId)"
+                    >
+                      <div class="when">
+                        <div class="dow">{{ s.dow }}</div>
+                        <div class="num">{{ s.day }}<small>{{ s.month }}</small></div>
+                      </div>
+                      <div class="what">
+                        {{ s.who }}
+                        <small>{{ s.service }}</small>
+                      </div>
+                      <span class="mode-pill" [class.remoto]="s.mode === 'Remoto'">
+                        {{ s.mode }}
+                      </span>
+                      <div class="time">{{ s.startTime }}</div>
+                      <span
+                        translate="no"
+                        class="material-symbols-outlined chevron"
+                        [class.invert]="openSessionId() === s.appointmentId"
+                      >expand_more</span>
                     </div>
-                    <div class="what">
-                      {{ s.who }}
-                      <small>{{ s.service }}</small>
-                    </div>
-                    <span class="mode-pill" [class.online]="s.mode === 'Online'">
-                      {{ s.mode }}
-                    </span>
-                    <div class="time">{{ s.startTime }}</div>
+
+                    @if (openSessionId() === s.appointmentId) {
+                      <div class="panel" id="panel-{{ s.appointmentId }}" @detailEnter>
+                        <div class="ad-rows">
+                          <div class="ad-row">
+                            <span translate="no" class="material-symbols-outlined">spa</span>
+                            <div><div class="ad-k">Serviço</div><div class="ad-v">{{ s.service }}</div></div>
+                          </div>
+                          @if (s.mode !== 'Remoto') {
+                            <div class="ad-row">
+                              <span translate="no" class="material-symbols-outlined">place</span>
+                              <div><div class="ad-k">Endereço</div><div class="ad-v" [class.to-agree]="!s.address">{{ s.address || 'a combinar' }}</div></div>
+                            </div>
+                          }
+                          @if (s.mode === 'Remoto') {
+                            <div class="ad-row">
+                              <span translate="no" class="material-symbols-outlined">videocam</span>
+                              <div><div class="ad-k">Plataforma</div><div class="ad-v" [class.to-agree]="!s.platform">{{ s.platform || 'a combinar' }}</div></div>
+                            </div>
+                          }
+                          <div class="ad-row">
+                            <span translate="no" class="material-symbols-outlined">payments</span>
+                            <div><div class="ad-k">Valor</div><div class="ad-v" [class.to-agree]="!s.price">{{ s.price || 'a combinar' }}</div></div>
+                          </div>
+                          <div class="ad-row">
+                            <span translate="no" class="material-symbols-outlined">event_repeat</span>
+                            <div><div class="ad-k">Recorrência</div><div class="ad-v">{{ s.recurrence }}</div></div>
+                          </div>
+                          <div class="ad-row">
+                            <span translate="no" class="material-symbols-outlined">schedule</span>
+                            <div><div class="ad-k">Duração</div><div class="ad-v">{{ s.duration }}</div></div>
+                          </div>
+                          <div class="ad-row">
+                            <span translate="no" class="material-symbols-outlined">credit_card</span>
+                            <div><div class="ad-k">Pagamento</div><div class="ad-v">{{ s.payment }}</div></div>
+                          </div>
+                        </div>
+
+                        <div class="pro-strip">
+                          @for (p of s.professionals; track p.id; let i = $index) {
+                            <div class="pro-row">
+                              <span [class]="'ad-av c' + (i % 3)">{{ p.initials }}</span>
+                              <div class="pro-body">
+                                <div class="ad-k">{{ s.professionals.length > 1 ? p.role : 'Profissional' }}</div>
+                                <div class="ad-v">{{ p.name }}</div>
+                              </div>
+                              <button
+                                class="btn-message"
+                                [attr.aria-label]="'Mensagem para ' + p.name"
+                                (click)="openThread(s)"
+                              >
+                                <span translate="no" class="material-symbols-outlined">forum</span>
+                                Mensagem
+                              </button>
+                            </div>
+                          }
+                        </div>
+
+                        @if (s.notes) {
+                          <div class="notes-box">
+                            <div class="notes-head">
+                              <span translate="no" class="material-symbols-outlined">sticky_note_2</span>
+                              <span>Notas da profissional</span>
+                            </div>
+                            <div class="notes-body">{{ s.notes }}</div>
+                          </div>
+                        }
+
+                        <div class="panel-actions">
+                          <button class="btn-cancel" (click)="cancelSession(s)">Cancelar sessão</button>
+                          <button class="btn-reschedule" (click)="rescheduleSession()">
+                            <span translate="no" class="material-symbols-outlined">event_repeat</span>
+                            Reagendar
+                          </button>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
+
+                @if (upcomingSessions().length === 0) {
+                  <div class="empty-day">
+                    <span translate="no" class="material-symbols-outlined">event_available</span>
+                    <p>{{ emptyStateMessage() }}</p>
                   </div>
                 }
               </div>
@@ -184,6 +395,16 @@
     >
       <span translate="no" class="material-symbols-outlined">event_note</span>
       <span>Agendamentos</span>
+    </a>
+    <a
+      [routerLink]="['messages']"
+      routerLinkActive="active"
+    >
+      <span translate="no" class="material-symbols-outlined">forum</span>
+      @if (messageService.unreadCount() > 0) {
+        <span class="badge">{{ messageService.unreadCount() }}</span>
+      }
+      <span>Mensagens</span>
     </a>
     <a
       [routerLink]="['notifications']"

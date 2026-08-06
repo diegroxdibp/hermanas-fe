@@ -21,7 +21,6 @@
           id="password"
           [type]="showPassword ? 'text' : 'password'"
           [formControl]="passwordCtrl"
-          placeholder="••••••••"
           autocomplete="new-password"
         />
         <button
@@ -68,7 +67,6 @@
           [type]="showConfirmPassword ? 'text' : 'password'"
           [formControl]="confirmPasswordCtrl"
           [class.has-error]="passwordsMismatch"
-          placeholder="••••••••"
           autocomplete="new-password"
         />
         <button
