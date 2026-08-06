@@ -312,6 +312,19 @@ export class DashboardPageComponent implements OnInit {
     return date < today;
   }
 
+  /** Data/hora real de início da sessão — s.date fica à meia-noite, a hora vem de startTime. */
+  private sessionDateTime(s: DashSession): Date {
+    const dt = new Date(s.date);
+    const [h, m] = s.startTime.split(':').map(Number);
+    dt.setHours(h || 0, m || 0, 0, 0);
+    return dt;
+  }
+
+  /** Cancelar/reagendar só é permitido até 24 h antes do início da sessão. */
+  canModifySession(s: DashSession): boolean {
+    return this.sessionDateTime(s).getTime() - Date.now() >= 24 * 60 * 60 * 1000;
+  }
+
   toggleSession(id: number): void {
     this.openSessionId.update((cur) => (cur === id ? null : id));
   }

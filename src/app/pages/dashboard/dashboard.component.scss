@@ -539,6 +539,13 @@
 
   span.material-symbols-outlined { font-size: 17px; }
   &:hover { background: var(--color-primary-blue); color: var(--color-white); }
+
+  &:disabled {
+    cursor: not-allowed;
+    color: var(--color-muted);
+    border-color: var(--color-border);
+    &:hover { background: none; color: var(--color-muted); }
+  }
 }
 
 .btn-cancel {
@@ -554,6 +561,75 @@
   transition: color var(--dur-fast);
 
   &:hover { color: #c62828; }
+
+  &:disabled {
+    cursor: not-allowed;
+    color: var(--color-muted);
+    &:hover { color: var(--color-muted); }
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   Tooltip — explica porque um botão está desativado
+═══════════════════════════════════════════════ */
+.tt {
+  position: relative;
+  display: inline-flex;
+  outline: none;
+
+  // Ancorada à direita (em vez de centrada) porque os botões vivem em
+  // colunas encostadas ao lado direito de cartões com overflow:hidden
+  // (arredondam os cantos) — crescer para a esquerda fica sempre dentro
+  // do cartão; crescer a partir do centro cortava o balão nesse limite.
+  .tt-bubble {
+    position: absolute;
+    bottom: calc(100% + 9px);
+    right: 0;
+    transform: translateY(4px);
+    width: max-content;
+    max-width: 220px;
+    background: var(--color-primary-blue);
+    color: var(--color-white);
+    font-size: 12px;
+    font-weight: var(--fw-medium);
+    line-height: 1.4;
+    text-align: center;
+    padding: 7px 11px;
+    border-radius: var(--radius-sm);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--dur-fast) var(--ease-care), transform var(--dur-fast) var(--ease-care);
+    z-index: 20;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      right: 14px;
+      border: 5px solid transparent;
+      border-top-color: var(--color-primary-blue);
+    }
+  }
+
+  // Rato/trackpad: só hover. Um clique também focava o botão e o balão
+  // ficava preso a abrir/fechar por clique — isso não deve acontecer aqui,
+  // só em touch (bloco abaixo).
+  @media (hover: hover) and (pointer: fine) {
+    &.tt-disabled:hover .tt-bubble {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  // Touch: não há hover, por isso o toque foca o botão — o balão
+  // aparece/desaparece ao tocar (abre, toca outra vez ou fora para fechar).
+  @media (hover: none), (pointer: coarse) {
+    &.tt-disabled:focus .tt-bubble,
+    &.tt-disabled:focus-within .tt-bubble {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
 
 /* ═══════════════════════════════════════════════
@@ -860,6 +936,7 @@
     align-items: stretch;
     padding-right: 0;
 
+    .tt { width: 100%; }
     .btn-reschedule, .btn-cancel { width: 100%; justify-content: center; }
   }
 }

@@ -151,11 +151,21 @@
 
               <!-- Actions -->
               <div class="actions">
-                <button class="btn-reschedule" (click)="rescheduleSession()">
-                  <span translate="no" class="material-symbols-outlined">event_repeat</span>
-                  Reagendar
-                </button>
-                <button class="btn-cancel" (click)="cancelSession(s)">Cancelar sessão</button>
+                <span class="tt" [class.tt-disabled]="!canModifySession(s)" [attr.tabindex]="!canModifySession(s) ? 0 : null">
+                  <button class="btn-reschedule" [disabled]="!canModifySession(s)" (click)="rescheduleSession()">
+                    <span translate="no" class="material-symbols-outlined">event_repeat</span>
+                    Reagendar
+                  </button>
+                  @if (!canModifySession(s)) {
+                    <span class="tt-bubble" role="tooltip">Só é possível cancelar ou reagendar até 24 h antes da sessão.</span>
+                  }
+                </span>
+                <span class="tt" [class.tt-disabled]="!canModifySession(s)" [attr.tabindex]="!canModifySession(s) ? 0 : null">
+                  <button class="btn-cancel" [disabled]="!canModifySession(s)" (click)="cancelSession(s)">Cancelar sessão</button>
+                  @if (!canModifySession(s)) {
+                    <span class="tt-bubble" role="tooltip">Só é possível cancelar ou reagendar até 24 h antes da sessão.</span>
+                  }
+                </span>
               </div>
             </div>
           } @else {
@@ -351,11 +361,21 @@
                         }
 
                         <div class="panel-actions">
-                          <button class="btn-cancel" (click)="cancelSession(s)">Cancelar sessão</button>
-                          <button class="btn-reschedule" (click)="rescheduleSession()">
-                            <span translate="no" class="material-symbols-outlined">event_repeat</span>
-                            Reagendar
-                          </button>
+                          <span class="tt" [class.tt-disabled]="!canModifySession(s)" [attr.tabindex]="!canModifySession(s) ? 0 : null">
+                            <button class="btn-cancel" [disabled]="!canModifySession(s)" (click)="cancelSession(s)">Cancelar sessão</button>
+                            @if (!canModifySession(s)) {
+                              <span class="tt-bubble" role="tooltip">Só é possível cancelar ou reagendar até 24 h antes da sessão.</span>
+                            }
+                          </span>
+                          <span class="tt" [class.tt-disabled]="!canModifySession(s)" [attr.tabindex]="!canModifySession(s) ? 0 : null">
+                            <button class="btn-reschedule" [disabled]="!canModifySession(s)" (click)="rescheduleSession()">
+                              <span translate="no" class="material-symbols-outlined">event_repeat</span>
+                              Reagendar
+                            </button>
+                            @if (!canModifySession(s)) {
+                              <span class="tt-bubble" role="tooltip">Só é possível cancelar ou reagendar até 24 h antes da sessão.</span>
+                            }
+                          </span>
                         </div>
                       </div>
                     }
