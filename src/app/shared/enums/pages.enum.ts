@@ -5,6 +5,7 @@ export enum Pages {
   SIGN_UP = `${Pages.AUTH}/signup`,
   FORGOT_PASSWORD = `${Pages.AUTH}/forgot-password`,
   RESET_PASSWORD = `${Pages.AUTH}/reset-password`,
+  CONFIRM_EMAIL = `${Pages.AUTH}/confirm-email`,
   DASHBOARD = 'dashboard',
   DASHBOARD_PROFILE = `${Pages.DASHBOARD}/profile`,
   DASHBOARD_SCHEDULE = `${Pages.DASHBOARD}/schedule`,

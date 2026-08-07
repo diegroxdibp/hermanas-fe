@@ -23,3 +23,12 @@
 
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
+
+# sw.js termina em .js, por isso a regra acima apanhava-o e punha-o em cache
+# durante um ano — precisamente o que impedia os browsers com o worker órfão
+# de alguma vez verem esta versão nova (ver public/sw.js). Fica depois da
+# regra /*.js para prevalecer sobre ela, tal como a nota lá em cima explica.
+/sw.js
+  Cache-Control: no-store, must-revalidate
+  CDN-Cache-Control: no-store
+  Pragma: no-cache

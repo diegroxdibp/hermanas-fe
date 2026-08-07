@@ -4,7 +4,13 @@ import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { SessionService } from '../shared/services/session.service';
 
-const AUTH_ENDPOINTS = ['/api/auth/login', '/api/auth/register', '/api/auth/me'];
+const AUTH_ENDPOINTS = [
+  '/api/auth/login',
+  '/api/auth/register',
+  '/api/auth/me',
+  '/api/auth/confirm-email',
+  '/api/auth/resend-confirmation',
+];
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);

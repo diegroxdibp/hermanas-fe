@@ -15,7 +15,10 @@ export const AppConstants = {
     logout: `${environment.apiUrl}/api/auth/logout`,
     forgotPassword: `${environment.apiUrl}/api/auth/forgot-password`,
     resetPassword: `${environment.apiUrl}/api/auth/reset-password`,
+    confirmEmail: `${environment.apiUrl}/api/auth/confirm-email`,
+    resendConfirmation: `${environment.apiUrl}/api/auth/resend-confirmation`,
     deleteAccount: `${environment.apiUrl}/api/user`,
+    requestAccountDeletion: `${environment.apiUrl}/api/user/request-deletion`,
     loginWithGoogle: `${environment.apiUrl}/oauth2/authorization/google`,
   },
   authentication: {

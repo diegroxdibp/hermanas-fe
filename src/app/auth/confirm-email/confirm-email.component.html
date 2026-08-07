@@ -1,0 +1,50 @@
+<div class="page">
+  <div class="card">
+    @if (!token) {
+      <h1>Confirme a sua conta</h1>
+      <p class="subtitle">Indique o seu email para receber um novo link de confirmação.</p>
+    } @else if (loading) {
+      <h1>A confirmar a sua conta...</h1>
+      <p class="subtitle">Aguarde um momento.</p>
+    } @else if (success) {
+      <h1>Conta confirmada</h1>
+      <p class="subtitle">A sua conta foi ativada com sucesso. Vamos redirecioná-lo para o login.</p>
+    } @else {
+      <h1>Não foi possível confirmar</h1>
+      <div class="error-msg">{{ error }}</div>
+    }
+
+    @if (!loading && !success) {
+      <form (submit)="resend($event)" novalidate>
+        @if (resendSent) {
+          <p class="subtitle">
+            Se esta conta existir e ainda não tiver sido confirmada, enviamos um novo link. Verifique o seu email.
+          </p>
+        } @else {
+          <div class="field">
+            <label for="resend-email">Reenviar link de confirmação para:</label>
+            <input
+              id="resend-email"
+              type="email"
+              [formControl]="resendEmailCtrl"
+              placeholder="seu@email.com"
+              autocomplete="email"
+            />
+          </div>
+
+          @if (resendError) {
+            <div class="error-msg">{{ resendError }}</div>
+          }
+
+          <button type="submit" class="btn-primary" [disabled]="resendLoading">
+            {{ resendLoading ? 'A enviar...' : 'Reenviar link' }}
+          </button>
+        }
+      </form>
+    }
+
+    <p class="switch-link">
+      <a (click)="navigationService.navigateTo(Pages.SIGN_IN)">Voltar ao login</a>
+    </p>
+  </div>
+</div>

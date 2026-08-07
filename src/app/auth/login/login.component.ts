@@ -22,6 +22,7 @@ export class LoginComponent {
 
   readonly Pages = Pages;
   error: string | null = null;
+  unconfirmed = false;
   showPassword = false;
 
   get emailCtrl(): FormControl {
@@ -39,6 +40,7 @@ export class LoginComponent {
     event.preventDefault();
     if (this.submitting) return;
     this.error = null;
+    this.unconfirmed = false;
     this.submitting = true;
     this.authService.signIn(this.formService.signInPayload()).subscribe({
       next: () => {
@@ -47,10 +49,15 @@ export class LoginComponent {
       },
       error: (err) => {
         this.submitting = false;
-        this.error =
-          err.status === 401
-            ? (err.error?.error ?? 'Email ou senha incorretos.')
-            : 'Ocorreu um erro. Tente novamente.';
+        if (err.status === 403) {
+          this.unconfirmed = true;
+          this.error = err.error?.error ?? 'Confirme o seu email antes de iniciar sessão.';
+        } else {
+          this.error =
+            err.status === 401
+              ? (err.error?.error ?? 'Email ou senha incorretos.')
+              : 'Ocorreu um erro. Tente novamente.';
+        }
       },
     });
   }

@@ -47,7 +47,12 @@
     <a class="forgot" (click)="navigationService.navigateTo(Pages.FORGOT_PASSWORD)">Esqueci minha senha</a>
 
     @if (error) {
-      <div class="error-msg">{{ error }}</div>
+      <div class="error-msg">
+        {{ error }}
+        @if (unconfirmed) {
+          <a (click)="navigationService.navigateTo(Pages.CONFIRM_EMAIL)">Reenviar link de confirmação</a>
+        }
+      </div>
     }
 
     <button type="submit" class="btn-primary" [disabled]="submitting">{{ submitting ? 'A entrar...' : 'Entrar' }}</button>

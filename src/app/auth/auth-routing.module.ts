@@ -7,6 +7,7 @@ import { RegisterComponent } from './register/register.component';
 import { CallbackComponent } from './callback/callback.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
+import { ConfirmEmailComponent } from './confirm-email/confirm-email.component';
 import { GuestOnlyGuard } from './guest-only.guard';
 
 const routes: Routes = [
@@ -29,6 +30,11 @@ const routes: Routes = [
         path: 'reset-password',
         canMatch: [GuestOnlyGuard],
         component: ResetPasswordComponent,
+      },
+      {
+        path: 'confirm-email',
+        canMatch: [GuestOnlyGuard],
+        component: ConfirmEmailComponent,
       },
       { path: 'callback', component: CallbackComponent },
       { path: '', redirectTo: 'signin', pathMatch: 'full' },

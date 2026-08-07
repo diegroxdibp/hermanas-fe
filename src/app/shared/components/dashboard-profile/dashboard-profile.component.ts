@@ -11,6 +11,7 @@ import { Countries } from '../../../../assets/countries';
 import { Genders } from '../../enums/genders.enum';
 import { UpdateProfilePayload } from '../../models/update-profile-payload.model';
 import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog.component';
+import { RequestAccountClosureDialogComponent } from './request-account-closure-dialog.component';
 import { User } from '../../../auth/user.model';
 import {getEnumKeyByValue} from '../../utils/getEnumKeyByValue';
 import { getBrowserCountry } from '../../utils/browser-country.util';
@@ -252,12 +253,36 @@ export class DashboardProfileComponent implements OnInit {
       panelClass: 'care-dialog',
     });
     ref.afterClosed().subscribe((confirmed: boolean) => {
-      if (confirmed) {
-        this.userService.deleteAccount().subscribe({
-          next: () => this.authService.logout(),
-          error: () => {},
-        });
-      }
+      if (!confirmed) return;
+      this.userService.deleteAccount().subscribe({
+        next: () => this.authService.logout(),
+        error: (err) => {
+          // 409: has upcoming appointments as a professional - closing the
+          // account outright would strand those patients, so it goes through
+          // a staff-mediated request instead.
+          if (err.status === 409) {
+            this.openRequestAccountClosureDialog();
+          }
+        },
+      });
+    });
+  }
+
+  openRequestAccountClosureDialog(): void {
+    const ref = this.dialog.open(RequestAccountClosureDialogComponent, {
+      width: '440px',
+      panelClass: 'care-dialog',
+    });
+    ref.afterClosed().subscribe((reason: string | null) => {
+      if (!reason) return;
+      this.userService.requestAccountDeletion({ reason }).subscribe({
+        next: () => this.snackbarService.openSnackBar({
+          message: 'O seu pedido foi enviado. A nossa equipa entrará em contacto em breve.',
+        }),
+        error: (err) => this.snackbarService.openSnackBar({
+          message: err.error?.error ?? 'Não foi possível enviar o pedido. Tente novamente.',
+        }),
+      });
     });
   }
 }

@@ -9,6 +9,7 @@ import { AuthService } from '../../auth/auth.service';
 import { OnboardingResponse } from '../models/onboarding-response.model';
 import { ProfileView } from '../models/profile-view.model';
 import { UpdateProfilePayload } from '../models/update-profile-payload.model';
+import { RequestDeletionPayload } from '../models/request-deletion-payload';
 
 @Injectable({
   providedIn: 'root',
@@ -52,5 +53,13 @@ export class UserService {
     return this.http.delete<void>(AppConstants.apiEndpoints.deleteAccount, {
       withCredentials: true,
     });
+  }
+
+  requestAccountDeletion(payload: RequestDeletionPayload): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(
+      AppConstants.apiEndpoints.requestAccountDeletion,
+      payload,
+      { withCredentials: true },
+    );
   }
 }

@@ -4,6 +4,7 @@ import { RegisterComponent } from './register/register.component';
 import { LoginComponent } from './login/login.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
+import { ConfirmEmailComponent } from './confirm-email/confirm-email.component';
 import { AuthRoutingModule } from './auth-routing.module';
 import { AuthComponent } from './auth.component';
 
@@ -16,6 +17,7 @@ import { AuthComponent } from './auth.component';
     RegisterComponent,
     ForgotPasswordComponent,
     ResetPasswordComponent,
+    ConfirmEmailComponent,
   ],
   declarations: [],
 })

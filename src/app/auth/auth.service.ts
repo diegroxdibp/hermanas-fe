@@ -15,6 +15,8 @@ import { SignUpPayload } from '../shared/models/sign-up-payload';
 import { SignUpResponse } from '../shared/models/sign-up-response';
 import { ForgotPasswordPayload } from '../shared/models/forgot-password-payload';
 import { ResetPasswordPayload } from '../shared/models/reset-password-payload';
+import { ConfirmEmailPayload } from '../shared/models/confirm-email-payload';
+import { ResendConfirmationPayload } from '../shared/models/resend-confirmation-payload';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { AppConstants } from '../app-constants';
@@ -44,12 +46,8 @@ export class AuthService {
         map(() => void 0)
       );
   }
-  signUp(payload: SignUpPayload): Observable<User> {
-    return this.http
-      .post<SignUpResponse>(AppConstants.apiEndpoints.register, payload, {
-        withCredentials: true,
-      })
-      .pipe(switchMap(() => this.refreshSession()));
+  signUp(payload: SignUpPayload): Observable<SignUpResponse> {
+    return this.http.post<SignUpResponse>(AppConstants.apiEndpoints.register, payload);
   }
 
   signIn(payload: SignInPayload): Observable<User> {
@@ -70,6 +68,20 @@ export class AuthService {
   resetPassword(payload: ResetPasswordPayload): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(
       AppConstants.apiEndpoints.resetPassword,
+      payload,
+    );
+  }
+
+  confirmEmail(payload: ConfirmEmailPayload): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(
+      AppConstants.apiEndpoints.confirmEmail,
+      payload,
+    );
+  }
+
+  resendConfirmation(payload: ResendConfirmationPayload): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(
+      AppConstants.apiEndpoints.resendConfirmation,
       payload,
     );
   }

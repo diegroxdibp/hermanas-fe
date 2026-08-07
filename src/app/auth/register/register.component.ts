@@ -3,7 +3,6 @@ import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { FormService } from '../../core/services/form.service';
 import { AuthService } from '../auth.service';
-import { Router } from '@angular/router';
 import { Pages } from '../../shared/enums/pages.enum';
 import { NavigationService } from '../../shared/services/navigation.service';
 import { FormControlsNames } from '../../shared/enums/form-controls-names.enum';
@@ -18,13 +17,13 @@ import { AppConstants } from '../../app-constants';
 export class RegisterComponent {
   private readonly authService = inject(AuthService);
   private readonly formService = inject(FormService);
-  private readonly router = inject(Router);
   readonly navigationService = inject(NavigationService);
 
   readonly Pages = Pages;
   error: string | null = null;
   showPassword = false;
   showConfirmPassword = false;
+  registered = false;
 
   readonly confirmPasswordCtrl = new FormControl('');
   readonly agreeTermsCtrl = new FormControl(false);
@@ -85,7 +84,7 @@ export class RegisterComponent {
     this.authService.signUp(this.formService.signUpPayload()).subscribe({
       next: () => {
         this.submitting = false;
-        this.router.navigate(['/onboarding']);
+        this.registered = true;
       },
       error: (err) => {
         this.submitting = false;
